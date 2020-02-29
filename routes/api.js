@@ -1,0 +1,32 @@
+const express = require("express");
+const router = express.Router();
+
+const requireJwtAuth = require("../middleware/requireJwtAuth");
+
+router.get("/api/user", requireJwtAuth, (req, res) => {
+  res.send({
+    user: {
+      displayName:
+        req.user.firstName
+    }
+  });
+});
+
+router.post("/api/feature", requireJwtAuth, (req, res) => {
+  res.send({
+    feature: "This is a feature. Only authenticated users can see this."
+  });
+});
+
+router.post("/api/profile", requireJwtAuth, (req, res) => {
+  res.send({
+    profile: {
+      provider: req.user.provider,
+      displayName:
+        req.user.firstName,
+      email: req.user.email
+    }
+  });
+});
+
+module.exports = router;
