@@ -8,17 +8,22 @@ const LoginFields = props => {
     email: '',
     password: ''
   });
-  const submitPressed = React.useCallback(() => handleSubmit(fields), [handleSubmit, fields]);
+  const submitPressed = React.useCallback(() => handleSubmit(fields), [
+    handleSubmit,
+    fields
+  ]);
   return (
     <Form className="w-100">
       <Form.Group controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
         <Form.Control
           value={fields.email}
-          onChange={e => setState({
-            ...fields,
-            email: e.target.value
-          })}
+          onChange={e =>
+            setState({
+              ...fields,
+              email: e.target.value
+            })
+          }
           type="email"
           placeholder="Enter email"
         />
@@ -30,10 +35,12 @@ const LoginFields = props => {
         <Form.Label>Password</Form.Label>
         <Form.Control
           value={fields.password}
-          onChange={e => setState({
-            ...fields,
-            password: e.target.value
-          })}
+          onChange={e =>
+            setState({
+              ...fields,
+              password: e.target.value
+            })
+          }
           type="password"
           placeholder="Password"
         />
@@ -45,7 +52,7 @@ const LoginFields = props => {
         Submit
       </Button>
     </Form>
-  )
+  );
 };
 
 export default LoginFields;

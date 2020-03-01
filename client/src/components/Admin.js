@@ -5,12 +5,20 @@ import { Button } from 'react-bootstrap';
 import { getUsers } from '../actions/adminReducer';
 
 const Admin = props => {
-  const { user: { token }, adminReducer: admin } =
-    useSelector(({ authReducer: { user }, adminReducer }) => ({ adminReducer, user }));
+  const {
+    user: { token },
+    adminReducer: admin
+  } = useSelector(({ authReducer: { user }, adminReducer }) => ({
+    adminReducer,
+    user
+  }));
   console.log(token, admin.users, admin.error);
   const dispatch = useDispatch();
-  const buttonClick = React.useCallback(() => dispatch(getUsers(token)),
-    [dispatch, getUsers, token]);
+  const buttonClick = React.useCallback(() => dispatch(getUsers(token)), [
+    dispatch,
+    getUsers,
+    token
+  ]);
   return (
     <div>
       <Button onClick={buttonClick} />

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -6,29 +7,39 @@ import { Alert, Container, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
 import { login } from '../actions/authReducer';
-import { routes } from '../constants'
+import { routes } from '../constants';
 
 import LoginFields from './LoginFields';
 
 const renderError = (...errors) =>
-  errors.map((error, i) => // eslint-disable-next-line react/no-array-index-key
-    error ? <Alert key={i} className="w-100 my-2" variant="danger">{error}</Alert> : null);
+  errors.map((error, i) =>
+    error ? (
+      <Alert key={i} className="w-100 my-2" variant="danger">
+        {error}
+      </Alert>
+    ) : null
+  );
 
 const Login = props => {
-  const { isAuthenticated, message } = useSelector(({ authReducer }) => authReducer);
+  const { isAuthenticated, message } = useSelector(
+    ({ authReducer }) => authReducer
+  );
   const [localError, setError] = React.useState(null);
-  const { location: { state: { reError } = { reError: null } } } = props;
+  const {
+    location: { state: { reError } = { reError: null } }
+  } = props;
   const dispatch = useDispatch();
   if (isAuthenticated) {
     return (
-      <Redirect to={{
-        pathname: routes.DASHBOARD,
-        state: {
-          from: props.location
-        }
-      }}
+      <Redirect
+        to={{
+          pathname: routes.DASHBOARD,
+          state: {
+            from: props.location
+          }
+        }}
       />
-    )
+    );
   }
 
   const handleSubmit = fields => {
@@ -59,12 +70,11 @@ const Login = props => {
 
 export default Login;
 
-
 const MainContainer = styled.div`
-&{
-  padding: 15px;
-  width: 100%;
-  margin: 5%;
-  border: 1px solid #ddd;
-}
+  & {
+    padding: 15px;
+    width: 100%;
+    margin: 5%;
+    border: 1px solid #ddd;
+  }
 `;

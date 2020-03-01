@@ -12,33 +12,38 @@ const PrivateRoute = ({ component: Component, scope, ...rest }) => {
     <Route
       {...rest}
       render={props => {
-        const { isAuthenticated, user: { scope: userScope } } = reducer;
+        const {
+          isAuthenticated,
+          user: { scope: userScope }
+        } = reducer;
         if (!isAuthenticated) {
           return (
-            <Redirect to={{
-              pathname: routes.LOGIN,
-              state: {
-                from: props.location,
-                reError: "User not authenticated."
-              }
-            }}
+            <Redirect
+              to={{
+                pathname: routes.LOGIN,
+                state: {
+                  from: props.location,
+                  reError: 'User not authenticated.'
+                }
+              }}
             />
-          )
+          );
         }
         if (userScope < scope) {
           // @TODO: create a path for this.
           return (
-            <Redirect to={{
-              pathname: routes.DASHBOARD,
-              state: {
-                from: props.location,
-                reError: "Permission denied."
-              }
-            }}
+            <Redirect
+              to={{
+                pathname: routes.DASHBOARD,
+                state: {
+                  from: props.location,
+                  reError: 'Permission denied.'
+                }
+              }}
             />
-          )
+          );
         }
-        return <Component {...props} />
+        return <Component {...props} />;
       }}
     />
   );

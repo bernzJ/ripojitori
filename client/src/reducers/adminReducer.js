@@ -1,7 +1,7 @@
 import { TYPES } from '../actions/adminReducer';
 
 const initialState = {
-  users: {},
+  users: [],
   error: null
 };
 

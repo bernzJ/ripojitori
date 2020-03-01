@@ -5,11 +5,9 @@ const TYPES = {
   AUTH_MESSAGE: 'AUTH_MESSAGE'
 };
 
-const getUsers = token => async (
-  dispatch
-) => {
+const getUsers = token => async dispatch => {
   try {
-    const { data } = await axios.post("admin/users", { 'x-auth-token': token });
+    const { data } = await axios.post('admin/users', { 'x-auth-token': token });
     if (data.users) {
       dispatch({
         type: TYPES.GET_USERS,

@@ -6,11 +6,9 @@ const TYPES = {
   AUTH_MESSAGE: 'AUTH_MESSAGE'
 };
 
-const login = user => async (
-  dispatch
-) => {
+const login = user => async dispatch => {
   try {
-    const { data } = await axios.post("auth/login", user);
+    const { data } = await axios.post('auth/login', user);
     if (data.user) {
       dispatch({
         type: TYPES.LOGIN_USER,

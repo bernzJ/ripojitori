@@ -1,15 +1,15 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react'
+import { PersistGate } from 'redux-persist/integration/react';
 
 import { store, persistor } from '../store';
 import { routes, scopes } from '../constants';
 
 import Loading from './Loading';
-import PrivateRoute from "./PrivateRoute";
-import Login from "./Login";
-import Dashboard from "./Dashboard";
+import PrivateRoute from './PrivateRoute';
+import Login from './Login';
+import Dashboard from './Dashboard';
 import Admin from './Admin';
 
 const App = () => {
@@ -17,15 +17,19 @@ const App = () => {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
-        {(bootstrapped) => {
+        {bootstrapped => {
           if (bootstrapped && loaded) {
             return (
               <Router>
                 <Switch>
-                  <PrivateRoute path={routes.ADMIN} scope={scopes.ADMIN} component={Admin} />
+                  <PrivateRoute
+                    path={routes.ADMIN}
+                    scope={scopes.ADMIN}
+                    component={Admin}
+                  />
                   <PrivateRoute
                     exact
-                    path={routes.DASHBOARD} 
+                    path={routes.DASHBOARD}
                     scope={scopes.PLEB}
                     component={Dashboard}
                   />
@@ -34,7 +38,7 @@ const App = () => {
               </Router>
             );
           }
-          return <Loading callback={()=> setLoaded(true)} />
+          return <Loading callback={() => setLoaded(true)} />;
         }}
       </PersistGate>
     </Provider>
