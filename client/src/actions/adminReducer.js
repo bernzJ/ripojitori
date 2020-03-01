@@ -10,8 +10,7 @@ const getUsers = token => async (
 ) => {
   try {
     const { data } = await axios.post("admin/users", { 'x-auth-token': token });
-    console.log(data);
-    if (data.user) {
+    if (data.users) {
       dispatch({
         type: TYPES.GET_USERS,
         payload: data
