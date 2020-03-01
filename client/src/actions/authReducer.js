@@ -2,23 +2,31 @@ import axios from 'axios';
 
 const TYPES = {
   LOGIN_USER: 'LOGIN_USER',
-  LOGOUT_USER: 'LOGOUT_USER'
+  LOGOUT_USER: 'LOGOUT_USER',
+  AUTH_MESSAGE: 'AUTH_MESSAGE'
 };
 
 const login = user => async (
-  dispatch,
-  getState
+  dispatch
 ) => {
   try {
-    const response = await axios.post("auth/login", user);
+    const { data } = await axios.post("auth/login", user);
+    if (data.user) {
+      dispatch({
+        type: TYPES.LOGIN_USER,
+        payload: data.user
+      });
+      return;
+    }
     dispatch({
-      type: TYPES.LOGIN_USER,
-      payload: { user: response.data }
+      type: TYPES.AUTH_MESSAGE,
+      payload: data.message
     });
+    return;
   } catch (error) {
     dispatch({
-      type: TYPES.LOGIN_USER,
-      payload: { error: error }
+      type: TYPES.AUTH_MESSAGE,
+      payload: error
     });
   }
 };

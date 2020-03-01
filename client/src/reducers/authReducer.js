@@ -9,6 +9,11 @@ const initialState = {
 const authReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
+    case TYPES.AUTH_MESSAGE:
+      return {
+        ...state,
+        error: payload
+      };
     case TYPES.LOGIN_USER:
       return {
         ...state,
@@ -26,4 +31,4 @@ const authReducer = (state = initialState, action) => {
   }
 };
 
-export { authReducer };
+export default authReducer;

@@ -1,5 +1,5 @@
-import routes from './routes';
-import scopes from './scopes';
+import routes from './routes.json';
+import scopes from './scopes.json';
 
 export {
   routes,

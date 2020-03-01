@@ -5,9 +5,9 @@ import { Provider } from 'react-redux';
 import store from '../store';
 import { routes, scopes } from '../constants';
 
-import PrivateRoute from '../components/PrivateRoute';
-import Login from '../components/Login';
-import Dashboard from '../components/Dashboard';
+import PrivateRoute from "./PrivateRoute";
+import Login from "./Login";
+import Dashboard from "./Dashboard";
 
 const App = () => (
   <Provider store={store()}>
