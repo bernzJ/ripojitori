@@ -19,7 +19,6 @@ const Login = props => {
   const [localError, setError] = React.useState(null);
   const { location: { state: { reError } = { reError: null } } } = props;
   const dispatch = useDispatch();
-  console.log(isAuthenticated);
   if (isAuthenticated) {
     return (
       <Redirect to={{

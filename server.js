@@ -10,6 +10,7 @@ const app = express();
 const keys = require("./config/keys");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/api");
+const adminRoutes = require("./routes/admin");
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -31,6 +32,7 @@ mongoose
 // Use Routes
 app.use("/", authRoutes);
 app.use("/", apiRoutes);
+app.use("/", adminRoutes);
 app.use("/static", express.static(__dirname + "/static"));
 
 // Serve static assets if in production

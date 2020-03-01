@@ -1,20 +1,20 @@
 import axios from 'axios';
 
 const TYPES = {
-  LOGIN_USER: 'LOGIN_USER',
-  LOGOUT_USER: 'LOGOUT_USER',
+  GET_USERS: 'GET_USERS',
   AUTH_MESSAGE: 'AUTH_MESSAGE'
 };
 
-const login = user => async (
+const getUsers = token => async (
   dispatch
 ) => {
   try {
-    const { data } = await axios.post("auth/login", user);
+    const { data } = await axios.post("admin/users", { 'x-auth-token': token });
+    console.log(data);
     if (data.user) {
       dispatch({
-        type: TYPES.LOGIN_USER,
-        payload: data.user
+        type: TYPES.GET_USERS,
+        payload: data
       });
       return;
     }
@@ -31,9 +31,4 @@ const login = user => async (
   }
 };
 
-const logout = () => ({
-  type: TYPES.SET_USER,
-  payload: {}
-});
-
-export { TYPES, login, logout };
+export { TYPES, getUsers };

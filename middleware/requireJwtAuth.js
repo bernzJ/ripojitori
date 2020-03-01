@@ -1,5 +1,16 @@
 const passport = require('passport');
 
-const requireJwtAuth = passport.authenticate('jwt', { session: false });
+const requireJwtAuth = function (req, res, next) {
+  passport.authenticate("jwt", { session: false }, function (err, user, info) {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.send(info);
+    }
+    req.user = user;
+    next();
+  })(req, res, next);
+};
 
 module.exports = requireJwtAuth;
