@@ -21,7 +21,7 @@ const passportLogin = new PassportLocalStrategy(
     });
     try {
       const userSchema = await schema.validateAsync({ email, password });
-      const user = await User.findOne({ email: userSchema.email });
+      const user = await User.findOne({ email: userSchema.email }, "-__v");
       if (!user) {
         return done(null, false, { message: "Email does not exists." });
       }
@@ -32,7 +32,7 @@ const passportLogin = new PassportLocalStrategy(
         if (!isMatch) {
           return done(null, false, { message: "Incorrect password." });
         }
-        return done(null, user);
+        return done(null, user.toObject());
       });
     } catch (error) {
       return done(error);

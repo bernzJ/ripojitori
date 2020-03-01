@@ -1,4 +1,5 @@
 {
   "DASHBOARD": "/",
-  "LOGIN": "/login"
+  "LOGIN": "/login",
+  "ADMIN": "/admin"
 }

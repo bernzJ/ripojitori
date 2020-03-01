@@ -11,16 +11,35 @@ const requireLocalAuth = require("../middleware/requireLocalAuth");
 tokenFromUser = user => {
   const token = jwt.sign({}, keys.secretOrKey, {
     expiresIn: "12h",
-    subject: user.id
+    subject: user._id.toString()
   });
   return token;
 };
 
+// @TODO: remove this in prod.
+router.get("/auth/register", async (req, res) => {
+  console.log(req.query);
+  const { email, password, firstName, lastName, scope } = req.query;
+  const newUser = await new User({
+    email,
+    password,
+    firstName,
+    lastName,
+    scope
+  });
+
+  newUser.registerUser(newUser, (err, user) => {
+    if (err) throw err;
+    res.send({ registerSuccess: true });
+  });
+});
+
 //local login
 router.post("/auth/login", requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
-  res.cookie("x-auth-cookie", token);
-  res.json({ token });
+  delete req.user._id;
+  // res.cookie("x-auth-cookie", token);
+  res.json({ user: { ...req.user, token } });
 });
 
 // logout

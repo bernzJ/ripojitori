@@ -3,8 +3,10 @@ import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import { Alert, Container, Row } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom';
 
 import { login } from '../actions/authReducer';
+import { routes } from '../constants'
 
 import LoginFields from './LoginFields';
 
@@ -13,10 +15,23 @@ const renderError = (...errors) =>
     error ? <Alert key={i} className="w-100 my-2" variant="danger">{error}</Alert> : null);
 
 const Login = props => {
+  const { isAuthenticated, message } = useSelector(({ authReducer }) => authReducer);
   const [localError, setError] = React.useState(null);
   const { location: { state: { reError } = { reError: null } } } = props;
   const dispatch = useDispatch();
-  const message = useSelector(({ authReducer: { error } }) => error);
+  console.log(isAuthenticated);
+  if (isAuthenticated) {
+    return (
+      <Redirect to={{
+        pathname: routes.DASHBOARD,
+        state: {
+          from: props.location
+        }
+      }}
+      />
+    )
+  }
+
   const handleSubmit = fields => {
     const { email, password } = fields;
     const re = /\S+@\S+\.\S+/;

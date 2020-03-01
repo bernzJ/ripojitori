@@ -6,13 +6,13 @@ import { useSelector } from 'react-redux';
 import { Redirect, Route } from 'react-router-dom';
 import { routes } from '../constants';
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
+const PrivateRoute = ({ component: Component, scope, ...rest }) => {
   const reducer = useSelector(({ authReducer }) => authReducer);
   return (
     <Route
       {...rest}
       render={props => {
-        const { isAuthenticated, user: { scope } } = reducer;
+        const { isAuthenticated, user: { scope: userScope } } = reducer;
         if (!isAuthenticated) {
           return (
             <Redirect to={{
@@ -25,7 +25,8 @@ const PrivateRoute = ({ component: Component, ...rest }) => {
             />
           )
         }
-        if (scope !== props.scope) {
+        if (userScope < scope) {
+          // @TODO: create a path for this.
           return (
             <Redirect to={{
               pathname: routes.DASHBOARD,
