@@ -4,18 +4,17 @@ const router = express.Router();
 const scopes = require("../constants/scopes.json");
 const requireJwtAuth = require("../middleware/requireJwtAuth");
 const requireScope = require("../middleware/requireScope");
+const User = require("../models/User");
 
 router.use((req, res, next) => {
   req.scope = scopes.ADMIN;
   next();
 })
 
-router.post("/admin/users", requireJwtAuth, requireScope, (req, res) => {
+router.post("/admin/users", requireJwtAuth, requireScope, async (req, res) => {
+  const users = await User.find({});
   res.send({
-    user: {
-      displayName:
-        req.user.firstName
-    }
+    users
   });
 });
 

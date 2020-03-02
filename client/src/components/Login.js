@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { Alert, Container, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
-import { login } from '../actions/authReducer';
+import { login } from '../actions/auth';
 import { routes } from '../constants';
 
 import LoginFields from './LoginFields';

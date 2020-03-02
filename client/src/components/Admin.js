@@ -1,8 +1,16 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Button } from 'react-bootstrap';
 
-import { getUsers } from '../actions/adminReducer';
+import VirtualizedList from './VirtualizedTable';
+import AdminSelector from '../selectors/admin';
+import { getUsers } from '../actions/admin';
+
+const makeGetAllUsers = () => AdminSelector();
+export const AllUsersItems = () => {
+  const getAllUsers = React.useMemo(makeGetAllUsers, []);
+  const allUsers = useSelector(state => getAllUsers(state));
+  return allUsers;
+};
 
 const Admin = props => {
   const {
@@ -12,17 +20,14 @@ const Admin = props => {
     adminReducer,
     user
   }));
-  console.log(token, admin.users, admin.error);
+
   const dispatch = useDispatch();
-  const buttonClick = React.useCallback(() => dispatch(getUsers(token)), [
-    dispatch,
-    getUsers,
-    token
-  ]);
+  React.useEffect(() => {
+    dispatch(getUsers(token));
+  }, [dispatch, getUsers, token]);
   return (
     <div>
-      <Button onClick={buttonClick} />
-      <span>le Admin Dashboard</span>
+      <VirtualizedList items={admin.users} />
     </div>
   );
 };

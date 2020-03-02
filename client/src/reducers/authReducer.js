@@ -1,4 +1,4 @@
-import { TYPES } from '../actions/authReducer';
+import { TYPES } from '../actions/auth';
 
 const initialState = {
   isAuthenticated: false,
@@ -12,7 +12,7 @@ const authReducer = (state = initialState, action) => {
     case TYPES.AUTH_MESSAGE:
       return {
         ...state,
-        error: payload
+        message: payload
       };
     case TYPES.LOGIN_USER:
       return {

@@ -21,10 +21,10 @@ const login = user => async dispatch => {
       payload: data.message
     });
     return;
-  } catch (error) {
+  } catch ({ message }) {
     dispatch({
       type: TYPES.AUTH_MESSAGE,
-      payload: error
+      payload: message
     });
   }
 };
