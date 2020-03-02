@@ -6,7 +6,8 @@ import { useSelector } from 'react-redux';
 import { Redirect, Route } from 'react-router-dom';
 import { routes } from '../constants';
 
-const PrivateRoute = ({ component: Component, scope, ...rest }) => {
+const PrivateRoute = ({ component, children, scope, ...rest }) => {
+  const Component = component || children;
   const reducer = useSelector(({ authReducer }) => authReducer);
   return (
     <Route
@@ -57,10 +58,11 @@ PrivateRoute.propTypes = {
     PropTypes.arrayOf(PropTypes.node),
     PropTypes.func,
     PropTypes.arrayOf(PropTypes.func)
-  ]).isRequired,
+  ]),
   scope: PropTypes.number
 };
 
 PrivateRoute.defaultProps = {
-  scope: 0
+  scope: 0,
+  component: undefined
 };

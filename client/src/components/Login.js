@@ -19,7 +19,7 @@ const renderError = (...errors) =>
       </Alert>
     ) : null
   );
-
+// @TODO: check if this can be cleaned (logic-wise).
 const Login = props => {
   const { isAuthenticated, message } = useSelector(
     ({ authReducer }) => authReducer

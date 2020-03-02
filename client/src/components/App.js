@@ -4,13 +4,13 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 
 import { store, persistor } from '../store';
-import { routes, scopes } from '../constants';
 
+import Routes from './Routes';
+import NavBar from './NavBar';
 import Loading from './Loading';
 import PrivateRoute from './PrivateRoute';
-import Login from './Login';
-import Dashboard from './Dashboard';
-import Admin from './Admin';
+
+const routeType = isPrivate => (isPrivate ? PrivateRoute : Route);
 
 const App = () => {
   const [loaded, setLoaded] = React.useState(false);
@@ -21,20 +21,23 @@ const App = () => {
           if (bootstrapped && loaded) {
             return (
               <Router>
-                <Switch>
-                  <PrivateRoute
-                    path={routes.ADMIN}
-                    scope={scopes.ADMIN}
-                    component={Admin}
-                  />
-                  <PrivateRoute
-                    exact
-                    path={routes.DASHBOARD}
-                    scope={scopes.PLEB}
-                    component={Dashboard}
-                  />
-                  <Route path={routes.LOGIN} component={Login} />
-                </Switch>
+                <div>
+                  <NavBar />
+                  <Switch>
+                    {Routes.map(({ isPrivate, scope, path, component }) => {
+                      const RouteComponent = routeType(isPrivate);
+                      return (
+                        <RouteComponent
+                          key={path}
+                          exact
+                          path={path}
+                          scope={scope}
+                          component={component}
+                        />
+                      );
+                    })}
+                  </Switch>
+                </div>
               </Router>
             );
           }
