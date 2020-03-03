@@ -12,6 +12,7 @@ const authReducer = (state = initialState, action) => {
     case TYPES.AUTH_MESSAGE:
       return {
         ...state,
+        isAuthenticated: false,
         message: payload
       };
     case TYPES.LOGIN_USER:

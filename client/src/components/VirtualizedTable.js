@@ -15,14 +15,23 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import ConfirmModal from './ConfirmModal';
 import AddEditUserModal from './AddEditUserModal';
 
+// @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index, style }) => {
-  const { users, selected, setSelected } = data;
+  const {
+    users,
+    state,
+    setState,
+    state: { selected }
+  } = data;
   const user = users[index];
   const HandleItemClick = () => {
-    if (selected.indexOf(user._id) > -1) {
-      setSelected([...selected.filter(s => s !== user._id)]);
+    if (selected.indexOf(user) > -1) {
+      setState({
+        ...state,
+        selected: [...selected.filter(s => s._id !== user._id)]
+      });
     } else {
-      setSelected([...selected, user._id]);
+      setState({ ...state, selected: [...selected, user] });
     }
   };
   return (
@@ -30,7 +39,7 @@ const renderItems = React.memo(({ data, index, style }) => {
       <RowItem
         className={classNames({
           row: true,
-          selected: selected.indexOf(user._id) > -1
+          selected: selected.indexOf(user) > -1
         })}
         key={user._id}
         onClick={HandleItemClick}
@@ -46,29 +55,44 @@ const renderItems = React.memo(({ data, index, style }) => {
 }, areEqual);
 
 const VirtualizedList = ({ items }) => {
-  const [selected, setSelected] = React.useState([]);
+  const [state, setState] = React.useState({
+    selected: [],
+    confirmModal: false,
+    cEModal: false
+  });
 
   if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   }
+
+  const renderModals = () => {
+    if (state.cEModal) {
+      return (
+        <AddEditUserModal
+          show={state.cEModal}
+          hide={() => setState({ ...state, cEModal: false })}
+          selectedUser={state.selected.length > 0 ? state.selected[0] : {}}
+        />
+      );
+    }
+    return null;
+  };
+
   return (
     <VHContainer>
+      {renderModals()}
       <div className="pl-thead">
         <ActionBox>
           <Row className="px-0 m-0">
-            <ButtonAction>
+            <ButtonAction onClick={() => setState({ ...state, cEModal: true })}>
               <FontAwesomeIcon icon={faUserPlus} />
             </ButtonAction>
-            <ConfirmModal
-              title="Are you sure ?"
-              message="Deleting selected users is permanent."
-              handleResponse={r => console.log(r)}
-              launchButton={
-                <ButtonAction>
-                  <FontAwesomeIcon icon={faUserTimes} />
-                </ButtonAction>
-              }
-            />
+            <ButtonAction>
+              <FontAwesomeIcon icon={faUserEdit} />
+            </ButtonAction>
+            <ButtonAction>
+              <FontAwesomeIcon icon={faUserTimes} />
+            </ButtonAction>
           </Row>
         </ActionBox>
         <div className="row mr-10">
@@ -87,8 +111,8 @@ const VirtualizedList = ({ items }) => {
               height={height}
               itemData={{
                 users: items,
-                selected,
-                setSelected
+                state,
+                setState
               }}
               itemCount={items.length}
               itemSize={38}
@@ -168,7 +192,6 @@ const ActionBox = styled.div`
 `;
 const ButtonAction = styled(Button)`
   &&& {
-    max-width: 120px;
     margin-left: 5px;
     margin-right: 5px;
     color: #fff;

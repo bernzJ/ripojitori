@@ -5,7 +5,7 @@ import VirtualizedList from './VirtualizedTable';
 import AdminSelector from '../selectors/admin';
 import { getUsers } from '../actions/admin';
 
-const makeGetAllUsers = () => AdminSelector();
+const makeGetAllUsers = () => AdminSelector;
 export const AllUsersItems = () => {
   const getAllUsers = React.useMemo(makeGetAllUsers, []);
   const allUsers = useSelector(state => getAllUsers(state));
@@ -13,13 +13,13 @@ export const AllUsersItems = () => {
 };
 
 const Admin = props => {
-  const {
-    user: { token },
-    adminReducer: admin
-  } = useSelector(({ authReducer: { user }, adminReducer }) => ({
-    adminReducer,
-    user
-  }));
+  const token = useSelector(
+    ({
+      authReducer: {
+        user: { token }
+      }
+    }) => token
+  );
 
   const dispatch = useDispatch();
   React.useEffect(() => {
@@ -27,7 +27,7 @@ const Admin = props => {
   }, [dispatch, getUsers, token]);
   return (
     <div>
-      <VirtualizedList items={admin.users} />
+      <VirtualizedList items={AllUsersItems()} />
     </div>
   );
 };
