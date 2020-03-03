@@ -1,33 +1,34 @@
 import axios from 'axios';
 
+import { setMessage, setMessageAndInvalidateSession } from './messages';
+
 const TYPES = {
-  IS_LOADING: false,
+  IS_LOADING: 'IS_LOADING',
   GET_USERS: 'GET_USERS',
-  AUTH_MESSAGE: 'AUTH_MESSAGE'
+  DEL_USERS: 'DEL_USERS'
 };
+
+const setUsers = payload => ({
+  type: TYPES.GET_USERS,
+  payload
+});
 
 const getUsers = token => async dispatch => {
   try {
-    dispatch({ type: TYPES.IS_LOADING });
+    dispatch({ type: TYPES.IS_LOADING, payload: true });
     const { data } = await axios.post('admin/users', { 'x-auth-token': token });
+    // @NOTE: uncomment to test invalid/errors.
+    // return dispatch(setMessageAndInvalidateSession('Booo ! get out.'));
     if (data.users) {
-      dispatch({
-        type: TYPES.GET_USERS,
-        payload: data.users
-      });
-      return;
+      dispatch(setUsers(data.users));
+    } else {
+      dispatch(setMessageAndInvalidateSession(data.message));
     }
-    dispatch({
-      type: TYPES.AUTH_MESSAGE,
-      payload: data.message
-    });
-    return;
-  } catch (error) {
-    dispatch({
-      type: TYPES.AUTH_MESSAGE,
-      payload: error.message
-    });
+  } catch ({ message }) {
+    dispatch(setMessageAndInvalidateSession(message));
   }
 };
 
-export { TYPES, getUsers };
+const delUsers = (token, users) => async dispatch => {};
+
+export { TYPES, getUsers, delUsers, setUsers };

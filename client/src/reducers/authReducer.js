@@ -1,20 +1,21 @@
 import { TYPES } from '../actions/auth';
+import { TYPES as MSG_TYPES } from '../actions/messages';
 
 const initialState = {
   isAuthenticated: false,
-  user: {},
-  error: null
+  user: {}
 };
 
 const authReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.AUTH_MESSAGE:
-      return {
-        ...state,
-        isAuthenticated: false,
-        message: payload
-      };
+    case MSG_TYPES.MESSAGES: {
+      const { invalidateSesssion } = payload;
+      if (invalidateSesssion === true) {
+        return initialState;
+      }
+      return state;
+    }
     case TYPES.LOGIN_USER:
       return {
         ...state,

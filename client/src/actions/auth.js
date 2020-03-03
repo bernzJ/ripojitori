@@ -1,31 +1,27 @@
 import axios from 'axios';
 
+import { setMessage } from './messages';
+
 const TYPES = {
   LOGIN_USER: 'LOGIN_USER',
-  LOGOUT_USER: 'LOGOUT_USER',
-  AUTH_MESSAGE: 'AUTH_MESSAGE'
+  LOGOUT_USER: 'LOGOUT_USER'
 };
+
+const setUser = payload => ({
+  type: TYPES.LOGIN_USER,
+  payload
+});
 
 const login = user => async dispatch => {
   try {
     const { data } = await axios.post('auth/login', user);
     if (data.user) {
-      dispatch({
-        type: TYPES.LOGIN_USER,
-        payload: data.user
-      });
-      return;
+      dispatch(setUser(data.user));
+    } else {
+      dispatch(setMessage(data.message));
     }
-    dispatch({
-      type: TYPES.AUTH_MESSAGE,
-      payload: data.message
-    });
-    return;
   } catch ({ message }) {
-    dispatch({
-      type: TYPES.AUTH_MESSAGE,
-      payload: message
-    });
+    dispatch(setMessage(message));
   }
 };
 
@@ -34,4 +30,4 @@ const logout = () => ({
   payload: {}
 });
 
-export { TYPES, login, logout };
+export { TYPES, login, logout, setUser };

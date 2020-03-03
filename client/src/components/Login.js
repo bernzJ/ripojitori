@@ -21,9 +21,13 @@ const renderError = (...errors) =>
   );
 // @TODO: check if this can be cleaned (logic-wise).
 const Login = props => {
-  const { isAuthenticated, message } = useSelector(
-    ({ authReducer }) => authReducer
-  );
+  const {
+    authReducer: { isAuthenticated },
+    messagesReducer: { messages }
+  } = useSelector(({ authReducer, messagesReducer }) => ({
+    authReducer,
+    messagesReducer
+  }));
   const [localError, setError] = React.useState(null);
   const {
     location: { state: { reError } = { reError: null } }
@@ -59,7 +63,7 @@ const Login = props => {
   return (
     <Container>
       <Row>
-        {renderError(message, localError, reError)}
+        {renderError(...messages, localError, reError)}
         <MainContainer>
           <LoginFields handleSubmit={handleSubmit} />
         </MainContainer>

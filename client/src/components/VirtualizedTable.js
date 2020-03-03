@@ -58,7 +58,8 @@ const VirtualizedList = ({ items }) => {
   const [state, setState] = React.useState({
     selected: [],
     confirmModal: false,
-    cEModal: false
+    cEModal: false,
+    cEMode: 0
   });
 
   if (items.length === 0) {
@@ -67,11 +68,31 @@ const VirtualizedList = ({ items }) => {
 
   const renderModals = () => {
     if (state.cEModal) {
+      if (state.cEMode === 0) {
+        return (
+          <AddEditUserModal
+            show={state.cEModal}
+            hide={() => setState({ ...state, cEModal: false })}
+          />
+        );
+      }
       return (
         <AddEditUserModal
           show={state.cEModal}
           hide={() => setState({ ...state, cEModal: false })}
-          selectedUser={state.selected.length > 0 ? state.selected[0] : {}}
+          selectedUser={state.selected[0]}
+          mode={1}
+        />
+      );
+    }
+    if (state.confirmModal) {
+      return (
+        <ConfirmModal
+          show={state.confirmModal}
+          hide={() => setState({ ...state, confirmModal: false })}
+          title="Are you sure ?"
+          message="Deleting selected users is permanent."
+          handleResponse={r => console.log(r)}
         />
       );
     }
@@ -87,10 +108,22 @@ const VirtualizedList = ({ items }) => {
             <ButtonAction onClick={() => setState({ ...state, cEModal: true })}>
               <FontAwesomeIcon icon={faUserPlus} />
             </ButtonAction>
-            <ButtonAction>
+            <ButtonAction
+              onClick={() =>
+                setState({
+                  ...state,
+                  cEModal: state.selected.length > 0,
+                  cEMode: 1
+                })
+              }
+            >
               <FontAwesomeIcon icon={faUserEdit} />
             </ButtonAction>
-            <ButtonAction>
+            <ButtonAction
+              onClick={() =>
+                setState({ ...state, confirmModal: state.selected.length > 0 })
+              }
+            >
               <FontAwesomeIcon icon={faUserTimes} />
             </ButtonAction>
           </Row>

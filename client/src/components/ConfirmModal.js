@@ -2,16 +2,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
 
-const ModalComponent = ({ title, message, handleResponse }) => {
-  const [show, setShow] = React.useState(true);
-
+const ModalComponent = ({ show, hide, title, message, handleResponse }) => {
   const handleClick = confirmed => {
-    setShow(!show);
     handleResponse(confirmed);
+    hide();
   };
 
   return (
-    <Modal show={show} onHide={() => setShow(false)}>
+    <Modal show={show} onHide={() => hide()}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
@@ -30,6 +28,8 @@ const ModalComponent = ({ title, message, handleResponse }) => {
 export default ModalComponent;
 
 ModalComponent.propTypes = {
+  show: PropTypes.bool.isRequired,
+  hide: PropTypes.func.isRequired,
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
   handleResponse: PropTypes.func.isRequired

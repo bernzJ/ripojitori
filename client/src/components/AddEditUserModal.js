@@ -10,6 +10,7 @@ const AddEditUserModal = ({ show, hide, mode, selectedUser }) => {
   };
   const [state, setState] = React.useState(initialState);
   const handleShow = () => {
+    // @TODO: this won't happend, remove.
     if (!selectedUser._id) {
       setState({
         ...state,
@@ -17,11 +18,10 @@ const AddEditUserModal = ({ show, hide, mode, selectedUser }) => {
       });
     }
   };
-  console.log('MODAL rendered');
   return (
     <Modal show={show} onHide={() => hide(false)} onShow={handleShow}>
       <Modal.Header closeButton>
-        <Modal.Title>Editing</Modal.Title>
+        <Modal.Title>{mode === 0 ? 'Adding' : 'Editing'}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Alert show={state.message !== null} variant="danger">
@@ -43,7 +43,7 @@ AddEditUserModal.propTypes = {
   selectedUser: PropTypes.shape(user),
   mode: PropTypes.number
 };
-
+// @MODES: 0 = Add, 1= Update
 AddEditUserModal.defaultProps = {
   mode: 0,
   selectedUser: {}

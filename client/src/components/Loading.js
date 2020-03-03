@@ -3,7 +3,7 @@ import { Container, Row, Spinner } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 
 const Loading = ({ callback, delay }) => {
-  setTimeout(() => callback(), delay);
+  setTimeout(() => (callback ? callback() : null), delay);
   return (
     <Container>
       <Row className="justify-content-center">
@@ -16,10 +16,11 @@ const Loading = ({ callback, delay }) => {
 export default Loading;
 
 Loading.propTypes = {
-  callback: PropTypes.func.isRequired,
+  callback: PropTypes.func,
   delay: PropTypes.number
 };
 
 Loading.defaultProps = {
+  callback: null,
   delay: 1000
 };

@@ -1,20 +1,20 @@
 import { TYPES } from '../actions/admin';
+import { TYPES as MSG_TYPES } from '../actions/messages';
 
 const initialState = {
   users: [],
-  error: null,
-  loading: false
+  loading: true
 };
 
 const adminReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
     case TYPES.IS_LOADING:
-      return { ...state, loading: true };
-    case TYPES.AUTH_MESSAGE:
+      return { ...state, loading: payload };
+    case MSG_TYPES.MESSAGES:
       return {
         ...state,
-        error: payload
+        loading: false
       };
     case TYPES.GET_USERS:
       return {
