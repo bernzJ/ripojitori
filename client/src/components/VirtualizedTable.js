@@ -1,10 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import {
+  faUserPlus,
+  faUserTimes,
+  faUserEdit
+} from '@fortawesome/free-solid-svg-icons';
+import { Button, Container, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Container } from 'react-bootstrap';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+
+import ConfirmModal from './ConfirmModal';
+import AddEditUserModal from './AddEditUserModal';
 
 const renderItems = React.memo(({ data, index, style }) => {
   const { users, selected, setSelected } = data;
@@ -35,15 +44,34 @@ const renderItems = React.memo(({ data, index, style }) => {
     </div>
   );
 }, areEqual);
+
 const VirtualizedList = ({ items }) => {
   const [selected, setSelected] = React.useState([]);
+
   if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   }
   return (
     <VHContainer>
       <div className="pl-thead">
-        <div className="row">
+        <ActionBox>
+          <Row className="px-0 m-0">
+            <ButtonAction>
+              <FontAwesomeIcon icon={faUserPlus} />
+            </ButtonAction>
+            <ConfirmModal
+              title="Are you sure ?"
+              message="Deleting selected users is permanent."
+              handleResponse={r => console.log(r)}
+              launchButton={
+                <ButtonAction>
+                  <FontAwesomeIcon icon={faUserTimes} />
+                </ButtonAction>
+              }
+            />
+          </Row>
+        </ActionBox>
+        <div className="row mr-10">
           <div className="col">ID</div>
           <div className="col">Email</div>
           <div className="col">First Name</div>
@@ -51,7 +79,7 @@ const VirtualizedList = ({ items }) => {
           <div className="col">Permission</div>
         </div>
       </div>
-      <div className="pl-tbody h-100">
+      <div className="pl-tbody h-100 mr-10">
         <AutoSizer>
           {({ height, width }) => (
             <List
@@ -90,12 +118,16 @@ const VHContainer = styled(Container)`
     -webkit-box-align: center;
     align-items: center;
   }
+  &&& .mr-10 {
+    margin-right: 120px;
+  }
   .col {
     padding: 0 10px;
     overflow: hidden;
     text-overflow: ellipsis;
   }
   .pl-thead {
+    position: relative;
     color: #fff;
     font-weight: 600;
     text-transform: uppercase;
@@ -123,5 +155,23 @@ const RowItem = styled.div`
   &&&:hover {
     background-color: #343a40;
     color: #fff;
+  }
+`;
+const ActionBox = styled.div`
+  &&& {
+    z-index: 9;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 10px;
+  }
+`;
+const ButtonAction = styled(Button)`
+  &&& {
+    max-width: 120px;
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #fff;
+    background-color: #343a40;
   }
 `;
