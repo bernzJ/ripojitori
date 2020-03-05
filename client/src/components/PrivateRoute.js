@@ -2,13 +2,16 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Redirect, Route } from 'react-router-dom';
+
+import { setMessage } from '../actions/messages';
 import { routes } from '../constants';
 
 const PrivateRoute = ({ component, children, scope, ...rest }) => {
   const Component = component || children;
   const reducer = useSelector(({ authReducer }) => authReducer);
+  const dispatch = useDispatch();
   return (
     <Route
       {...rest}
@@ -18,13 +21,13 @@ const PrivateRoute = ({ component, children, scope, ...rest }) => {
           user: { scope: userScope }
         } = reducer;
         if (!isAuthenticated) {
+          dispatch(setMessage({ message: 'User not authenticated.' }));
           return (
             <Redirect
               to={{
                 pathname: routes.LOGIN,
                 state: {
-                  from: props.location,
-                  reError: 'User not authenticated.'
+                  from: props.location
                 }
               }}
             />
@@ -32,13 +35,13 @@ const PrivateRoute = ({ component, children, scope, ...rest }) => {
         }
         if (userScope < scope) {
           // @TODO: create a path for this.
+          dispatch(setMessage({ message: 'Permission denied.' }));
           return (
             <Redirect
               to={{
                 pathname: routes.DASHBOARD,
                 state: {
-                  from: props.location,
-                  reError: 'Permission denied.'
+                  from: props.location
                 }
               }}
             />

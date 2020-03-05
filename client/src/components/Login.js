@@ -7,6 +7,7 @@ import { Alert, Container, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 
 import { login } from '../actions/auth';
+import { setMessage } from '../actions/messages';
 import { routes } from '../constants';
 
 import LoginFields from './LoginFields';
@@ -20,7 +21,6 @@ const renderError = (...errors) =>
       </Alert>
     ) : null
   );
-// @TODO: check if this can be cleaned (logic-wise).
 const Login = props => {
   const {
     authReducer: { isAuthenticated },
@@ -29,10 +29,6 @@ const Login = props => {
     authReducer,
     messagesReducer
   }));
-  const [localError, setError] = React.useState(null);
-  const {
-    location: { state: { reError } = { reError: null } }
-  } = props;
   const dispatch = useDispatch();
   if (isAuthenticated) {
     return (
@@ -51,11 +47,11 @@ const Login = props => {
     const { email, password } = fields;
     const re = /\S+@\S+\.\S+/;
     if (!re.test(email)) {
-      setError('Invalid email.');
+      dispatch(setMessage({ message: 'Invalid email.' }));
       return;
     }
     if (password.length < 5) {
-      setError('Invalid password.');
+      dispatch(setMessage({ message: 'Invalid password.' }));
       return;
     }
     dispatch(login({ email, password }));
@@ -64,7 +60,7 @@ const Login = props => {
   return (
     <Container>
       <Row>
-        {renderError(...messages, localError, reError)}
+        {renderError(...messages)}
         <MainContainer>
           <LoginFields handleSubmit={handleSubmit} />
         </MainContainer>
