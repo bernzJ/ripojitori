@@ -52,7 +52,11 @@ const Admin = props => {
           dismissible
         >
           <Alert.Heading>Messages</Alert.Heading>
-          <p>{messages.map(message => message)}</p>
+          <p>
+            {messages.map(message => (
+              <p>{message}</p>
+            ))}
+          </p>
         </Alert>
       </Row>
       <Row>
