@@ -9,7 +9,7 @@ import ConfirmModal from './ConfirmModal';
 
 const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
   const initialState = {
-    user: params.selected || user
+    user: { ...params.selected, password: '' } || user
   };
   const [state, setState] = React.useState(initialState);
   const dispatch = useDispatch();
@@ -62,6 +62,16 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
                 placeholder="Last name"
                 value={currentUser.lastName}
                 onChange={e => setUserParam({ lastName: e.target.value })}
+              />
+            </Col>
+          </Row>
+          <Row className="py-2">
+            <Col>
+              <Form.Label>Password</Form.Label>
+              <Form.Control
+                placeholder="Password"
+                value={currentUser.password}
+                onChange={e => setUserParam({ password: e.target.value })}
               />
             </Col>
           </Row>

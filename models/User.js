@@ -19,26 +19,17 @@ const userSchema = new Schema({
     type: Number,
   }
 });
-/*
-userSchema.pre("save", function(next) {
-  const user = this;
-  bcrypt.genSalt(10, function(err, salt) {
-    if (err) {
-      return next(err);
-    }
-    bcrypt.hash(user.password, salt, function(err, hash) {
-      if (err) {
-        return next(err);
-      }
-      user.password = hash;
-      next();
-    });
-  });
-});
-*/
-userSchema.methods.registerUser = async function () {
+const getHash = async function (seed) {
   const salt = await bcrypt.genSalt(10);
-  const hash = await bcrypt.hash(this.password, salt);
+  const hash = await bcrypt.hash(seed, salt);
+  return hash;
+}
+userSchema.statics.hashPassword = async function (password) {
+  const hash = await getHash(password);
+  return hash;
+};
+userSchema.methods.registerUser = async function () {
+  const hash = await getHash(this.password);
   this.password = hash;
   await this.save();
 };

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const Joi = require("@hapi/joi");
 
 const scopes = require("../constants/scopes.json");
 const requireJwtAuth = require("../middleware/requireJwtAuth");
@@ -13,7 +14,7 @@ router.use((req, res, next) => {
 
 router.post("/admin/users", requireJwtAuth, requireScope, async (req, res) => {
   try {
-    const users = await User.find({});
+    const users = await User.find({}, "-password");
     res.send({
       users
     });
@@ -24,10 +25,35 @@ router.post("/admin/users", requireJwtAuth, requireScope, async (req, res) => {
 
 router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res) => {
   try {
-    const { user, user: { email } } = req.body;
-    const result = await User.updateOne({ email: email }, user, { upsert: true });
+    const { user } = req.body;
+
+    if (!user.password || user.password.length < 4) {
+      delete user.password;
+    }
+
+    const schema = Joi.object({
+      email: Joi.string()
+        .email()
+        .required(),
+      password: Joi.string()
+        .min(5)
+        .max(12).optional(),
+      firstName: Joi.string()
+        .required(),
+      lastName: Joi.string()
+        .required(),
+      scope: Joi.number()
+        .required()
+    });
+    const userSchema = await schema.validateAsync(user);
+    const { email } = userSchema;
+    if (userSchema.password) {
+      userSchema.password = await User.hashPassword(userSchema.password);
+    }
+    await User.updateOne({ email }, userSchema, { upsert: true });
+    //const result = await User.updateOne({ email: email }, user, { upsert: true });
     res.send({
-      result
+      result: "Saved"
     });
   } catch ({ message }) {
     res.send({ message })

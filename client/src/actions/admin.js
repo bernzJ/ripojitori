@@ -14,12 +14,13 @@ const setUsers = payload => ({
 
 const getUsers = () => async (dispatch, getState) => {
   try {
+    dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
       authReducer: {
         user: { token }
       }
     } = getState();
-    dispatch({ type: TYPES.IS_LOADING, payload: true });
+
     const { data } = await axios.post('admin/users', { 'x-auth-token': token });
     // @NOTE: uncomment to test invalid/errors.
     // return dispatch(setMessageAndInvalidateSession('Booo ! get out.'));
@@ -35,46 +36,58 @@ const getUsers = () => async (dispatch, getState) => {
 
 const delUsers = users => async (dispatch, getState) => {
   try {
+    dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
       authReducer: {
         user: { token }
       }
     } = getState();
-    dispatch({ type: TYPES.IS_LOADING, payload: true });
+
     const { data } = await axios.post('admin/users/del', {
       'x-auth-token': token,
       users
     });
-    dispatch(
-      setMessage({
-        message: `Sent query, deleted: ${data.result.deletedCount} users.`
-      })
-    );
-    dispatch(getUsers());
+    if (data.message) {
+      dispatch(setMessage(data));
+    } else {
+      dispatch(
+        setMessage({
+          message: `Sent query, deleted: ${data.result.deletedCount} users.`
+        })
+      );
+      dispatch(getUsers());
+    }
   } catch ({ message }) {
     dispatch(setMessageAndInvalidateSession(message));
   }
 };
 
 // @NOTE: this upsert, so if _id is not here, its created.
-const addUser = user => async (dispatch, getState) => {
+const addUser = ({ email, password, firstName, lastName, scope }) => async (
+  dispatch,
+  getState
+) => {
   try {
+    dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
       authReducer: {
         user: { token }
       }
     } = getState();
-    dispatch({ type: TYPES.IS_LOADING, payload: true });
-    await axios.post('admin/users/create', {
+    const { data } = await axios.post('admin/users/create', {
       'x-auth-token': token,
-      user
+      user: { email, password, firstName, lastName, scope }
     });
-    dispatch(
-      setMessage({
-        message: 'Saved changes.'
-      })
-    );
-    dispatch(getUsers());
+    if (data.message) {
+      dispatch(setMessage(data));
+    } else {
+      dispatch(
+        setMessage({
+          message: 'Saved changes.'
+        })
+      );
+      dispatch(getUsers());
+    }
   } catch ({ message }) {
     dispatch(setMessageAndInvalidateSession(message));
   }
