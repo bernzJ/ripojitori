@@ -26,8 +26,16 @@ const login = user => async dispatch => {
 };
 
 const logout = () => ({
-  type: TYPES.SET_USER,
-  payload: {}
+  type: TYPES.LOGOUT_USER
 });
 
-export { TYPES, login, logout, setUser };
+const apiLogout = () => async dispatch => {
+  try {
+    await axios.post('auth/logout');
+    dispatch(logout());
+  } catch ({ message }) {
+    dispatch(setMessage(message));
+  }
+};
+
+export { TYPES, login, logout, setUser, apiLogout };

@@ -3,14 +3,16 @@ import styled from 'styled-components';
 import classNames from 'classnames';
 import { Nav, Navbar } from 'react-bootstrap';
 import { withRouter, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 
 import { routes } from '../constants';
+import { apiLogout } from '../actions/auth';
 
 const NavBar = props => {
   const {
     location: { pathname }
   } = props;
+  const dispatch = useDispatch();
   const userScope = useSelector(
     ({
       authReducer: {
@@ -27,29 +29,34 @@ const NavBar = props => {
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto">
-          <Nav>
+          <Linky
+            className={classNames({
+              selected: pathname === routes.DASHBOARD
+            })}
+            to={routes.DASHBOARD}
+          >
+            Dashboard
+          </Linky>
+          {userScope ? (
             <Linky
               className={classNames({
-                selected: pathname === routes.DASHBOARD
+                selected: pathname === routes.ADMIN
               })}
-              to={routes.DASHBOARD}
+              to={routes.ADMIN}
             >
-              Dashboard
+              Admin
             </Linky>
-          </Nav>
-          {userScope ? (
-            <Nav>
-              <Linky
-                className={classNames({
-                  selected: pathname === routes.ADMIN
-                })}
-                to={routes.ADMIN}
-              >
-                Admin
-              </Linky>
-            </Nav>
           ) : null}
         </Nav>
+        <Linky
+          onClick={() => dispatch(apiLogout())}
+          className={classNames({
+            selected: pathname === routes.LOGIN
+          })}
+          to={routes.LOGIN}
+        >
+          Logout
+        </Linky>
       </Navbar.Collapse>
     </Navbar>
   );

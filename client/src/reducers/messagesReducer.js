@@ -1,4 +1,5 @@
 import { TYPES } from '../actions/messages';
+import { TYPES as AUTH_TYPES } from '../actions/auth';
 
 const initialState = {
   messages: [],
@@ -20,6 +21,8 @@ const messagesReducer = (state = initialState, action) => {
         invalidateSesssion
       };
     }
+    case AUTH_TYPES.LOGOUT_USER:
+      return initialState;
     default:
       return state;
   }

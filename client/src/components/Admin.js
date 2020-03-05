@@ -1,3 +1,4 @@
+/* eslint-disable react/no-array-index-key */
 import React from 'react';
 import { Alert, Container, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
@@ -53,8 +54,8 @@ const Admin = props => {
         >
           <Alert.Heading>Messages</Alert.Heading>
           <p>
-            {messages.map(message => (
-              <p>{message}</p>
+            {messages.map((message, i) => (
+              <p key={i}>{message}</p>
             ))}
           </p>
         </Alert>

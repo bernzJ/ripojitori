@@ -43,7 +43,7 @@ router.post("/auth/login", requireLocalAuth, (req, res) => {
 });
 
 // logout
-router.get("/auth/logout", (req, res) => {
+router.post("/auth/logout", (req, res) => {
   req.logout();
   res.send(false);
 });
