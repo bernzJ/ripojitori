@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,8 +13,8 @@ import classNames from 'classnames';
 import { FixedSizeList as List, areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-import ConfirmModal from './ConfirmModal';
-import AddEditUserModal from './AddEditUserModal';
+import { actionsBox, intScopeToString } from '../constants';
+import AddEditDelUser from './AddEditDelUser';
 
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index, style }) => {
@@ -48,7 +49,7 @@ const renderItems = React.memo(({ data, index, style }) => {
         <div className="col">{user.email}</div>
         <div className="col">{user.firstName}</div>
         <div className="col">{user.lastName}</div>
-        <div className="col">{user.scope}</div>
+        <div className="col">{intScopeToString(user.scope)}</div>
       </RowItem>
     </div>
   );
@@ -57,47 +58,22 @@ const renderItems = React.memo(({ data, index, style }) => {
 const VirtualizedList = ({ items }) => {
   const [state, setState] = React.useState({
     selected: [],
-    confirmModal: false,
-    cEModal: false,
-    cEMode: 0
+    action: {
+      name: actionsBox.NONE,
+      visibility: false,
+      toggle: null,
+      params: {}
+    }
   });
 
   if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   }
-
-  const renderModals = () => {
-    if (state.cEModal) {
-      if (state.cEMode === 0) {
-        return (
-          <AddEditUserModal
-            show={state.cEModal}
-            hide={() => setState({ ...state, cEModal: false })}
-          />
-        );
-      }
-      return (
-        <AddEditUserModal
-          show={state.cEModal}
-          hide={() => setState({ ...state, cEModal: false })}
-          selectedUser={state.selected[0]}
-          mode={1}
-        />
-      );
-    }
-    if (state.confirmModal) {
-      return (
-        <ConfirmModal
-          show={state.confirmModal}
-          hide={() => setState({ ...state, confirmModal: false })}
-          title="Are you sure ?"
-          message="Deleting selected users is permanent."
-          handleResponse={r => console.log(r)}
-        />
-      );
-    }
-    return null;
-  };
+  const { action } = state;
+  const setVisibility = visibility =>
+    setState({ ...state, action: { ...action, visibility } });
+  const renderModals = () =>
+    action.name === actionsBox.NONE ? null : <AddEditDelUser {...action} />;
 
   return (
     <VHContainer>
@@ -105,24 +81,59 @@ const VirtualizedList = ({ items }) => {
       <div className="pl-thead">
         <ActionBox>
           <Row className="px-0 m-0">
-            <ButtonAction onClick={() => setState({ ...state, cEModal: true })}>
-              <FontAwesomeIcon icon={faUserPlus} />
-            </ButtonAction>
             <ButtonAction
               onClick={() =>
                 setState({
                   ...state,
-                  cEModal: state.selected.length > 0,
-                  cEMode: 1
+                  action: {
+                    mode: actionsBox.CREATE,
+                    visibility: true,
+                    toggle: setVisibility
+                  }
                 })
               }
+            >
+              <FontAwesomeIcon icon={faUserPlus} />
+            </ButtonAction>
+            <ButtonAction
+              onClick={() => {
+                const { selected } = state;
+                if (selected.length > 0) {
+                  setState({
+                    ...state,
+                    action: {
+                      mode: actionsBox.EDIT,
+                      visibility: true,
+                      toggle: setVisibility,
+                      params: {
+                        selected: selected[0]
+                      }
+                    }
+                  });
+                }
+              }}
             >
               <FontAwesomeIcon icon={faUserEdit} />
             </ButtonAction>
             <ButtonAction
-              onClick={() =>
-                setState({ ...state, confirmModal: state.selected.length > 0 })
-              }
+              onClick={() => {
+                const { selected } = state;
+                if (selected.length > 0) {
+                  setState({
+                    ...state,
+                    action: {
+                      mode: actionsBox.DELETE,
+                      visibility: true,
+                      toggle: setVisibility,
+                      params: {
+                        selected,
+                        title: 'Are you sure ?',
+                        message: 'Deleting selected users is permanent.'
+                      }
+                    }
+                  });
+                }
+              }}
             >
               <FontAwesomeIcon icon={faUserTimes} />
             </ButtonAction>

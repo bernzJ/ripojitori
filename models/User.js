@@ -36,23 +36,14 @@ userSchema.pre("save", function(next) {
   });
 });
 */
-userSchema.methods.registerUser = (newUser, callback) => {
-  bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(newUser.password, salt, (errh, hash) => {
-      if (err) {
-        console.log(err);
-      }
-      // set pasword to hash
-      newUser.password = hash;
-      newUser.save(callback);
-    });
-  });
+userSchema.methods.registerUser = async function () {
+  const salt = await bcrypt.genSalt(10);
+  const hash = await bcrypt.hash(this.password, salt);
+  this.password = hash;
+  await this.save();
 };
-userSchema.methods.comparePassword = function (candidatePassword, callback) {
-  bcrypt.compare(candidatePassword, this.password, (err, isMatch) => {
-    if (err) return callback(err);
-    callback(null, isMatch);
-  });
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
 const User = mongoose.model("users", userSchema);

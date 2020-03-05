@@ -8,12 +8,16 @@ const initialState = {
 const messagesReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
+    case TYPES.RESET: {
+      return initialState;
+    }
     case TYPES.MESSAGES: {
       const { messages: prevMessages } = state;
-      const { message } = payload;
+      const { message, invalidateSesssion = false } = payload;
       return {
         ...state,
-        messages: [...prevMessages, message]
+        messages: [...prevMessages, message],
+        invalidateSesssion
       };
     }
     default:

@@ -18,7 +18,7 @@ const login = user => async dispatch => {
     if (data.user) {
       dispatch(setUser(data.user));
     } else {
-      dispatch(setMessage(data.message));
+      dispatch(setMessage(data));
     }
   } catch ({ message }) {
     dispatch(setMessage(message));

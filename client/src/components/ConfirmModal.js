@@ -5,11 +5,11 @@ import { Button, Modal } from 'react-bootstrap';
 const ModalComponent = ({ show, hide, title, message, handleResponse }) => {
   const handleClick = confirmed => {
     handleResponse(confirmed);
-    hide();
+    hide(false);
   };
 
   return (
-    <Modal show={show} onHide={() => hide()}>
+    <Modal show={show} onHide={() => hide(false)}>
       <Modal.Header closeButton>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>

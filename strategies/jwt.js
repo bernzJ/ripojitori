@@ -14,14 +14,13 @@ const jwtLogin = new JwtStrategy(
   async (payload, done) => {
     try {
       const user = await User.findById(payload.sub);
-
       if (user) {
         done(null, user);
       } else {
         done(null, false);
       }
-    } catch (err) {
-      done(err, false);
+    } catch ({ message }) {
+      done(null, false, message);
     }
   }
 );

@@ -1,13 +1,14 @@
 const TYPES = {
-  MESSAGES: 'MESSAGES'
+  MESSAGES: 'MESSAGES',
+  RESET: 'RESET'
 };
 
-const setMessage = message => ({
+const setMessage = payload => ({
   type: TYPES.MESSAGES,
-  payload: {
-    message
-  }
+  payload
 });
+
+const resetMessage = () => ({ type: TYPES.RESET });
 
 const setMessageAndInvalidateSession = message => ({
   type: TYPES.MESSAGES,
@@ -17,4 +18,4 @@ const setMessageAndInvalidateSession = message => ({
   }
 });
 
-export { TYPES, setMessage, setMessageAndInvalidateSession };
+export { TYPES, setMessage, resetMessage, setMessageAndInvalidateSession };

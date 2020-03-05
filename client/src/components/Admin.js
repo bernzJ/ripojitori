@@ -6,6 +6,7 @@ import VirtualizedList from './VirtualizedTable';
 import Loading from './Loading';
 import AdminSelector from '../selectors/admin';
 import { getUsers } from '../actions/admin';
+import { resetMessage } from '../actions/messages';
 
 const makeGetAllUsers = () => AdminSelector;
 export const AllUsersItems = () => {
@@ -16,9 +17,6 @@ export const AllUsersItems = () => {
 
 const Admin = props => {
   const {
-    authReducer: {
-      user: { token }
-    },
     adminReducer: { loading },
     messagesReducer: { messages }
   } = useSelector(({ authReducer, adminReducer, messagesReducer }) => ({
@@ -26,19 +24,20 @@ const Admin = props => {
     adminReducer,
     messagesReducer
   }));
-
-  const [show, setShow] = React.useState(messages.length > 0);
+  const [show, setShow] = React.useState(false);
   const dispatch = useDispatch();
   const items = AllUsersItems();
 
   React.useEffect(() => {
-    dispatch(getUsers(token));
-  }, [dispatch, getUsers, token]);
+    dispatch(getUsers());
+  }, [dispatch, getUsers]);
 
   if (loading) {
     return <Loading />;
   }
-
+  if (messages.length > 0 && !show) {
+    setShow(true);
+  }
   return (
     <Container className="py-3">
       <Row>
@@ -47,11 +46,12 @@ const Admin = props => {
           show={show}
           variant="danger"
           onClose={() => {
+            dispatch(resetMessage());
             setShow(false);
           }}
           dismissible
         >
-          <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+          <Alert.Heading>Messages</Alert.Heading>
           <p>{messages.map(message => message)}</p>
         </Alert>
       </Row>

@@ -15,7 +15,8 @@ const renderError = (...errors) =>
   errors.map((error, i) =>
     error ? (
       <Alert key={i} className="w-100 my-2" variant="danger">
-        {error}
+        <Alert.Heading>Messages</Alert.Heading>
+        <p>{error}</p>
       </Alert>
     ) : null
   );
