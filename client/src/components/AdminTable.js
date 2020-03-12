@@ -55,7 +55,7 @@ const renderItems = React.memo(({ data, index, style }) => {
   );
 }, areEqual);
 
-const VirtualizedList = ({ items }) => {
+const AdminTable = ({ items }) => {
   const [state, setState] = React.useState({
     selected: [],
     action: {
@@ -170,9 +170,9 @@ const VirtualizedList = ({ items }) => {
   );
 };
 
-export default VirtualizedList;
+export default AdminTable;
 
-VirtualizedList.propTypes = {
+AdminTable.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 

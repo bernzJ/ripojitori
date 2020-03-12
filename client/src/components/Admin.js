@@ -3,7 +3,7 @@ import React from 'react';
 import { Alert, Container, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 
-import VirtualizedList from './VirtualizedTable';
+import AdminTable from './AdminTable';
 import Loading from './Loading';
 import AdminSelector from '../selectors/admin';
 import { getUsers } from '../actions/admin';
@@ -53,15 +53,13 @@ const Admin = props => {
           dismissible
         >
           <Alert.Heading>Messages</Alert.Heading>
-          <p>
-            {messages.map((message, i) => (
-              <p key={i}>{message}</p>
-            ))}
-          </p>
+          {messages.map((message, i) => (
+            <p key={i}>{message}</p>
+          ))}
         </Alert>
       </Row>
       <Row>
-        <VirtualizedList items={items} />
+        <AdminTable items={items} />
       </Row>
     </Container>
   );

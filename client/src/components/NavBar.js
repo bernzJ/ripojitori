@@ -5,7 +5,7 @@ import { Nav, Navbar } from 'react-bootstrap';
 import { withRouter, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { routes } from '../constants';
+import { routes, scopes } from '../constants';
 import { apiLogout } from '../actions/auth';
 
 const NavBar = props => {
@@ -37,7 +37,7 @@ const NavBar = props => {
           >
             Dashboard
           </Linky>
-          {userScope ? (
+          {userScope === scopes.ADMIN ? (
             <Linky
               className={classNames({
                 selected: pathname === routes.ADMIN

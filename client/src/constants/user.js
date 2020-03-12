@@ -1,5 +1,7 @@
+import ObjectID from 'bson-objectid';
+
 const user = {
-  _id: '',
+  _id: ObjectID(),
   email: '',
   password: '',
   firstName: '',

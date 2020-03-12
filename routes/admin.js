@@ -32,6 +32,8 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
     }
 
     const schema = Joi.object({
+      _id: Joi.string()
+        .required(),
       email: Joi.string()
         .email()
         .required(),
@@ -46,11 +48,13 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
         .required()
     });
     const userSchema = await schema.validateAsync(user);
-    const { email } = userSchema;
+    const { _id } = userSchema;
+    delete userSchema._id;
+
     if (userSchema.password) {
       userSchema.password = await User.hashPassword(userSchema.password);
     }
-    await User.updateOne({ email }, userSchema, { upsert: true });
+    await User.updateOne({ _id }, userSchema, { upsert: true });
     //const result = await User.updateOne({ email: email }, user, { upsert: true });
     res.send({
       result: "Saved"
@@ -70,23 +74,6 @@ router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res) =
   } catch ({ message }) {
     res.send({ message })
   }
-});
-
-router.post("/api/feature", requireJwtAuth, (req, res) => {
-  res.send({
-    feature: "This is a feature. Only authenticated users can see this."
-  });
-});
-
-router.post("/api/profile", requireJwtAuth, (req, res) => {
-  res.send({
-    profile: {
-      provider: req.user.provider,
-      displayName:
-        req.user.firstName,
-      email: req.user.email
-    }
-  });
 });
 
 module.exports = router;

@@ -3,13 +3,13 @@ import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, Col, Dropdown, Form, Modal, Row } from 'react-bootstrap';
 
-import { user, actionsBox, scopes, intScopeToString } from '../constants';
-import { addUser, delUsers } from '../actions/admin';
+import { company, actionsBox, scopes, intScopeToString } from '../constants';
+import { addCompany, delCompanies } from '../actions/api';
 import ConfirmModal from './ConfirmModal';
 
-const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
+const AddEditDelCompany = ({ visibility, toggle, mode, params }) => {
   const initialState = {
-    user: params.selected ? { ...params.selected, password: '' } : user
+    company: params.selected ? { ...params.selected } : company
   };
   const [state, setState] = React.useState(initialState);
   const dispatch = useDispatch();
@@ -18,7 +18,7 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
     const { selected, title, message } = params;
     const handleResponse = confirm => {
       if (confirm) {
-        dispatch(delUsers(selected.map(u => u._id)));
+        dispatch(delCompanies(selected.map(u => u._id)));
       }
     };
     return (
@@ -32,63 +32,80 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
     );
   }
 
-  const { user: currentUser } = state;
-  const setUserParam = kv =>
-    setState({ ...state, user: { ...currentUser, ...kv } });
-
+  const { company: currentCompany } = state;
+  const setCompanyParam = kv =>
+    setState({ ...state, company: { ...currentCompany, ...kv } });
   return (
     <Modal show={visibility} onHide={() => toggle(false)}>
       <Modal.Header closeButton>
         <Modal.Title>
           {mode === actionsBox.CREATE
             ? 'Adding'
-            : `Editing ${currentUser.email}`}
+            : `Editing ${currentCompany.name}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Row className="py-2">
             <Col>
-              <Form.Label>First name</Form.Label>
+              <Form.Label>Company Name</Form.Label>
               <Form.Control
-                placeholder="First name"
-                value={currentUser.firstName}
-                onChange={e => setUserParam({ firstName: e.target.value })}
-              />
-            </Col>
-            <Col>
-              <Form.Label>Last name</Form.Label>
-              <Form.Control
-                placeholder="Last name"
-                value={currentUser.lastName}
-                onChange={e => setUserParam({ lastName: e.target.value })}
+                placeholder="Company Name"
+                value={currentCompany.name}
+                onChange={e => setCompanyParam({ name: e.target.value })}
               />
             </Col>
           </Row>
           <Row className="py-2">
             <Col>
-              <Form.Label>Password</Form.Label>
+              <Form.Label>Client Name</Form.Label>
               <Form.Control
-                placeholder="Password"
-                value={currentUser.password}
-                onChange={e => setUserParam({ password: e.target.value })}
+                placeholder="Client Name"
+                value={currentCompany.clientName}
+                onChange={e => setCompanyParam({ clientName: e.target.value })}
+              />
+            </Col>
+            <Col>
+              <Form.Label>Client Type</Form.Label>
+              <Form.Control
+                placeholder="Client Type"
+                value={currentCompany.clientType}
+                onChange={e => setCompanyParam({ clientType: e.target.value })}
               />
             </Col>
           </Row>
           <Row className="py-2">
             <Col>
-              <Form.Label>Email</Form.Label>
+              <Form.Label>Hours</Form.Label>
               <Form.Control
-                placeholder="Email"
-                value={currentUser.email}
-                onChange={e => setUserParam({ email: e.target.value })}
+                placeholder="Hours"
+                value={currentCompany.hours}
+                onChange={e => setCompanyParam({ hours: e.target.value })}
               />
             </Col>
+            <Col>
+              <Form.Label>Start Time</Form.Label>
+              <Form.Control
+                placeholder="Start"
+                value={currentCompany.start}
+                onChange={e => setCompanyParam({ start: e.target.value })}
+              />
+            </Col>
+            <Col>
+              <Form.Label>End Time</Form.Label>
+              <Form.Control
+                placeholder="End"
+                value={currentCompany.end}
+                onChange={e => setCompanyParam({ end: e.target.value })}
+              />
+            </Col>
+          </Row>
+          <Row>
             <Col>
               <Form.Label>Permission</Form.Label>
-              <Dropdown onSelect={scope => setUserParam({ scope })}>
+              <Dropdown onSelect={scope => setCompanyParam({ scope })}>
                 <Dropdown.Toggle variant="Secondary" id="dropdown-scopes">
-                  {intScopeToString(currentUser.scope)}
+                  {intScopeToString(currentCompany.scope)}
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
@@ -108,7 +125,7 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
           Cancel
         </Button>
         <Button
-          onClick={() => dispatch(addUser(currentUser))}
+          onClick={() => dispatch(addCompany(currentCompany))}
           variant="success"
         >
           Save
@@ -117,15 +134,15 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
     </Modal>
   );
 };
-export default AddEditDelUser;
+export default AddEditDelCompany;
 
-AddEditDelUser.propTypes = {
+AddEditDelCompany.propTypes = {
   visibility: PropTypes.bool.isRequired,
   toggle: PropTypes.func.isRequired,
   mode: PropTypes.string.isRequired,
   params: PropTypes.oneOfType([PropTypes.object])
 };
 
-AddEditDelUser.defaultProps = {
+AddEditDelCompany.defaultProps = {
   params: {}
 };

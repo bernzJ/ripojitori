@@ -4,15 +4,18 @@ import { setMessage, setMessageAndInvalidateSession } from './messages';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
-  GET_USERS: 'GET_USERS'
+  GET_COMPANIES: 'GET_COMPANIES',
+  SET_FILTER: 'SET_FILTER'
 };
 
-const setUsers = payload => ({
-  type: TYPES.GET_USERS,
+const setCompanies = payload => ({
+  type: TYPES.GET_COMPANIES,
   payload
 });
 
-const getUsers = () => async (dispatch, getState) => {
+const setFilter = payload => ({ type: TYPES.SET_FILTER, payload });
+
+const getCompanies = () => async (dispatch, getState) => {
   try {
     dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
@@ -21,11 +24,11 @@ const getUsers = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('admin/users', { 'x-auth-token': token });
-    // @NOTE: uncomment to test invalid/errors.
-    // return dispatch(setMessageAndInvalidateSession('Booo ! get out.'));
-    if (data.users) {
-      dispatch(setUsers(data.users));
+    const { data } = await axios.post('api/companies', {
+      'x-auth-token': token
+    });
+    if (data.companies) {
+      dispatch(setCompanies(data.companies));
     } else {
       console.log(data);
       dispatch(setMessage(data));
@@ -35,7 +38,7 @@ const getUsers = () => async (dispatch, getState) => {
   }
 };
 
-const delUsers = users => async (dispatch, getState) => {
+const delCompanies = companies => async (dispatch, getState) => {
   try {
     dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
@@ -44,32 +47,33 @@ const delUsers = users => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('admin/users/del', {
+    const { data } = await axios.post('api/companies/del', {
       'x-auth-token': token,
-      users
+      companies
     });
     if (data.message) {
       dispatch(setMessage(data));
     } else {
       dispatch(
         setMessage({
-          message: `Sent query, deleted: ${data.result.deletedCount} users.`
+          message: `Sent query, deleted: ${data.result.deletedCount} companies.`
         })
       );
-      dispatch(getUsers());
+      dispatch(getCompanies());
     }
   } catch ({ message }) {
     dispatch(setMessageAndInvalidateSession(message));
   }
 };
 
-// @NOTE: this upsert, so if _id is not here, its created.
-const addUser = ({
+const addCompany = ({
   _id,
-  email,
-  password,
-  firstName,
-  lastName,
+  name,
+  clientName,
+  clientType,
+  hours,
+  start,
+  end,
   scope
 }) => async (dispatch, getState) => {
   try {
@@ -79,9 +83,9 @@ const addUser = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post('admin/users/create', {
+    const { data } = await axios.post('api/companies/create', {
       'x-auth-token': token,
-      user: { _id, email, password, firstName, lastName, scope }
+      company: { _id, name, clientName, clientType, hours, start, end, scope }
     });
     if (data.message) {
       dispatch(setMessage(data));
@@ -91,11 +95,18 @@ const addUser = ({
           message: 'Saved changes.'
         })
       );
-      dispatch(getUsers());
+      dispatch(getCompanies());
     }
   } catch ({ message }) {
     dispatch(setMessageAndInvalidateSession(message));
   }
 };
 
-export { TYPES, getUsers, addUser, delUsers, setUsers };
+export {
+  TYPES,
+  getCompanies,
+  addCompany,
+  delCompanies,
+  setCompanies,
+  setFilter
+};
