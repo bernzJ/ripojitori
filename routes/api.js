@@ -14,15 +14,6 @@ router.use((req, res, next) => {
   next();
 });
 
-router.get("/api/user", requireJwtAuth, (req, res) => {
-  res.send({
-    user: {
-      displayName:
-        req.user.firstName
-    }
-  });
-});
-
 router.post("/api/companies", requireJwtAuth, requireScope, async (req, res) => {
   try {
     const companies = await Company.find({}, `-_v ${req.user.scope === scopes.ADMIN ? "" : "-scope"}`);
@@ -82,17 +73,6 @@ router.post("/api/companies/del", requireJwtAuth, requireScope, ((req, res, next
   } catch ({ message }) {
     res.send({ message })
   }
-});
-
-router.post("/api/profile", requireJwtAuth, (req, res) => {
-  res.send({
-    profile: {
-      provider: req.user.provider,
-      displayName:
-        req.user.firstName,
-      email: req.user.email
-    }
-  });
 });
 
 module.exports = router;
