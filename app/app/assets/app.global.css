@@ -1,0 +1,15 @@
+@import '~bootstrap/dist/css/bootstrap.css';
+@import '~@fortawesome/fontawesome-free/css/all.css';
+
+body {
+  font-family: 'Montserrat';
+}
+
+input[type="textbox"], input[type="email"], input[type="password"] {
+  border-radius: 0;
+  border: 1px solid #ddd;
+}
+
+.btn {
+  border-radius: 0;
+}

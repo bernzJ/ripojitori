@@ -1,0 +1,13 @@
+{
+  "name": "ripojitori",
+  "productName": "Ripojitori",
+  "version": "0.0.1",
+  "description": "Electron stuff",
+  "main": "./main.prod.js",
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
