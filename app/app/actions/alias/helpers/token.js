@@ -1,6 +1,6 @@
 import path from 'path';
 import * as fse from 'fs-extra';
-import { setLoading, setTest } from '../../test';
+import { setLoading, setToken, setSaved } from '../../token';
 
 const getAppFolderPath = () =>
   process.env.APPDATA ||
@@ -8,18 +8,18 @@ const getAppFolderPath = () =>
     ? `${process.env.HOME}/Library/Preferences`
     : `${process.env.HOME}/.local/share`);
 
-const getTestJsonPath = () => {
+const getTokenJsonPath = () => {
   let appFolderPath = getAppFolderPath();
-  appFolderPath = path.resolve(appFolderPath, '/Ripojitori/test.json');
+  appFolderPath = path.resolve(appFolderPath, '/Ripojitori/token.json');
   return fse.ensureFile(appFolderPath).then(() => appFolderPath);
 };
 
 // @TODO: dispatch into error message.
-const getTestAsJSON = () => async (dispatch, getState) => {
+const getTokenAsJSON = () => async dispatch => {
   try {
-    const filePath = await getTestJsonPath();
+    const filePath = await getTokenJsonPath();
     const dataJson = await fse.readJson(filePath);
-    dispatch(setTest(dataJson));
+    dispatch(setToken(dataJson));
   } catch (e) {
     // @TODO: dispatch into error message.
     return { error: true };
@@ -28,14 +28,13 @@ const getTestAsJSON = () => async (dispatch, getState) => {
   }
 };
 // @TODO: dispatch into error message.
-const saveTestAsJSON = () => async (dispatch, getState) => {
+const saveTokenAsJSON = token => async dispatch => {
   try {
     dispatch(setLoading(true));
-    const {
-      testReducer: { test }
-    } = getState();
-    const filePath = await getTestJsonPath();
-    await fse.writeJSON(filePath, test);
+    dispatch(setToken(token));
+    const filePath = await getTokenJsonPath();
+    await fse.writeJSON(filePath, token);
+    dispatch(setSaved(true));
   } catch (e) {
     // @TODO: dispatch into error message.
     return { error: true };
@@ -43,4 +42,4 @@ const saveTestAsJSON = () => async (dispatch, getState) => {
     dispatch(setLoading(false));
   }
 };
-export { getTestAsJSON, saveTestAsJSON };
+export { getTokenAsJSON, saveTokenAsJSON };

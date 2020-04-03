@@ -15,7 +15,7 @@ const jwtLogin = new JwtStrategy(
     try {
       const user = await User.findById(payload.sub);
       if (user) {
-        done(null, user);
+        done(null, user.toObject());
       } else {
         done(null, false);
       }

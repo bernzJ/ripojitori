@@ -1,7 +1,6 @@
 /* eslint-disable */
 import { app, BrowserWindow, ipcMain } from 'electron';
-import { loadTest } from './actions/alias/test';
-
+import { loadToken } from './actions/alias/token';
 let mainWindow = null;
 
 const createMainForm = store => {
@@ -18,7 +17,9 @@ const createMainForm = store => {
     }
   });
 
-  store.dispatch(loadTest());
+  // Check if we have session.
+  store.dispatch(loadToken());
+
   mainWindow.openDevTools();
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);

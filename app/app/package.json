@@ -8,6 +8,7 @@
     "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
     "postinstall": "yarn electron-rebuild"
   },
+  "proxy": "http://localhost:5000",
   "license": "MIT",
   "dependencies": {}
 }

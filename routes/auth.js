@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const keys = require("../config/keys");
 const User = require("../models/User");
 const requireLocalAuth = require("../middleware/requireLocalAuth");
+const requireJwtAuth = require("../middleware/requireJwtAuth");
 
 const tokenFromUser = user => {
   const token = jwt.sign({}, keys.secretOrKey, {
@@ -34,6 +35,14 @@ router.get("/auth/register", async (req, res) => {
 
 //local login
 router.post("/auth/login", requireLocalAuth, (req, res) => {
+  const token = tokenFromUser(req.user);
+  delete req.user._id;
+  // res.cookie("x-auth-cookie", token);
+  res.json({ user: { ...req.user, token } });
+});
+
+//JWT login
+router.post("/auth/jwt-login", requireJwtAuth, (req, res) => {
   const token = tokenFromUser(req.user);
   delete req.user._id;
   // res.cookie("x-auth-cookie", token);
