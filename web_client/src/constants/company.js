@@ -2,9 +2,11 @@ import ObjectID from 'bson-objectid';
 
 const company = {
   _id: ObjectID(),
-  name: '',
+  projectResource: '',
   clientName: '',
-  clientType: '',
+  segment: '',
+  category: '',
+  status: '',
   hours: '',
   start: Date.now(),
   end: Date.now(),

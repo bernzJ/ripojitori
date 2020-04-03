@@ -2,9 +2,11 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const companySchema = new Schema({
-  name: String,
+  projectResource: String,
   clientName: String,
-  clientType: String,
+  segment: String,
+  category: String,
+  status: String,
   hours: String,
   start: Date,
   end: Date,

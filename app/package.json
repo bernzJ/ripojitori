@@ -56,8 +56,8 @@
     ]
   },
   "build": {
-    "productName": "electron-app-boilerplate",
-    "appId": "org.electron-app-boilerplate.app",
+    "productName": "Client Database",
+    "appId": "org.electron-app-boilerplate.client-database",
     "files": [
       "dist/",
       "node_modules/",

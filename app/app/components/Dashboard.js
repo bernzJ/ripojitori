@@ -54,8 +54,8 @@ const Dashboard = props => {
   }
 
   return (
-    <Container className="py-3">
-      <Row>
+    <Container fluid className="py-3">
+      <Row className="px-5">
         <Alert
           className="w-100"
           show={show}
@@ -72,7 +72,7 @@ const Dashboard = props => {
           ))}
         </Alert>
       </Row>
-      <Row className="justify-content-end">
+      <Row className="justify-content-end px-5">
         <Form>
           <Form.Control
             placeholder="Search"
@@ -81,7 +81,7 @@ const Dashboard = props => {
           />
         </Form>
       </Row>
-      <Row>
+      <Row className="px-5">
         <DashboardTable items={items} />
       </Row>
     </Container>

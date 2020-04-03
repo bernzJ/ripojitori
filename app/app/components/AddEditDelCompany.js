@@ -41,21 +41,11 @@ const AddEditDelCompany = ({ visibility, toggle, mode, params }) => {
         <Modal.Title>
           {mode === actionsBox.CREATE
             ? 'Adding'
-            : `Editing ${currentCompany.name}`}
+            : `Editing ${currentCompany.clientName}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
-          <Row className="py-2">
-            <Col>
-              <Form.Label>Company Name</Form.Label>
-              <Form.Control
-                placeholder="Company Name"
-                value={currentCompany.name}
-                onChange={e => setCompanyParam({ name: e.target.value })}
-              />
-            </Col>
-          </Row>
           <Row className="py-2">
             <Col>
               <Form.Label>Client Name</Form.Label>
@@ -65,12 +55,42 @@ const AddEditDelCompany = ({ visibility, toggle, mode, params }) => {
                 onChange={e => setCompanyParam({ clientName: e.target.value })}
               />
             </Col>
+          </Row>
+          <Row className="py-2">
             <Col>
-              <Form.Label>Client Type</Form.Label>
+              <Form.Label>Project Resource</Form.Label>
               <Form.Control
-                placeholder="Client Type"
-                value={currentCompany.clientType}
-                onChange={e => setCompanyParam({ clientType: e.target.value })}
+                placeholder="Project Resource"
+                value={currentCompany.projectResource}
+                onChange={e =>
+                  setCompanyParam({ projectResource: e.target.value })
+                }
+              />
+            </Col>
+            <Col>
+              <Form.Label>Segment</Form.Label>
+              <Form.Control
+                placeholder="Segment"
+                value={currentCompany.segment}
+                onChange={e => setCompanyParam({ segment: e.target.value })}
+              />
+            </Col>
+          </Row>
+          <Row className="py-2">
+            <Col>
+              <Form.Label>Category</Form.Label>
+              <Form.Control
+                placeholder="Category"
+                value={currentCompany.category}
+                onChange={e => setCompanyParam({ category: e.target.value })}
+              />
+            </Col>
+            <Col>
+              <Form.Label>Status</Form.Label>
+              <Form.Control
+                placeholder="Status"
+                value={currentCompany.status}
+                onChange={e => setCompanyParam({ status: e.target.value })}
               />
             </Col>
           </Row>

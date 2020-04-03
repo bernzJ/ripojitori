@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import axios from 'axios';
 
 import { setMessage, setMessageAndInvalidateSession } from './messages';
@@ -31,7 +30,6 @@ const getCompanies = () => async (dispatch, getState) => {
     if (data.companies) {
       dispatch(setCompanies(data.companies));
     } else {
-      console.log(data);
       dispatch(setMessage(data));
     }
   } catch ({ message }) {
@@ -72,9 +70,11 @@ const delCompanies = companies => async (dispatch, getState) => {
 
 const addCompany = ({
   _id,
-  name,
+  projectResource,
   clientName,
-  clientType,
+  segment,
+  category,
+  status,
   hours,
   start,
   end,
@@ -91,7 +91,18 @@ const addCompany = ({
       'http://localhost:5000/api/companies/create',
       {
         'x-auth-token': token,
-        company: { _id, name, clientName, clientType, hours, start, end, scope }
+        company: {
+          _id,
+          projectResource,
+          clientName,
+          segment,
+          category,
+          status,
+          hours,
+          start,
+          end,
+          scope
+        }
       }
     );
     if (data.message) {

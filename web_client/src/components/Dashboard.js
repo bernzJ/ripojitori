@@ -8,6 +8,7 @@ import Loading from './Loading';
 import getAllCompanies from '../selectors/companies';
 import { getCompanies, setFilter } from '../actions/api';
 import { resetMessage } from '../actions/messages';
+import { saveToken } from '../actions/alias/token';
 
 const makeGetAllCompanies = () => getAllCompanies;
 export const AllCompaniesItems = () => {
@@ -18,13 +19,20 @@ export const AllCompaniesItems = () => {
 
 const Dashboard = props => {
   const {
+    authReducer: {
+      user: { token }
+    },
     apiReducer: { loading, filter },
-    messagesReducer: { messages }
-  } = useSelector(({ authReducer, apiReducer, messagesReducer }) => ({
-    authReducer,
-    apiReducer,
-    messagesReducer
-  }));
+    messagesReducer: { messages },
+    tokenReducer: { saved }
+  } = useSelector(
+    ({ authReducer, apiReducer, messagesReducer, tokenReducer }) => ({
+      authReducer,
+      apiReducer,
+      messagesReducer,
+      tokenReducer
+    })
+  );
 
   const [show, setShow] = React.useState(false);
   const dispatch = useDispatch();
@@ -32,17 +40,22 @@ const Dashboard = props => {
 
   React.useEffect(() => {
     dispatch(getCompanies());
-  }, [dispatch, getCompanies]);
+    if (!saved) {
+      dispatch(saveToken(token));
+    }
+  }, [dispatch, getCompanies, saveToken, token, saved]);
 
   if (loading) {
     return <Loading />;
   }
+
   if (messages.length > 0 && !show) {
     setShow(true);
   }
+
   return (
-    <Container className="py-3">
-      <Row>
+    <Container fluid className="py-3">
+      <Row className="px-5">
         <Alert
           className="w-100"
           show={show}
@@ -59,7 +72,7 @@ const Dashboard = props => {
           ))}
         </Alert>
       </Row>
-      <Row className="justify-content-end">
+      <Row className="justify-content-end px-5">
         <Form>
           <Form.Control
             placeholder="Search"
@@ -68,7 +81,7 @@ const Dashboard = props => {
           />
         </Form>
       </Row>
-      <Row>
+      <Row className="px-5">
         <DashboardTable items={items} />
       </Row>
     </Container>

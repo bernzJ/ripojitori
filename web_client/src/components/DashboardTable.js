@@ -42,12 +42,14 @@ const renderItems = React.memo(({ data, index, style }) => {
         key={company._id}
         onClick={HandleItemClick}
       >
-        <div className="col">{company.name}</div>
         <div className="col">{company.clientName}</div>
-        <div className="col">{company.clientType}</div>
+        <div className="col">{company.segment}</div>
+        <div className="col">{company.category}</div>
         <div className="col">{company.hours}</div>
+        <div className="col">{company.status}</div>
         <div className="col">{company.start}</div>
         <div className="col">{company.end}</div>
+        <div className="col">{company.projectResource}</div>
       </RowItem>
     </div>
   );
@@ -181,17 +183,19 @@ const DashboardTable = ({ items }) => {
   };
 
   return (
-    <VHContainer>
+    <VHContainer fluid>
       {renderModals()}
       <div className="pl-thead">
         <ActionBox>{renderButtons()}</ActionBox>
         <div className="row mr-10">
-          <div className="col">Company Name</div>
           <div className="col">Client Name</div>
-          <div className="col">Client Type</div>
+          <div className="col">Segment</div>
+          <div className="col">Category</div>
           <div className="col">Hours</div>
+          <div className="col">Status</div>
           <div className="col">Start</div>
           <div className="col">End</div>
+          <div className="col">Project resource</div>
         </div>
       </div>
       <div className="pl-tbody h-100 mr-10">
@@ -226,6 +230,7 @@ DashboardTable.propTypes = {
 const VHContainer = styled(Container)`
   &&& {
     height: calc(100vh - 70px);
+    padding: 0;
   }
   .row {
     margin: 5px 0;

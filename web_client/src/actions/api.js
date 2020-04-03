@@ -68,9 +68,11 @@ const delCompanies = companies => async (dispatch, getState) => {
 
 const addCompany = ({
   _id,
-  name,
+  projectResource,
   clientName,
-  clientType,
+  segment,
+  category,
+  status,
   hours,
   start,
   end,
@@ -85,7 +87,18 @@ const addCompany = ({
     } = getState();
     const { data } = await axios.post('api/companies/create', {
       'x-auth-token': token,
-      company: { _id, name, clientName, clientType, hours, start, end, scope }
+      company: {
+        _id,
+        projectResource,
+        clientName,
+        segment,
+        category,
+        status,
+        hours,
+        start,
+        end,
+        scope
+      }
     });
     if (data.message) {
       dispatch(setMessage(data));
