@@ -58,7 +58,7 @@ const delCompanies = companies => async (dispatch, getState) => {
     } else {
       dispatch(
         setMessage({
-          message: `Sent query, deleted: ${data.result.deletedCount} companies.`
+          message: `Sent query: ${JSON.stringify(data)}.`
         })
       );
       dispatch(getCompanies());

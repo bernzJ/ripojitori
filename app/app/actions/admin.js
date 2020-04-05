@@ -56,7 +56,7 @@ const delUsers = users => async (dispatch, getState) => {
     } else {
       dispatch(
         setMessage({
-          message: `Sent query, deleted: ${data.result.deletedCount} users.`
+          message: `Sent query: ${JSON.stringify(data)}.`
         })
       );
       dispatch(getUsers());
