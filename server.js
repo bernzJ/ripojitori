@@ -1,5 +1,6 @@
 const express = require("express");
-const mongoose = require("mongoose");
+const sql = require('mssql/msnodesqlv8');
+//const mongoose = require("mongoose");
 const path = require("path");
 const https = require("https");
 const fs = require("fs");
@@ -21,13 +22,27 @@ require("./strategies/jwt");
 require("./strategies/local");
 
 // DB Config
-const dbConnection = keys.mongoURI;
+// const dbConnection = keys.mongoURI;
 
 // Connect to Mongo
-mongoose
+/* mongoose
   .connect(dbConnection, { useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true })
   .then(() => console.log("MongoDB Connected..."))
   .catch(err => console.log(err));
+*/
+// Connect to SQL Server
+sql.connect({
+  server: '(localdb)\\MSSQLLocalDB',
+  database: 'master',
+  parseJSON: true,
+  options: {
+    encrypt: false
+  }
+}).then(() => {
+  console.log("SQL Server Connected...")
+}).catch(err => {
+  console.dir(err)
+})
 
 // Use Routes
 app.use("/", authRoutes);

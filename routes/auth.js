@@ -3,7 +3,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 
 const keys = require("../config/keys");
-const User = require("../models/User");
+// const User = require("../models/User");
 const requireLocalAuth = require("../middleware/requireLocalAuth");
 const requireJwtAuth = require("../middleware/requireJwtAuth");
 
@@ -16,7 +16,7 @@ const tokenFromUser = user => {
 };
 
 // @TODO: remove this in prod.
-router.get("/auth/register", async (req, res) => {
+/*router.get("/auth/register", async (req, res) => {
   try {
     console.log(req.query);
     const { email, password, firstName, lastName, scope } = req.query;
@@ -31,7 +31,7 @@ router.get("/auth/register", async (req, res) => {
   } catch ({ message }) {
     res.send({ message });
   }
-});
+});*/
 
 //local login
 router.post("/auth/login", requireLocalAuth, (req, res) => {

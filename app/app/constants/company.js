@@ -1,7 +1,5 @@
-import ObjectID from 'bson-objectid';
-
 const company = {
-  _id: ObjectID(),
+  _id: -1,
   projectResource: '',
   clientName: '',
   segment: '',
