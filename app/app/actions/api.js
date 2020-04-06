@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { endpoints } from '../constants';
 import { setMessage, setMessageAndInvalidateSession } from './messages';
 
 const TYPES = {
@@ -24,7 +25,7 @@ const getCompanies = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('http://localhost:5000/api/companies', {
+    const { data } = await axios.post(`${endpoints.PROD}/api/companies`, {
       'x-auth-token': token
     });
     if (data.companies) {
@@ -46,13 +47,10 @@ const delCompanies = companies => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(
-      'http://localhost:5000/api/companies/del',
-      {
-        'x-auth-token': token,
-        companies
-      }
-    );
+    const { data } = await axios.post(`${endpoints.PROD}/api/companies/del`, {
+      'x-auth-token': token,
+      companies
+    });
     if (data.message) {
       dispatch(setMessage(data));
     } else {
@@ -88,7 +86,7 @@ const addCompany = ({
       }
     } = getState();
     const { data } = await axios.post(
-      'http://localhost:5000/api/companies/create',
+      `${endpoints.PROD}/api/companies/create`,
       {
         'x-auth-token': token,
         company: {

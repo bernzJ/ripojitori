@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+import { endpoints } from '../constants';
 import { setMessage } from './messages';
 
 const TYPES = {
@@ -14,7 +15,7 @@ const setUser = payload => ({
 
 const login = user => async dispatch => {
   try {
-    const { data } = await axios.post('http://localhost:5000/auth/login', user);
+    const { data } = await axios.post(`${endpoints.PROD}/auth/login`, user);
     if (data.user) {
       dispatch(setUser(data.user));
     } else {
@@ -27,7 +28,7 @@ const login = user => async dispatch => {
 
 const jwtLogin = token => async dispatch => {
   try {
-    const { data } = await axios.post('http://localhost:5000/auth/jwt-login', {
+    const { data } = await axios.post(`${endpoints.PROD}/auth/jwt-login`, {
       'x-auth-token': token
     });
     if (data.user) {
@@ -46,7 +47,7 @@ const logout = () => ({
 
 const apiLogout = () => async dispatch => {
   try {
-    await axios.post('http://localhost:5000/auth/logout');
+    await axios.post(`${endpoints.PROD}/auth/logout`);
     dispatch(logout());
   } catch ({ message }) {
     dispatch(setMessage(message));

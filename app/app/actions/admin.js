@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import axios from 'axios';
 
+import { endpoints } from '../constants';
 import { setMessage, setMessageAndInvalidateSession } from './messages';
 
 const TYPES = {
@@ -22,7 +23,7 @@ const getUsers = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('http://localhost:5000/admin/users', {
+    const { data } = await axios.post(`${endpoints.PROD}/admin/users`, {
       'x-auth-token': token
     });
     // @NOTE: uncomment to test invalid/errors.
@@ -47,7 +48,7 @@ const delUsers = users => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('http://localhost:5000/admin/users/del', {
+    const { data } = await axios.post(`${endpoints.PROD}/admin/users/del`, {
       'x-auth-token': token,
       users
     });
@@ -82,13 +83,10 @@ const addUser = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post(
-      'http://localhost:5000/admin/users/create',
-      {
-        'x-auth-token': token,
-        user: { _id, email, password, firstName, lastName, scope }
-      }
-    );
+    const { data } = await axios.post(`${endpoints.PROD}/admin/users/create`, {
+      'x-auth-token': token,
+      user: { _id, email, password, firstName, lastName, scope }
+    });
     if (data.message) {
       dispatch(setMessage(data));
     } else {
