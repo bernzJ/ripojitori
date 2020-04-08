@@ -1,13 +1,14 @@
-import { remote } from 'electron';
 import React from 'react';
 import styled from 'styled-components';
 import { Container, Row } from 'react-bootstrap';
+// @NOTE: Dont style-wrap this component, or it wont transpile.
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faWindowClose,
   faWindowMaximize,
   faWindowMinimize
 } from '@fortawesome/free-solid-svg-icons';
+import { remote } from 'electron';
 
 const DragBar = () => {
   const [isMaximized, setMaximized] = React.useState(false);
@@ -18,7 +19,7 @@ const DragBar = () => {
           <IconContainer
             onClick={() => remote.BrowserWindow.getFocusedWindow().minimize()}
           >
-            <FontAwesomeIconWrapper
+            <FontAwesomeIcon
               size="2x"
               color="#3e454d"
               icon={faWindowMinimize}
@@ -36,7 +37,7 @@ const DragBar = () => {
               }
             }}
           >
-            <FontAwesomeIconWrapper
+            <FontAwesomeIcon
               size="2x"
               color="#3e454d"
               icon={faWindowMaximize}
@@ -45,11 +46,7 @@ const DragBar = () => {
           <IconContainer
             onClick={() => remote.BrowserWindow.getFocusedWindow().close()}
           >
-            <FontAwesomeIconWrapper
-              size="2x"
-              color="#3e454d"
-              icon={faWindowClose}
-            />
+            <FontAwesomeIcon size="2x" color="#3e454d" icon={faWindowClose} />
           </IconContainer>
         </Row>
       </Container>
@@ -67,19 +64,17 @@ const Bar = styled.div`
     width: 100%;
     height: 60px;
   }
+  &&& svg {
+    color: #3e454d;
+    transition: color 0.2s linear;
+  }
+  &&& svg:hover {
+    color: #fff;
+  }
 `;
 const IconContainer = styled.div`
   &&& {
     margin: 10px;
     -webkit-app-region: no-drag;
-  }
-`;
-const FontAwesomeIconWrapper = styled(FontAwesomeIcon)`
-  &&& {
-    color: #3e454d;
-    transition: color 0.2s linear;
-  }
-  &&&:hover {
-    color: #fff;
   }
 `;

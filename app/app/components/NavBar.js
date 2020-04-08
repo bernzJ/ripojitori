@@ -24,45 +24,47 @@ const NavBar = props => {
     return null;
   }
   return (
-    <BlueNavBar collapseOnSelect expand="lg">
-      <LogoContainer className="p-3">
-        <Title href="#">Client Database</Title>
-      </LogoContainer>
-      <Navbar.Toggle aria-controls="responsive-navbar-nav" />
-      <Navbar.Collapse id="responsive-navbar-nav">
-        <Nav className="mr-auto">
-          <Linky
-            className={classNames({
-              selected: pathname === routes.DASHBOARD
-            })}
-            to={routes.DASHBOARD}
-          >
-            Dashboard
-          </Linky>
-          {userScope === scopes.ADMIN ? (
+    <NavWrapper>
+      <Navbar collapseOnSelect expand="lg">
+        <LogoContainer className="p-3">
+          <Title className="navbar-brand">Client Database</Title>
+        </LogoContainer>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="mr-auto">
             <Linky
               className={classNames({
-                selected: pathname === routes.ADMIN
+                selected: pathname === routes.DASHBOARD
               })}
-              to={routes.ADMIN}
+              to={routes.DASHBOARD}
             >
-              Admin
+              Dashboard
             </Linky>
-          ) : null}
-        </Nav>
-        <LinkA
-          onClick={() => {
-            dispatch(apiLogout());
-          }}
-          className={classNames({
-            selected: pathname === routes.LOGIN
-          })}
-          href="#"
-        >
-          Logout
-        </LinkA>
-      </Navbar.Collapse>
-    </BlueNavBar>
+            {userScope === scopes.ADMIN ? (
+              <Linky
+                className={classNames({
+                  selected: pathname === routes.ADMIN
+                })}
+                to={routes.ADMIN}
+              >
+                Admin
+              </Linky>
+            ) : null}
+          </Nav>
+          <LinkA
+            onClick={() => {
+              dispatch(apiLogout());
+            }}
+            className={classNames({
+              selected: pathname === routes.LOGIN
+            })}
+            href="#"
+          >
+            Logout
+          </LinkA>
+        </Navbar.Collapse>
+      </Navbar>
+    </NavWrapper>
   );
 };
 
@@ -90,14 +92,15 @@ const LinkA = styled.a`
     color: #fff;
   }
 `;
-const BlueNavBar = styled(Navbar)`
-  &&& {
+const NavWrapper = styled.div`
+  &&& .navbar-collapse {
     padding: 0;
     background-color: #00355c;
   }
 `;
-const Title = styled(Navbar.Brand)`
+const Title = styled.label`
   &&& {
+    user-select: none;
     color: #fff;
     font-weight: 500;
     margin: 0;
