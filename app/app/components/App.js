@@ -8,7 +8,7 @@ import { configureFlashMessages } from 'redux-flash-messages';
 import { configureStore, history } from '../store/configureStore';
 
 import Routes from './Routes';
-import NavBar from './NavBar';
+import NavBarBlue from './NavBarBlue';
 import PrivateRoute from './PrivateRoute';
 import DragBar from './DragBar';
 
@@ -23,7 +23,7 @@ const App = () => {
     <Provider store={store}>
       <ConnectedRouter history={history}>
         <DragBar />
-        <NavBar />
+        <NavBarBlue />
         <Switch>
           {Routes.map(({ isPrivate, scope, path, component }) => {
             const RouteComponent = routeType(isPrivate);

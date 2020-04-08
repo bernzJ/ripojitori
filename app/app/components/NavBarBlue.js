@@ -8,7 +8,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { routes, scopes } from '../constants';
 import { apiLogout } from '../actions/auth';
 
-const NavBar = props => {
+const NavBarBlue = props => {
   const {
     location: { pathname }
   } = props;
@@ -25,90 +25,85 @@ const NavBar = props => {
   }
   return (
     <NavWrapper>
-      <Navbar collapseOnSelect expand="lg">
-        <LogoContainer className="p-3">
-          <Title className="navbar-brand">Client Database</Title>
-        </LogoContainer>
+      <Navbar id="main-nav" collapseOnSelect expand="lg">
+        <div className="p-3 logo-container">
+          <label className="navbar-brand title">Client Database</label>
+        </div>
         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
         <Navbar.Collapse id="responsive-navbar-nav">
           <Nav className="mr-auto">
-            <Linky
+            <Link
               className={classNames({
+                linky: true,
                 selected: pathname === routes.DASHBOARD
               })}
               to={routes.DASHBOARD}
             >
               Dashboard
-            </Linky>
+            </Link>
             {userScope === scopes.ADMIN ? (
-              <Linky
+              <Link
                 className={classNames({
+                  linky: true,
                   selected: pathname === routes.ADMIN
                 })}
                 to={routes.ADMIN}
               >
                 Admin
-              </Linky>
+              </Link>
             ) : null}
           </Nav>
-          <LinkA
+          <a
             onClick={() => {
               dispatch(apiLogout());
             }}
             className={classNames({
+              linka: true,
               selected: pathname === routes.LOGIN
             })}
             href="#"
           >
             Logout
-          </LinkA>
+          </a>
         </Navbar.Collapse>
       </Navbar>
     </NavWrapper>
   );
 };
 
-export default withRouter(NavBar);
+export default withRouter(NavBarBlue);
 
-const Linky = styled(Link)`
-  &&& {
-    padding: 15px;
-    text-decoration: none;
-    color: #c3c3c3;
-    transition: color 0.2s linear;
-  }
-  &&&.selected {
-    color: #fff;
-  }
-`;
-const LinkA = styled.a`
-  &&& {
-    padding: 15px;
-    text-decoration: none;
-    color: #c3c3c3;
-    transition: color 0.2s linear;
-  }
-  &&&.selected {
-    color: #fff;
-  }
-`;
 const NavWrapper = styled.div`
-  &&& .navbar-collapse {
+  &&& #main-nav {
     padding: 0;
     background-color: #00355c;
   }
-`;
-const Title = styled.label`
-  &&& {
+  &&& .linky {
+    padding: 15px;
+    text-decoration: none;
+    color: #c3c3c3;
+    transition: color 0.2s linear;
+  }
+  &&& .linky.selected {
+    color: #fff;
+  }
+  &&& .linka {
+    padding: 15px;
+    text-decoration: none;
+    color: #c3c3c3;
+    transition: color 0.2s linear;
+  }
+  &&& .linka.selected {
+    color: #fff;
+  }
+  &&& .title {
     user-select: none;
     color: #fff;
     font-weight: 500;
     margin: 0;
     padding: 0;
   }
-`;
-const LogoContainer = styled.div`
-  &&& {
+  &&& .logo-container {
     height: 62px;
     background-color: #4898cf;
   }
