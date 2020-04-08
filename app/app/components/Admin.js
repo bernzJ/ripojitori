@@ -1,13 +1,14 @@
 /* eslint-disable react/no-array-index-key */
 import React from 'react';
-import { Alert, Container, Row } from 'react-bootstrap';
+import styled from 'styled-components';
+import { Container, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
 
 import AdminTable from './AdminTable';
 import Loading from './Loading';
+import FlashMessage from './FlashMessage';
 import AdminSelector from '../selectors/admin';
 import { getUsers } from '../actions/admin';
-import { resetMessage } from '../actions/messages';
 
 const makeGetAllUsers = () => AdminSelector;
 export const AllUsersItems = () => {
@@ -18,14 +19,11 @@ export const AllUsersItems = () => {
 
 const Admin = props => {
   const {
-    adminReducer: { loading },
-    messagesReducer: { messages }
-  } = useSelector(({ authReducer, adminReducer, messagesReducer }) => ({
+    adminReducer: { loading }
+  } = useSelector(({ authReducer, adminReducer }) => ({
     authReducer,
-    adminReducer,
-    messagesReducer
+    adminReducer
   }));
-  const [show, setShow] = React.useState(false);
   const dispatch = useDispatch();
   const items = AllUsersItems();
 
@@ -36,33 +34,22 @@ const Admin = props => {
   if (loading) {
     return <Loading />;
   }
-  if (messages.length > 0 && !show) {
-    setShow(true);
-  }
   return (
-    <Container className="py-3">
-      <Row>
-        <Alert
-          className="w-100"
-          show={show}
-          variant="danger"
-          onClose={() => {
-            dispatch(resetMessage());
-            setShow(false);
-          }}
-          dismissible
-        >
-          <Alert.Heading>Messages</Alert.Heading>
-          {messages.map((message, i) => (
-            <p key={i}>{message}</p>
-          ))}
-        </Alert>
+    <MainContainer fluid>
+      <Row className="p-5 justify-content-center">
+        <FlashMessage />
       </Row>
-      <Row>
+      <Row className="px-5">
         <AdminTable items={items} />
       </Row>
-    </Container>
+    </MainContainer>
   );
 };
 
 export default Admin;
+
+const MainContainer = styled(Container)`
+  &&& {
+    height: calc(97vh - 122px);
+  }
+`;

@@ -3,7 +3,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { Container, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faWindowClose, faExpand } from '@fortawesome/free-solid-svg-icons';
+import {
+  faWindowClose,
+  faWindowMaximize,
+  faWindowMinimize
+} from '@fortawesome/free-solid-svg-icons';
 
 const DragBar = () => {
   const [isMaximized, setMaximized] = React.useState(false);
@@ -12,9 +16,13 @@ const DragBar = () => {
       <Container fluid>
         <Row className="justify-content-end align-items-center">
           <IconContainer
-            onClick={() => remote.BrowserWindow.getFocusedWindow().close()}
+            onClick={() => remote.BrowserWindow.getFocusedWindow().minimize()}
           >
-            <FontAwesomeIcon size="2x" color="#eb4034" icon={faWindowClose} />
+            <FontAwesomeIconWrapper
+              size="2x"
+              color="#3e454d"
+              icon={faWindowMinimize}
+            />
           </IconContainer>
           <IconContainer
             onClick={() => {
@@ -28,7 +36,20 @@ const DragBar = () => {
               }
             }}
           >
-            <FontAwesomeIcon size="2x" color="#fff" icon={faExpand} />
+            <FontAwesomeIconWrapper
+              size="2x"
+              color="#3e454d"
+              icon={faWindowMaximize}
+            />
+          </IconContainer>
+          <IconContainer
+            onClick={() => remote.BrowserWindow.getFocusedWindow().close()}
+          >
+            <FontAwesomeIconWrapper
+              size="2x"
+              color="#3e454d"
+              icon={faWindowClose}
+            />
           </IconContainer>
         </Row>
       </Container>
@@ -51,5 +72,14 @@ const IconContainer = styled.div`
   &&& {
     margin: 10px;
     -webkit-app-region: no-drag;
+  }
+`;
+const FontAwesomeIconWrapper = styled(FontAwesomeIcon)`
+  &&& {
+    color: #3e454d;
+    transition: color 0.2s linear;
+  }
+  &&&:hover {
+    color: #fff;
   }
 `;

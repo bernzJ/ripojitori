@@ -1,10 +1,11 @@
 import { TYPES as ALIAS_TYPES } from '../actions/alias/token';
 import { TYPES } from '../actions/token';
+import { TYPES as AUTH_TYPES } from '../actions/auth';
 
 const initialState = {
   token: '',
   saved: false,
-  loading: true
+  loading: false
 };
 
 const tokenReducer = (state = initialState, action) => {
@@ -22,6 +23,8 @@ const tokenReducer = (state = initialState, action) => {
         token: payload
       };
     }
+    case AUTH_TYPES.LOGIN_USER:
+      return initialState;
     case TYPES.GET_TOKEN:
     case ALIAS_TYPES.ALIAS_SAVE_TOKEN:
     case ALIAS_TYPES.ALIAS_LOAD_TOKEN:

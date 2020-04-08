@@ -20,7 +20,9 @@ const createMainForm = store => {
   // Check if we have session.
   store.dispatch(loadToken());
 
-  mainWindow.openDevTools();
+  if (process.env.NODE_ENV === 'development') {
+    mainWindow.openDevTools();
+  }
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
 

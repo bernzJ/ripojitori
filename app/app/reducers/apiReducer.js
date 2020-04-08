@@ -1,5 +1,4 @@
 import { TYPES } from '../actions/api';
-import { TYPES as MSG_TYPES } from '../actions/messages';
 import { TYPES as AUTH_TYPES } from '../actions/auth';
 
 const initialState = {
@@ -20,11 +19,6 @@ const apiReducer = (state = initialState, action) => {
         ...state,
         loading: false,
         companies: payload
-      };
-    case MSG_TYPES.MESSAGES:
-      return {
-        ...state,
-        loading: false
       };
     case AUTH_TYPES.LOGOUT_USER:
       return initialState;

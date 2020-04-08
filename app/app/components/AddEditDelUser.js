@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, Col, Dropdown, Form, Modal, Row } from 'react-bootstrap';
@@ -37,7 +38,7 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
     setState({ ...state, user: { ...currentUser, ...kv } });
 
   return (
-    <Modal show={visibility} onHide={() => toggle(false)}>
+    <ModalWrapper show={visibility} onHide={() => toggle(false)} centered>
       <Modal.Header closeButton>
         <Modal.Title>
           {mode === actionsBox.CREATE
@@ -104,17 +105,15 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => toggle(false)} variant="danger">
-          Cancel
-        </Button>
-        <Button
+        <CancelButton onClick={() => toggle(false)}>Cancel</CancelButton>
+        <SaveButton
           onClick={() => dispatch(addUser(currentUser))}
           variant="success"
         >
           Save
-        </Button>
+        </SaveButton>
       </Modal.Footer>
-    </Modal>
+    </ModalWrapper>
   );
 };
 export default AddEditDelUser;
@@ -129,3 +128,54 @@ AddEditDelUser.propTypes = {
 AddEditDelUser.defaultProps = {
   params: {}
 };
+
+const ModalWrapper = styled(Modal)`
+  &&& .modal-content,
+  &&& .modal-header,
+  &&& .modal-footer {
+    border: none;
+    border-radius: 0;
+    color: #00355c;
+    background-clip: none;
+  }
+  &&& .modal-header {
+    background-color: #4898cf;
+    color: #fff;
+  }
+  &&& .modal-content input {
+    border-radius: 0;
+  }
+  &&& .modal-content .dropdown .dropdown-toggle {
+    border: 1px solid #ced4da;
+  }
+`;
+const SaveButton = styled(Button)`
+  &&& {
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #4898cf;
+    transition: background-color 0.2s linear;
+    border: none;
+  }
+  &&&:hover,
+  &&&:focus {
+    outline: none;
+    box-shadow: none;
+    background-color: #5abcff;
+  }
+`;
+const CancelButton = styled(Button)`
+  &&& {
+    text-transform: uppercase;
+    color: #fff;
+    background-color: #969696;
+    transition: background-color 0.2s linear;
+    border: none;
+  }
+  &&&:hover,
+  &&&:focus {
+    outline: none;
+    box-shadow: none;
+    background-color: #c5c5c5;
+  }
+`;

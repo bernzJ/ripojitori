@@ -42,7 +42,7 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
         .required(),
       password: Joi.string()
         .min(5)
-        .max(12).optional(),
+        .max(12),
       firstName: Joi.string()
         .required(),
       lastName: Joi.string()
@@ -51,7 +51,6 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
         .required()
     });
     const userSchema = await schema.validateAsync(user);
-
     if (userSchema.password) {
       userSchema.password = await User.hashPassword(userSchema.password);
     }
@@ -89,15 +88,13 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
         `);
     }
     await ps.execute(userSchema);
-
+    await ps.unprepare();
     // await User.updateOne({ _id }, userSchema, { upsert: true });
     res.send({
       result: "Saved"
     });
   } catch ({ message }) {
     res.send({ message });
-  } finally {
-    await ps.unprepare();
   }
 });
 
@@ -117,14 +114,13 @@ router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res) =
     var stmt = "DELETE from users where _id in (" + Object.keys(paramsObj).map((o) => { return '@' + o }).join(',') + ')';
     await ps.prepare(stmt);
     const result = await ps.execute(paramsObj);
+    await ps.unprepare();
 
     res.send({
       result
     });
   } catch ({ message }) {
     res.send({ message });
-  } finally {
-    await ps.unprepare();
   }
 });
 

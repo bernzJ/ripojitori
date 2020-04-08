@@ -20,6 +20,8 @@ const jwtLogin = new JwtStrategy(
       ps.input('_id', sql.Int);
       await ps.prepare("SELECT * FROM users WHERE _id = @_id FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER;");
       const result = await ps.execute({ _id: payload.sub });
+      await ps.unprepare();
+
       const user = result.recordset[0];
       if (user) {
         done(null, user);
@@ -28,8 +30,6 @@ const jwtLogin = new JwtStrategy(
       }
     } catch ({ message }) {
       done(null, false, message);
-    } finally {
-      await ps.unprepare();
     }
   }
 );

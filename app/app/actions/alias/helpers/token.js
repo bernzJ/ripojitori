@@ -1,16 +1,11 @@
 import path from 'path';
 import * as fse from 'fs-extra';
+import getAppDataPath from 'appdata-path';
 import { setLoading, setToken, setSaved } from '../../token';
 
-const getAppFolderPath = () =>
-  process.env.APPDATA ||
-  (process.platform === 'darwin'
-    ? `${process.env.HOME}/Library/Preferences`
-    : `${process.env.HOME}/.local/share`);
-
 const getTokenJsonPath = () => {
-  let appFolderPath = getAppFolderPath();
-  appFolderPath = path.resolve(appFolderPath, '/Ripojitori/token.json');
+  let appFolderPath = getAppDataPath('client-database');
+  appFolderPath = path.resolve(appFolderPath, 'token.json');
   return fse.ensureFile(appFolderPath).then(() => appFolderPath);
 };
 

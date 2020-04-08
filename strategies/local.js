@@ -30,6 +30,8 @@ const passportLogin = new PassportLocalStrategy(
       ps.input('email', sql.VarChar(50));
       await ps.prepare("SELECT * FROM users WHERE email = @email FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER;");
       const result = await ps.execute({ email: userSchema.email });
+      await ps.unprepare();
+
       user = result.recordset[0];
 
 
@@ -45,8 +47,6 @@ const passportLogin = new PassportLocalStrategy(
       done(null, user);
     } catch ({ message }) {
       done(null, false, message);
-    } finally {
-      await ps.unprepare();
     }
   }
 );

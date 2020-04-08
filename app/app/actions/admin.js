@@ -1,8 +1,8 @@
-/* eslint-disable no-console */
 import axios from 'axios';
+import { addError, addSuccess } from 'redux-flash-messages';
 
 import { endpoints } from '../constants';
-import { setMessage, setMessageAndInvalidateSession } from './messages';
+import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
@@ -22,20 +22,17 @@ const getUsers = () => async (dispatch, getState) => {
         user: { token }
       }
     } = getState();
-
     const { data } = await axios.post(`${endpoints.PROD}/admin/users`, {
       'x-auth-token': token
     });
-    // @NOTE: uncomment to test invalid/errors.
-    // return dispatch(setMessageAndInvalidateSession('Booo ! get out.'));
     if (data.users) {
       dispatch(setUsers(data.users));
-    } else {
-      console.log(data);
-      dispatch(setMessage(data));
+    } else if (data.message) {
+      addError({ text: data.message, data: 'admin.js getUsers data.users' });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'admin.js getUsers catch' });
   }
 };
 
@@ -53,17 +50,14 @@ const delUsers = users => async (dispatch, getState) => {
       users
     });
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({ text: data.message, data: 'admin.js delUsers data.message' });
     } else {
-      dispatch(
-        setMessage({
-          message: `Sent query: ${JSON.stringify(data)}.`
-        })
-      );
       dispatch(getUsers());
+      addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'admin.js delUsers catch' });
   }
 };
 
@@ -88,17 +82,14 @@ const addUser = ({
       user: { _id, email, password, firstName, lastName, scope }
     });
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({ text: data.message, data: 'admin.js addUser data.message' });
     } else {
-      dispatch(
-        setMessage({
-          message: 'Saved changes.'
-        })
-      );
+      addSuccess({ text: 'Saved changes.' });
       dispatch(getUsers());
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'admin.js addUser catch' });
   }
 };
 

@@ -84,14 +84,13 @@ router.post("/api/companies/create", requireJwtAuth, requireScope, ((req, res, n
           WHERE _id = @_id
      `);
     await ps.execute(companySchema);
+    await ps.unprepare();
 
     res.send({
       result: "Saved"
     });
   } catch ({ message }) {
     res.send({ message })
-  } finally {
-    await ps.unprepare();
   }
 });
 
@@ -110,14 +109,13 @@ router.post("/api/companies/del", requireJwtAuth, requireScope, ((req, res, next
     var stmt = "DELETE from companies where _id in (" + Object.keys(paramsObj).map((o) => { return '@' + o }).join(',') + ')';
     await ps.prepare(stmt);
     const result = await ps.execute(paramsObj);
+    await ps.unprepare();
 
     res.send({
       result
     });
   } catch ({ message }) {
     res.send({ message })
-  } finally {
-    await ps.unprepare();
   }
 });
 

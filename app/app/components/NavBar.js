@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { routes, scopes } from '../constants';
 import { apiLogout } from '../actions/auth';
-import { saveToken } from '../actions/alias/token';
 
 const NavBar = props => {
   const {
@@ -25,8 +24,10 @@ const NavBar = props => {
     return null;
   }
   return (
-    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
-      <Navbar.Brand href="#home">Client Database</Navbar.Brand>
+    <BlueNavBar collapseOnSelect expand="lg">
+      <LogoContainer className="p-3">
+        <Title href="#">Client Database</Title>
+      </LogoContainer>
       <Navbar.Toggle aria-controls="responsive-navbar-nav" />
       <Navbar.Collapse id="responsive-navbar-nav">
         <Nav className="mr-auto">
@@ -49,20 +50,19 @@ const NavBar = props => {
             </Linky>
           ) : null}
         </Nav>
-        <Linky
+        <LinkA
           onClick={() => {
             dispatch(apiLogout());
-            dispatch(saveToken(''));
           }}
           className={classNames({
             selected: pathname === routes.LOGIN
           })}
-          to={routes.LOGIN}
+          href="#"
         >
           Logout
-        </Linky>
+        </LinkA>
       </Navbar.Collapse>
-    </Navbar>
+    </BlueNavBar>
   );
 };
 
@@ -77,5 +77,36 @@ const Linky = styled(Link)`
   }
   &&&.selected {
     color: #fff;
+  }
+`;
+const LinkA = styled.a`
+  &&& {
+    padding: 15px;
+    text-decoration: none;
+    color: #c3c3c3;
+    transition: color 0.2s linear;
+  }
+  &&&.selected {
+    color: #fff;
+  }
+`;
+const BlueNavBar = styled(Navbar)`
+  &&& {
+    padding: 0;
+    background-color: #00355c;
+  }
+`;
+const Title = styled(Navbar.Brand)`
+  &&& {
+    color: #fff;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+  }
+`;
+const LogoContainer = styled.div`
+  &&& {
+    height: 62px;
+    background-color: #4898cf;
   }
 `;

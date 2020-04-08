@@ -1,41 +1,34 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import styled from 'styled-components';
-import { Alert, Container, Row } from 'react-bootstrap';
+import { Container, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
+import { addError } from 'redux-flash-messages';
 
 import { login, jwtLogin } from '../actions/auth';
-import { setMessage } from '../actions/messages';
 import { routes } from '../constants';
 
 import LoginFields from './LoginFields';
 import Loading from './Loading';
+import FlashMessage from './FlashMessage';
 
-const renderError = (...errors) =>
-  errors.map((error, i) =>
-    error ? (
-      <Alert key={i} className="w-100 my-2" variant="danger">
-        <Alert.Heading>Messages</Alert.Heading>
-        <p>{error}</p>
-      </Alert>
-    ) : null
-  );
 const Login = props => {
   const {
-    authReducer: { isAuthenticated },
-    messagesReducer: { messages },
-    tokenReducer: { loading, token }
-  } = useSelector(({ authReducer, messagesReducer, tokenReducer }) => ({
+    authReducer: { isAuthenticated, loading: JWTLoading },
+    tokenReducer: { loading: tokenLoading, token }
+  } = useSelector(({ authReducer, tokenReducer }) => ({
     authReducer,
-    messagesReducer,
     tokenReducer
   }));
-  const [triedToJWT, setTriedToJWT] = useState(false);
   const dispatch = useDispatch();
-
-  if (loading) {
+  React.useEffect(() => {
+    if (!tokenLoading) {
+      dispatch(jwtLogin(token));
+    }
+  }, [dispatch, jwtLogin, token, tokenLoading]);
+  if ((tokenLoading || JWTLoading) && !isAuthenticated) {
     return <Loading />;
   }
 
@@ -52,39 +45,45 @@ const Login = props => {
     );
   }
 
-  if (!triedToJWT && token !== '') {
-    dispatch(jwtLogin(token));
-    setTriedToJWT(true);
-  }
-
   const handleSubmit = fields => {
     const { email, password } = fields;
     const re = /\S+@\S+\.\S+/;
     if (!re.test(email)) {
-      dispatch(setMessage({ message: 'Invalid email.' }));
+      addError({
+        text: 'Invalid email.',
+        data: 'Login.js handleSubmit !re.test(email)'
+      });
       return;
     }
     if (password.length < 5) {
-      dispatch(setMessage({ message: 'Invalid password.' }));
+      addError({
+        text: 'Invalid password.',
+        data: 'Login.js handleSubmit password.length < 5'
+      });
       return;
     }
     dispatch(login({ email, password }));
   };
 
   return (
-    <Container>
-      <Row>
-        {renderError(...messages)}
+    <FirstContainer>
+      <Row className="justify-content-center">
+        <FlashMessage />
         <MainContainer>
           <LoginFields handleSubmit={handleSubmit} />
         </MainContainer>
       </Row>
-    </Container>
+    </FirstContainer>
   );
 };
 
 export default Login;
 
+const FirstContainer = styled(Container)`
+  &&& {
+    padding-top: 85px;
+  }
+`;
 const MainContainer = styled.div`
   & {
     padding: 15px;

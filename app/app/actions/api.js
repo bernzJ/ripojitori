@@ -1,7 +1,8 @@
 import axios from 'axios';
+import { addError, addSuccess } from 'redux-flash-messages';
 
 import { endpoints } from '../constants';
-import { setMessage, setMessageAndInvalidateSession } from './messages';
+import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
@@ -30,11 +31,15 @@ const getCompanies = () => async (dispatch, getState) => {
     });
     if (data.companies) {
       dispatch(setCompanies(data.companies));
-    } else {
-      dispatch(setMessage(data));
+    } else if (data.message) {
+      addError({
+        text: data.message,
+        data: 'api.js getCompanies data.companies'
+      });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js getCompanies catch' });
   }
 };
 
@@ -52,17 +57,17 @@ const delCompanies = companies => async (dispatch, getState) => {
       companies
     });
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({
+        text: data.message,
+        data: 'api.js delCompanies data.message'
+      });
     } else {
-      dispatch(
-        setMessage({
-          message: `Sent query: ${JSON.stringify(data)}.`
-        })
-      );
       dispatch(getCompanies());
+      addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js delCompanies catch' });
   }
 };
 
@@ -104,17 +109,17 @@ const addCompany = ({
       }
     );
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({
+        text: data.message,
+        data: 'api.js addCompany data.message'
+      });
     } else {
-      dispatch(
-        setMessage({
-          message: 'Saved changes.'
-        })
-      );
       dispatch(getCompanies());
+      addSuccess({ text: 'Saved changes.' });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js addCompany catch' });
   }
 };
 

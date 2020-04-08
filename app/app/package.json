@@ -1,6 +1,6 @@
 {
-  "name": "ripojitori",
-  "productName": "Ripojitori",
+  "name": "client-database",
+  "productName": "Client Database",
   "version": "0.0.1",
   "description": "Electron stuff",
   "main": "./main.prod.js",
