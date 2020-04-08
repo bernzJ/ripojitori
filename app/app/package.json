@@ -1,7 +1,7 @@
 {
   "name": "client-database",
   "productName": "Client Database",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Electron stuff",
   "main": "./main.prod.js",
   "scripts": {
