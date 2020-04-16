@@ -10,6 +10,29 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { remote } from 'electron';
 
+const Bar = styled.div`
+  &&& {
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+    background-color: #343a40;
+    width: 100%;
+    height: 60px;
+  }
+  &&& svg {
+    color: #3e454d;
+    transition: color 0.2s linear;
+  }
+  &&& svg:hover {
+    color: #fff;
+  }
+`;
+const IconContainer = styled.div`
+  &&& {
+    margin: 10px;
+    -webkit-app-region: no-drag;
+  }
+`;
+
 const DragBar = () => {
   const [isMaximized, setMaximized] = React.useState(false);
   return (
@@ -55,26 +78,3 @@ const DragBar = () => {
 };
 
 export default DragBar;
-
-const Bar = styled.div`
-  &&& {
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
-    background-color: #343a40;
-    width: 100%;
-    height: 60px;
-  }
-  &&& svg {
-    color: #3e454d;
-    transition: color 0.2s linear;
-  }
-  &&& svg:hover {
-    color: #fff;
-  }
-`;
-const IconContainer = styled.div`
-  &&& {
-    margin: 10px;
-    -webkit-app-region: no-drag;
-  }
-`;

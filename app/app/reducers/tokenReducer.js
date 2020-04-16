@@ -5,7 +5,7 @@ import { TYPES as AUTH_TYPES } from '../actions/auth';
 const initialState = {
   token: '',
   saved: false,
-  loading: false
+  loading: true
 };
 
 const tokenReducer = (state = initialState, action) => {

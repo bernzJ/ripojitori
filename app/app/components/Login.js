@@ -14,6 +14,20 @@ import LoginFields from './LoginFields';
 import Loading from './Loading';
 import FlashMessage from './FlashMessage';
 
+const FirstContainer = styled(Container)`
+  &&& {
+    padding-top: 85px;
+  }
+`;
+const MainContainer = styled.div`
+  & {
+    padding: 15px;
+    width: 100%;
+    margin: 5%;
+    border: 1px solid #ddd;
+  }
+`;
+
 const Login = props => {
   const {
     authReducer: { isAuthenticated, loading: JWTLoading },
@@ -78,17 +92,3 @@ const Login = props => {
 };
 
 export default Login;
-
-const FirstContainer = styled(Container)`
-  &&& {
-    padding-top: 85px;
-  }
-`;
-const MainContainer = styled.div`
-  & {
-    padding: 15px;
-    width: 100%;
-    margin: 5%;
-    border: 1px solid #ddd;
-  }
-`;

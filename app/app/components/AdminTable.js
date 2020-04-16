@@ -18,6 +18,118 @@ import { actionsBox, intScopeToString } from '../constants';
 import AddEditDelUser from './AddEditDelUser';
 import VirtualTable from './VirtualTable';
 
+const MainTableContainer = styled.div`
+  @media only screen and (max-width: 1100px) {
+    &&& table,
+    &&& thead,
+    &&& tbody,
+    &&& th,
+    &&& td,
+    &&& tr {
+      display: block;
+    }
+
+    &&& thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    &&& tr {
+      border: 1px solid #ccc;
+    }
+
+    &&& td {
+      border: none;
+      border-bottom: 1px solid #f8f8f8;
+      position: relative;
+      padding-left: 50%;
+      white-space: normal;
+      text-align: left;
+    }
+
+    &&& td:before {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      text-align: left;
+      color: #00355c;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    &&& td:before {
+      content: attr(data-title);
+    }
+  }
+`;
+const VHContainer = styled(Container)`
+  &&& {
+    position: relative;
+    height: 350px;
+    padding: 0;
+    margin-top: 15px;
+  }
+`;
+const RowItem = styled.tr`
+  &:first-of-type {
+    border-top: 3px solid #f8f8f8;
+  }
+  & {
+    cursor: default;
+    transition: all 0.2s linear;
+    border-bottom: 3px solid #f8f8f8;
+    background-color: #fff;
+  }
+  &&&.selected {
+    background-color: #0e5181;
+    color: #fff;
+  }
+  &&&:hover {
+    background-color: #14639c;
+    color: #fff;
+  }
+  & td {
+    padding: 15px 20px;
+  }
+`;
+const PLHead = styled.tr`
+  &&& {
+    margin-bottom: 20px;
+  }
+  &&& th {
+    height: 54px;
+    position: relative;
+    color: #00355c;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    margin-top: 10px;
+    background-color: #fff;
+    padding: 0 20px;
+  }
+`;
+const ActionBox = styled.div`
+  &&& {
+    z-index: 9;
+    position: absolute;
+    right: 0;
+    top: -70px;
+    margin: 10px;
+  }
+`;
+const ButtonAction = styled(Button)`
+  &&& {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #fff;
+    background-color: #4898cf;
+    border: none;
+  }
+`;
+
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index }) => {
   const {
@@ -178,120 +290,8 @@ const AdminTable = ({ items }) => {
   );
 };
 
-export default AdminTable;
-
 AdminTable.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
-const MainTableContainer = styled.div`
-  @media only screen and (max-width: 1100px) {
-    &&& table,
-    &&& thead,
-    &&& tbody,
-    &&& th,
-    &&& td,
-    &&& tr {
-      display: block;
-    }
-
-    &&& thead tr {
-      position: absolute;
-      top: -9999px;
-      left: -9999px;
-    }
-
-    &&& tr {
-      border: 1px solid #ccc;
-    }
-
-    &&& td {
-      border: none;
-      border-bottom: 1px solid #f8f8f8;
-      position: relative;
-      padding-left: 50%;
-      white-space: normal;
-      text-align: left;
-    }
-
-    &&& td:before {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      width: 45%;
-      padding-right: 10px;
-      white-space: nowrap;
-      text-align: left;
-      color: #00355c;
-      font-weight: 600;
-      text-transform: uppercase;
-    }
-    &&& td:before {
-      content: attr(data-title);
-    }
-  }
-`;
-const VHContainer = styled(Container)`
-  &&& {
-    position: relative;
-    height: 350px;
-    padding: 0;
-    margin-top: 15px;
-  }
-`;
-const RowItem = styled.tr`
-  &:first-of-type {
-    border-top: 3px solid #f8f8f8;
-  }
-  & {
-    cursor: default;
-    transition: all 0.2s linear;
-    border-bottom: 3px solid #f8f8f8;
-    background-color: #fff;
-  }
-  &&&.selected {
-    background-color: #0e5181;
-    color: #fff;
-  }
-  &&&:hover {
-    background-color: #14639c;
-    color: #fff;
-  }
-  & td {
-    padding: 15px 20px;
-  }
-`;
-const PLHead = styled.tr`
-  &&& {
-    margin-bottom: 20px;
-  }
-  &&& th {
-    height: 54px;
-    position: relative;
-    color: #00355c;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 11px;
-    margin-top: 10px;
-    background-color: #fff;
-    padding: 0 20px;
-  }
-`;
-const ActionBox = styled.div`
-  &&& {
-    z-index: 9;
-    position: absolute;
-    right: 0;
-    top: -70px;
-    margin: 10px;
-  }
-`;
-const ButtonAction = styled(Button)`
-  &&& {
-    margin-left: 5px;
-    margin-right: 5px;
-    color: #fff;
-    background-color: #4898cf;
-    border: none;
-  }
-`;
+export default AdminTable;

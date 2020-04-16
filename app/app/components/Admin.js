@@ -10,6 +10,12 @@ import FlashMessage from './FlashMessage';
 import AdminSelector from '../selectors/admin';
 import { getUsers } from '../actions/admin';
 
+const MainContainer = styled(Container)`
+  &&& {
+    height: calc(97vh - 122px);
+  }
+`;
+
 const makeGetAllUsers = () => AdminSelector;
 export const AllUsersItems = () => {
   const getAllUsers = React.useMemo(makeGetAllUsers, []);
@@ -47,9 +53,3 @@ const Admin = props => {
 };
 
 export default Admin;
-
-const MainContainer = styled(Container)`
-  &&& {
-    height: calc(97vh - 122px);
-  }
-`;

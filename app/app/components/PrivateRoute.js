@@ -58,8 +58,6 @@ const PrivateRoute = ({ component, children, scope, ...rest }) => {
   );
 };
 
-export default PrivateRoute;
-
 PrivateRoute.propTypes = {
   component: PropTypes.oneOfType([
     PropTypes.node,
@@ -74,3 +72,5 @@ PrivateRoute.defaultProps = {
   scope: 0,
   component: undefined
 };
+
+export default PrivateRoute;

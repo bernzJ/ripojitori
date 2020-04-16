@@ -13,6 +13,43 @@ import getAllCompanies from '../selectors/companies';
 import { getCompanies, setFilter } from '../actions/api';
 import { saveToken } from '../actions/alias/token';
 
+const MainContainer = styled(Container)`
+  &&& {
+    height: calc(97vh - 122px);
+  }
+`;
+const FormContainer = styled(Form)`
+  &&& {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px;
+    border-radius: 25px;
+    border: #efefef 1px solid;
+    background-color: #fff;
+  }
+  &&&:hover .search {
+    color: #4898cf;
+  }
+  &&& .round {
+    color: #a2a1a4;
+    transition: all 0.2s linear;
+    border: none;
+    box-shadow: none;
+  }
+  &&& .round::placeholder {
+    color: #757575;
+  }
+  &&& .round:focus,
+  &&& .round:hover {
+    outline: none;
+  }
+  &&& .search {
+    display: inline-block;
+    transition: color 0.2s linear;
+  }
+`;
+
 const makeGetAllCompanies = () => getAllCompanies;
 export const AllCompaniesItems = () => {
   const getAllUsers = React.useMemo(makeGetAllCompanies, []);
@@ -75,40 +112,3 @@ const Dashboard = props => {
 };
 
 export default Dashboard;
-
-const MainContainer = styled(Container)`
-  &&& {
-    height: calc(97vh - 122px);
-  }
-`;
-const FormContainer = styled(Form)`
-  &&& {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px;
-    border-radius: 25px;
-    border: #efefef 1px solid;
-    background-color: #fff;
-  }
-  &&&:hover .search {
-    color: #4898cf;
-  }
-  &&& .round {
-    color: #a2a1a4;
-    transition: all 0.2s linear;
-    border: none;
-    box-shadow: none;
-  }
-  &&& .round::placeholder {
-    color: #757575;
-  }
-  &&& .round:focus,
-  &&& .round:hover {
-    outline: none;
-  }
-  &&& .search {
-    display: inline-block;
-    transition: color 0.2s linear;
-  }
-`;

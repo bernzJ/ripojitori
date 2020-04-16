@@ -55,8 +55,8 @@ const LoginFields = props => {
   );
 };
 
-export default LoginFields;
-
 LoginFields.propTypes = {
   handleSubmit: PropTypes.func.isRequired
 };
+
+export default LoginFields;

@@ -3,35 +3,6 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Button, Modal } from 'react-bootstrap';
 
-const ModalComponent = ({ show, hide, title, message, handleResponse }) => {
-  const handleClick = confirmed => {
-    handleResponse(confirmed);
-    hide(false);
-  };
-
-  return (
-    <ModalWrapper show={show} onHide={() => hide(false)} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>{title}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>{message}</Modal.Body>
-      <Modal.Footer>
-        <CancelButton onClick={() => handleClick(false)}>Cancel</CancelButton>
-        <SaveButton onClick={() => handleClick(true)}>Confirm</SaveButton>
-      </Modal.Footer>
-    </ModalWrapper>
-  );
-};
-export default ModalComponent;
-
-ModalComponent.propTypes = {
-  show: PropTypes.bool.isRequired,
-  hide: PropTypes.func.isRequired,
-  title: PropTypes.string.isRequired,
-  message: PropTypes.string.isRequired,
-  handleResponse: PropTypes.func.isRequired
-};
-
 const ModalWrapper = styled(Modal)`
   &&& .modal-content,
   &&& .modal-header,
@@ -82,3 +53,33 @@ const CancelButton = styled(Button)`
     background-color: #c5c5c5;
   }
 `;
+
+const ModalComponent = ({ show, hide, title, message, handleResponse }) => {
+  const handleClick = confirmed => {
+    handleResponse(confirmed);
+    hide(false);
+  };
+
+  return (
+    <ModalWrapper show={show} onHide={() => hide(false)} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>{title}</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>{message}</Modal.Body>
+      <Modal.Footer>
+        <CancelButton onClick={() => handleClick(false)}>Cancel</CancelButton>
+        <SaveButton onClick={() => handleClick(true)}>Confirm</SaveButton>
+      </Modal.Footer>
+    </ModalWrapper>
+  );
+};
+
+ModalComponent.propTypes = {
+  show: PropTypes.bool.isRequired,
+  hide: PropTypes.func.isRequired,
+  title: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
+  handleResponse: PropTypes.func.isRequired
+};
+
+export default ModalComponent;

@@ -3,31 +3,6 @@ import styled from 'styled-components';
 import { removeFlashMessage } from 'redux-flash-messages';
 import { useDispatch, useSelector } from 'react-redux';
 
-const FlashMessage = props => {
-  const { messages } = useSelector(({ flashMessage }) => flashMessage);
-  const dispatch = useDispatch();
-  const onFlashMessageClick = flashMessage => {
-    // flashMessage.onClick(flashMessage);
-    dispatch(removeFlashMessage(flashMessage.id));
-  };
-  const renderMessage = message => {
-    // @TODO log these: message.data
-    return (
-      <Flash
-        debug={typeof message.data === 'string' ? message.data : ''}
-        key={message.id}
-        className={`animated bounceInLeft flash-message ${message.type}`}
-        onClick={() => onFlashMessageClick(message)}
-      >
-        {message.text}
-      </Flash>
-    );
-  };
-  return messages.map(message => renderMessage(message));
-};
-
-export default FlashMessage;
-
 const Flash = styled.div`
   &&& {
     position: absolute;
@@ -57,3 +32,28 @@ const Flash = styled.div`
     border-color: #ffeeba;
   }
 `;
+
+const FlashMessage = props => {
+  const { messages } = useSelector(({ flashMessage }) => flashMessage);
+  const dispatch = useDispatch();
+  const onFlashMessageClick = flashMessage => {
+    // flashMessage.onClick(flashMessage);
+    dispatch(removeFlashMessage(flashMessage.id));
+  };
+  const renderMessage = message => {
+    // @TODO log these: message.data
+    return (
+      <Flash
+        debug={typeof message.data === 'string' ? message.data : ''}
+        key={message.id}
+        className={`animated bounceInLeft flash-message ${message.type}`}
+        onClick={() => onFlashMessageClick(message)}
+      >
+        {message.text}
+      </Flash>
+    );
+  };
+  return messages.map(message => renderMessage(message));
+};
+
+export default FlashMessage;

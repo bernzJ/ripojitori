@@ -8,6 +8,42 @@ import { useSelector, useDispatch } from 'react-redux';
 import { routes, scopes } from '../constants';
 import { apiLogout } from '../actions/auth';
 
+const NavWrapper = styled.div`
+  &&& #main-nav {
+    padding: 0;
+    background-color: #00355c;
+  }
+  &&& .linky {
+    padding: 15px;
+    text-decoration: none;
+    color: #c3c3c3;
+    transition: color 0.2s linear;
+  }
+  &&& .linky.selected {
+    color: #fff;
+  }
+  &&& .linka {
+    padding: 15px;
+    text-decoration: none;
+    color: #c3c3c3;
+    transition: color 0.2s linear;
+  }
+  &&& .linka.selected {
+    color: #fff;
+  }
+  &&& .title {
+    user-select: none;
+    color: #fff;
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+  }
+  &&& .logo-container {
+    height: 62px;
+    background-color: #4898cf;
+  }
+`;
+
 const NavBarBlue = props => {
   const {
     location: { pathname }
@@ -72,39 +108,3 @@ const NavBarBlue = props => {
 };
 
 export default withRouter(NavBarBlue);
-
-const NavWrapper = styled.div`
-  &&& #main-nav {
-    padding: 0;
-    background-color: #00355c;
-  }
-  &&& .linky {
-    padding: 15px;
-    text-decoration: none;
-    color: #c3c3c3;
-    transition: color 0.2s linear;
-  }
-  &&& .linky.selected {
-    color: #fff;
-  }
-  &&& .linka {
-    padding: 15px;
-    text-decoration: none;
-    color: #c3c3c3;
-    transition: color 0.2s linear;
-  }
-  &&& .linka.selected {
-    color: #fff;
-  }
-  &&& .title {
-    user-select: none;
-    color: #fff;
-    font-weight: 500;
-    margin: 0;
-    padding: 0;
-  }
-  &&& .logo-container {
-    height: 62px;
-    background-color: #4898cf;
-  }
-`;
