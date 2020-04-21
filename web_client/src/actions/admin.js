@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { addError, addSuccess } from 'redux-flash-messages';
 
-import { setMessage, setMessageAndInvalidateSession } from './messages';
+import { endpoints } from '../constants';
+import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
@@ -20,18 +22,18 @@ const getUsers = () => async (dispatch, getState) => {
         user: { token }
       }
     } = getState();
-
-    const { data } = await axios.post('admin/users', { 'x-auth-token': token });
-    // @NOTE: uncomment to test invalid/errors.
-    // return dispatch(setMessageAndInvalidateSession('Booo ! get out.'));
+    console.log(endpoints);
+    const { data } = await axios.post(`${endpoints.PROD}/admin/users`, {
+      'x-auth-token': token
+    });
     if (data.users) {
       dispatch(setUsers(data.users));
-    } else {
-      console.log(data);
-      dispatch(setMessage(data));
+    } else if (data.message) {
+      addError({ text: data.message, data: 'admin.js getUsers data.users' });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'admin.js getUsers catch' });
   }
 };
 
@@ -44,22 +46,19 @@ const delUsers = users => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('admin/users/del', {
+    const { data } = await axios.post(`${endpoints.PROD}/admin/users/del`, {
       'x-auth-token': token,
       users
     });
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({ text: data.message, data: 'admin.js delUsers data.message' });
     } else {
-      dispatch(
-        setMessage({
-          message: `Sent query, deleted: ${data.result.deletedCount} users.`
-        })
-      );
       dispatch(getUsers());
+      addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'admin.js delUsers catch' });
   }
 };
 
@@ -79,22 +78,19 @@ const addUser = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post('admin/users/create', {
+    const { data } = await axios.post(`${endpoints.PROD}/admin/users/create`, {
       'x-auth-token': token,
       user: { _id, email, password, firstName, lastName, scope }
     });
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({ text: data.message, data: 'admin.js addUser data.message' });
     } else {
-      dispatch(
-        setMessage({
-          message: 'Saved changes.'
-        })
-      );
+      addSuccess({ text: 'Saved changes.' });
       dispatch(getUsers());
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'admin.js addUser catch' });
   }
 };
 

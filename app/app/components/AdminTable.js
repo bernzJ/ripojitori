@@ -154,7 +154,7 @@ const renderItems = React.memo(({ data, index }) => {
       className={classNames({
         selected: selected.indexOf(user) > -1
       })}
-      kkey={user._id}
+      key={user._id}
       onClick={HandleItemClick}
     >
       <td data-title="ID">{user._id}</td>

@@ -11,7 +11,7 @@ const enhancers = [];
 const persistConfig = {
   key: 'root',
   storage,
-  blacklist: ['messagesReducer']
+  blacklist: ['flashMessage']
 };
 // @TODO: remove this if we don't use. This would save current route.
 const actionCreators = {

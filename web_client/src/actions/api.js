@@ -1,6 +1,8 @@
 import axios from 'axios';
+import { addError, addSuccess } from 'redux-flash-messages';
 
-import { setMessage, setMessageAndInvalidateSession } from './messages';
+import { endpoints } from '../constants';
+import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
@@ -24,17 +26,20 @@ const getCompanies = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('api/companies', {
+    const { data } = await axios.post(`${endpoints.PROD}/api/companies`, {
       'x-auth-token': token
     });
     if (data.companies) {
       dispatch(setCompanies(data.companies));
-    } else {
-      console.log(data);
-      dispatch(setMessage(data));
+    } else if (data.message) {
+      addError({
+        text: data.message,
+        data: 'api.js getCompanies data.companies'
+      });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js getCompanies catch' });
   }
 };
 
@@ -47,22 +52,22 @@ const delCompanies = companies => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post('api/companies/del', {
+    const { data } = await axios.post(`${endpoints.PROD}/api/companies/del`, {
       'x-auth-token': token,
       companies
     });
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({
+        text: data.message,
+        data: 'api.js delCompanies data.message'
+      });
     } else {
-      dispatch(
-        setMessage({
-          message: `Sent query, deleted: ${data.result.deletedCount} companies.`
-        })
-      );
       dispatch(getCompanies());
+      addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js delCompanies catch' });
   }
 };
 
@@ -85,33 +90,36 @@ const addCompany = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post('api/companies/create', {
-      'x-auth-token': token,
-      company: {
-        _id,
-        projectResource,
-        clientName,
-        segment,
-        category,
-        status,
-        hours,
-        start,
-        end,
-        scope
+    const { data } = await axios.post(
+      `${endpoints.PROD}/api/companies/create`,
+      {
+        'x-auth-token': token,
+        company: {
+          _id,
+          projectResource,
+          clientName,
+          segment,
+          category,
+          status,
+          hours,
+          start,
+          end,
+          scope
+        }
       }
-    });
+    );
     if (data.message) {
-      dispatch(setMessage(data));
+      addError({
+        text: data.message,
+        data: 'api.js addCompany data.message'
+      });
     } else {
-      dispatch(
-        setMessage({
-          message: 'Saved changes.'
-        })
-      );
       dispatch(getCompanies());
+      addSuccess({ text: 'Saved changes.' });
     }
   } catch ({ message }) {
-    dispatch(setMessageAndInvalidateSession(message));
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js addCompany catch' });
   }
 };
 

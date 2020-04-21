@@ -13,8 +13,6 @@ const Loading = ({ callback, delay }) => {
   );
 };
 
-export default Loading;
-
 Loading.propTypes = {
   callback: PropTypes.func,
   delay: PropTypes.number
@@ -24,3 +22,5 @@ Loading.defaultProps = {
   callback: null,
   delay: 1000
 };
+
+export default Loading;

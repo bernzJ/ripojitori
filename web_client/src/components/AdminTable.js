@@ -10,14 +10,127 @@ import {
 import { Button, Container, Row } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { FixedSizeList as List, areEqual } from 'react-window';
+import { areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { actionsBox, intScopeToString } from '../constants';
 import AddEditDelUser from './AddEditDelUser';
+import VirtualTable from './VirtualTable';
+
+const MainTableContainer = styled.div`
+  @media only screen and (max-width: 1100px) {
+    &&& table,
+    &&& thead,
+    &&& tbody,
+    &&& th,
+    &&& td,
+    &&& tr {
+      display: block;
+    }
+
+    &&& thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    &&& tr {
+      border: 1px solid #ccc;
+    }
+
+    &&& td {
+      border: none;
+      border-bottom: 1px solid #f8f8f8;
+      position: relative;
+      padding-left: 50%;
+      white-space: normal;
+      text-align: left;
+    }
+
+    &&& td:before {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      text-align: left;
+      color: #00355c;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    &&& td:before {
+      content: attr(data-title);
+    }
+  }
+`;
+const VHContainer = styled(Container)`
+  &&& {
+    position: relative;
+    height: 350px;
+    padding: 0;
+    margin-top: 15px;
+  }
+`;
+const RowItem = styled.tr`
+  &:first-of-type {
+    border-top: 3px solid #f8f8f8;
+  }
+  & {
+    cursor: default;
+    transition: all 0.2s linear;
+    border-bottom: 3px solid #f8f8f8;
+    background-color: #fff;
+  }
+  &&&.selected {
+    background-color: #0e5181;
+    color: #fff;
+  }
+  &&&:hover {
+    background-color: #14639c;
+    color: #fff;
+  }
+  & td {
+    padding: 15px 20px;
+  }
+`;
+const PLHead = styled.tr`
+  &&& {
+    margin-bottom: 20px;
+  }
+  &&& th {
+    height: 54px;
+    position: relative;
+    color: #00355c;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    margin-top: 10px;
+    background-color: #fff;
+    padding: 0 20px;
+  }
+`;
+const ActionBox = styled.div`
+  &&& {
+    z-index: 9;
+    position: absolute;
+    right: 0;
+    top: -70px;
+    margin: 10px;
+  }
+`;
+const ButtonAction = styled(Button)`
+  &&& {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #fff;
+    background-color: #4898cf;
+    border: none;
+  }
+`;
 
 // @TODO: memo this might be useless.
-const renderItems = React.memo(({ data, index, style }) => {
+const renderItems = React.memo(({ data, index }) => {
   const {
     users,
     state,
@@ -36,24 +149,26 @@ const renderItems = React.memo(({ data, index, style }) => {
     }
   };
   return (
-    <div style={style}>
-      <RowItem
-        className={classNames({
-          row: true,
-          selected: selected.indexOf(user) > -1
-        })}
-        key={user._id}
-        onClick={HandleItemClick}
-      >
-        <div className="col">{user._id}</div>
-        <div className="col">{user.email}</div>
-        <div className="col">{user.firstName}</div>
-        <div className="col">{user.lastName}</div>
-        <div className="col">{intScopeToString(user.scope)}</div>
-      </RowItem>
-    </div>
+    <RowItem
+      className={classNames({
+        selected: selected.indexOf(user) > -1
+      })}
+      key={user._id}
+      onClick={HandleItemClick}
+    >
+      <td data-title="ID">{user._id}</td>
+      <td data-title="Email">{user.email}</td>
+      <td data-title="First Name">{user.firstName}</td>
+      <td data-title="Last Name">{user.lastName}</td>
+      <td data-title="Permission">{intScopeToString(user.scope)}</td>
+    </RowItem>
   );
 }, areEqual);
+
+const checkBreakpoint = () => {
+  const { innerWidth: width } = window;
+  return width <= 1100 ? 442 : 78;
+};
 
 const AdminTable = ({ items }) => {
   const [state, setState] = React.useState({
@@ -66,9 +181,9 @@ const AdminTable = ({ items }) => {
     }
   });
 
-  if (items.length === 0) {
+  /* if (items.length === 0) {
     return <span>Nothing to see here.</span>;
-  }
+  } */
   const { action } = state;
   const setVisibility = visibility =>
     setState({ ...state, action: { ...action, visibility } });
@@ -76,9 +191,9 @@ const AdminTable = ({ items }) => {
     action.name === actionsBox.NONE ? null : <AddEditDelUser {...action} />;
 
   return (
-    <VHContainer>
+    <VHContainer fluid>
       {renderModals()}
-      <div className="pl-thead">
+      <MainTableContainer className="h-100">
         <ActionBox>
           <Row className="px-0 m-0">
             <ButtonAction
@@ -139,106 +254,40 @@ const AdminTable = ({ items }) => {
             </ButtonAction>
           </Row>
         </ActionBox>
-        <div className="row mr-10">
-          <div className="col">ID</div>
-          <div className="col">Email</div>
-          <div className="col">First Name</div>
-          <div className="col">Last Name</div>
-          <div className="col">Permission</div>
-        </div>
-      </div>
-      <div className="pl-tbody h-100 mr-10">
         <AutoSizer>
           {({ height, width }) => (
-            <List
+            <VirtualTable
               width={width}
               height={height}
+              header={
+                <thead>
+                  <PLHead>
+                    <th>ID</th>
+                    <th>Email</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Permission</th>
+                  </PLHead>
+                </thead>
+              }
+              row={renderItems}
               itemData={{
                 users: items,
                 state,
                 setState
               }}
               itemCount={items.length}
-              itemSize={38}
-            >
-              {renderItems}
-            </List>
+              itemSize={checkBreakpoint()}
+            />
           )}
         </AutoSizer>
-      </div>
+      </MainTableContainer>
     </VHContainer>
   );
 };
-
-export default AdminTable;
 
 AdminTable.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
-const VHContainer = styled(Container)`
-  &&& {
-    height: calc(100vh - 70px);
-  }
-  .row {
-    margin: 5px 0;
-    padding: 0 20px;
-    -webkit-box-align: center;
-    align-items: center;
-  }
-  &&& .mr-10 {
-    margin-right: 120px;
-  }
-  .col {
-    padding: 0 10px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .pl-thead {
-    position: relative;
-    color: #fff;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 11px;
-    margin-top: 10px;
-    padding: 15px 0;
-    background-color: #343a40;
-  }
-  .pl-tbody .row {
-    background-color: #fff;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    color: #212529;
-    font-size: 16px;
-  }
-`;
-const RowItem = styled.div`
-  & {
-    cursor: default;
-    transition: all 0.2s linear;
-  }
-  &&&.selected {
-    background-color: #e6e6e6;
-  }
-  &&&:hover {
-    background-color: #343a40;
-    color: #fff;
-  }
-`;
-const ActionBox = styled.div`
-  &&& {
-    z-index: 9;
-    position: absolute;
-    right: 0;
-    top: 0;
-    margin: 10px;
-  }
-`;
-const ButtonAction = styled(Button)`
-  &&& {
-    margin-left: 5px;
-    margin-right: 5px;
-    color: #fff;
-    background-color: #343a40;
-  }
-`;
+export default AdminTable;
