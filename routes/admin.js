@@ -43,50 +43,31 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
       password: Joi.string()
         .min(5)
         .max(12),
-      firstName: Joi.string()
+      first_name: Joi.string()
         .required(),
-      lastName: Joi.string()
+      last_name: Joi.string()
         .required(),
       scope: Joi.number()
         .required()
     });
     const userSchema = await schema.validateAsync(user);
+   
     if (userSchema.password) {
       userSchema.password = await User.hashPassword(userSchema.password);
+    } else {
+      userSchema.password = '';
     }
 
     ps.input('_id', sql.Int);
-    ps.input('firstName', sql.VarChar(50));
-    ps.input('lastName', sql.VarChar(50));
+    ps.input('first_name', sql.VarChar(50));
+    ps.input('last_name', sql.VarChar(50));
     ps.input('email', sql.VarChar(50));
     ps.input('scope', sql.Int);
+    ps.input('password', sql.VarChar(255));
 
-    if (userSchema.password) {
-      ps.input('password', sql.VarChar(255));
-      await ps.prepare(`
-        IF NOT EXISTS (SELECT * FROM users WHERE _id = @_id)
 
-            INSERT INTO users (email, password, firstName, lastName, scope)
-            VALUES (@email, @password, @firstName, @lastName, @scope)
+    await ps.prepare(`EXEC [dbo].[update_user] @_id, @email, @password, @first_name, @last_name, @scope`);
 
-        ELSE
-            UPDATE users
-            SET email = @email, password = @password, firstName = @firstName, lastName = @lastName, scope = @scope
-            WHERE _id = @_id
-        `);
-    } else {
-      await ps.prepare(`
-        IF NOT EXISTS (SELECT * FROM users WHERE _id = @_id)
-
-            INSERT INTO users (email, firstName, lastName, scope)
-            VALUES (@email, @firstName, @lastName, @scope)
-
-        ELSE
-            UPDATE users
-            SET email = @email, firstName = @firstName, lastName = @lastName, scope = @scope
-            WHERE _id = @_id
-        `);
-    }
     await ps.execute(userSchema);
     await ps.unprepare();
     // await User.updateOne({ _id }, userSchema, { upsert: true });

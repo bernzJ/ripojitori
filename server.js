@@ -18,7 +18,7 @@ const allowCrossDomain = (req, res, next) => {
 
 const keys = require("./config/keys");
 const authRoutes = require("./routes/auth");
-const apiRoutes = require("./routes/api");
+const apiRoutes = require("./routes/customers");
 const adminRoutes = require("./routes/admin");
 
 // Bodyparser Middleware
@@ -41,10 +41,12 @@ require("./strategies/local");
 */
 // Connect to SQL Server
 sql.connect({
-  server: '(localdb)\\MSSQLLocalDB',
-  database: 'master',
+  server: 'SCALYBOI\\CLIENTDATABASE',
+  database: 'clientdb',
   parseJSON: true,
+  driver: "msnodesqlv8",
   options: {
+    trustedConnection: true,
     encrypt: false
   }
 }).then(() => {

@@ -6,18 +6,18 @@ import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
-  GET_COMPANIES: 'GET_COMPANIES',
+  GET_CUSTOMERS: 'GET_CUSTOMERS',
   SET_FILTER: 'SET_FILTER'
 };
 
-const setCompanies = payload => ({
-  type: TYPES.GET_COMPANIES,
+const setCustomers = payload => ({
+  type: TYPES.GET_CUSTOMERS,
   payload
 });
 
 const setFilter = payload => ({ type: TYPES.SET_FILTER, payload });
 
-const getCompanies = () => async (dispatch, getState) => {
+const getCustomers = () => async (dispatch, getState) => {
   try {
     dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
@@ -26,24 +26,24 @@ const getCompanies = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.PROD}/api/companies`, {
+    const { data } = await axios.post(`${endpoints.DEV}/customers`, {
       'x-auth-token': token
     });
-    if (data.companies) {
-      dispatch(setCompanies(data.companies));
+    if (data.customers) {
+      dispatch(setCustomers(data.customers));
     } else if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js getCompanies data.companies'
+        data: 'api.js getCustomers data.customers'
       });
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js getCompanies catch' });
+    addError({ text: message, data: 'api.js getCustomers catch' });
   }
 };
 
-const delCompanies = companies => async (dispatch, getState) => {
+const delCustomers = customers => async (dispatch, getState) => {
   try {
     dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
@@ -52,26 +52,26 @@ const delCompanies = companies => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.PROD}/api/companies/del`, {
+    const { data } = await axios.post(`${endpoints.DEV}/customers/del`, {
       'x-auth-token': token,
-      companies
+      customers
     });
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js delCompanies data.message'
+        data: 'api.js delCustomers data.message'
       });
     } else {
-      dispatch(getCompanies());
+      dispatch(getCustomers());
       addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js delCompanies catch' });
+    addError({ text: message, data: 'api.js delCustomers catch' });
   }
 };
-
-const addCompany = ({
+// @TODO: fix this (params)
+const addCustomer = ({
   _id,
   projectResource,
   clientName,
@@ -90,44 +90,41 @@ const addCompany = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post(
-      `${endpoints.PROD}/api/companies/create`,
-      {
-        'x-auth-token': token,
-        company: {
-          _id,
-          projectResource,
-          clientName,
-          segment,
-          category,
-          status,
-          hours,
-          start,
-          end,
-          scope
-        }
+    const { data } = await axios.post(`${endpoints.DEV}/api/customers/create`, {
+      'x-auth-token': token,
+      customer: {
+        _id,
+        projectResource,
+        clientName,
+        segment,
+        category,
+        status,
+        hours,
+        start,
+        end,
+        scope
       }
-    );
+    });
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js addCompany data.message'
+        data: 'api.js addCustomer data.message'
       });
     } else {
-      dispatch(getCompanies());
+      dispatch(getCustomers());
       addSuccess({ text: 'Saved changes.' });
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js addCompany catch' });
+    addError({ text: message, data: 'api.js addCustomer catch' });
   }
 };
 
 export {
   TYPES,
-  getCompanies,
-  addCompany,
-  delCompanies,
-  setCompanies,
+  getCustomers,
+  addCustomer,
+  delCustomers,
+  setCustomers,
   setFilter
 };

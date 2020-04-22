@@ -21,7 +21,7 @@ const setLoading = payload => ({
 
 const login = user => async dispatch => {
   try {
-    const { data } = await axios.post(`${endpoints.PROD}/auth/login`, user);
+    const { data } = await axios.post(`${endpoints.DEV}/auth/login`, user);
     if (data.user) {
       dispatch(setUser(data.user));
     } else if (data.message) {
@@ -39,7 +39,7 @@ const login = user => async dispatch => {
 
 const jwtLogin = token => async dispatch => {
   try {
-    const { data } = await axios.post(`${endpoints.PROD}/auth/jwt-login`, {
+    const { data } = await axios.post(`${endpoints.DEV}/auth/jwt-login`, {
       'x-auth-token': token
     });
     if (data.user) {
@@ -63,7 +63,7 @@ const logout = () => ({
 
 const apiLogout = () => async dispatch => {
   try {
-    await axios.post(`${endpoints.PROD}/auth/logout`);
+    await axios.post(`${endpoints.DEV}/auth/logout`);
     dispatch(logout());
   } catch ({ message }) {
     addError({ text: message, data: 'auth.js apiLogout catch' });

@@ -2,7 +2,7 @@ import routes from './routes.json';
 import { scopes, intScopeToString } from './scopes';
 import actionsBox from './actionsBox.json';
 import user from './user';
-import company from './company';
+import customer from './customer';
 import endpoints from './endpoints';
 
 export {
@@ -10,7 +10,7 @@ export {
   scopes,
   intScopeToString,
   user,
-  company,
+  customer,
   actionsBox,
   endpoints
 };

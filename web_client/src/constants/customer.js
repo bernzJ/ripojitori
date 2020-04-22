@@ -1,0 +1,32 @@
+const customer = {
+  ID: -1,
+  selected: false,
+  Country: '',
+  Logo: '',
+  'Company Name': '',
+  'Company Address1': '',
+  'Company Address2': '',
+  City: '',
+  State: '',
+  Zip: '',
+  Website: '',
+  'Time Zone': '',
+  'Fiscal Year Begin': '',
+  'Fiscal Year End': '',
+  'Number of Employees': '',
+  'Quarterly Close Cycle': '',
+  'Month End Close Period': '',
+  'OMS Service Type': '',
+  'Active Projects': '',
+  'Financial Platform': '',
+  'HR System': '',
+  SSO: '',
+  'Test Site': '',
+  'Refresh Date': '',
+  'LG Owner': '',
+  'Employee Groups': '',
+  scope: 0,
+  Industry: ''
+};
+
+export default customer;

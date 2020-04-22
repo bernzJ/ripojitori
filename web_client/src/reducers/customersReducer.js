@@ -1,24 +1,24 @@
-import { TYPES } from '../actions/api';
+import { TYPES } from '../actions/customers';
 import { TYPES as AUTH_TYPES } from '../actions/auth';
 
 const initialState = {
   filter: '',
-  companies: [],
+  customers: [],
   loading: true
 };
 
-const apiReducer = (state = initialState, action) => {
+const customersReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
     case TYPES.SET_FILTER:
       return { ...state, filter: payload };
     case TYPES.IS_LOADING:
       return { ...state, loading: payload };
-    case TYPES.GET_COMPANIES:
+    case TYPES.GET_CUSTOMERS:
       return {
         ...state,
         loading: false,
-        companies: payload
+        customers: payload
       };
     case AUTH_TYPES.LOGOUT_USER:
       return initialState;
@@ -27,4 +27,4 @@ const apiReducer = (state = initialState, action) => {
   }
 };
 
-export default apiReducer;
+export default customersReducer;

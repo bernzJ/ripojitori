@@ -9,12 +9,12 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import DashboardTable from './DashboardTable';
 import Loading from './Loading';
 import FlashMessage from './FlashMessage';
-import getAllCompanies from '../selectors/companies';
-import { getCompanies, setFilter } from '../actions/api';
+import getAllCustomers from '../selectors/customers';
+import { getCustomers, setFilter } from '../actions/customers';
 
 const MainContainer = styled(Container)`
   &&& {
-    height: calc(97vh - 122px);
+    height: calc(100vh - 62px);
   }
 `;
 const FormContainer = styled(Form)`
@@ -48,27 +48,32 @@ const FormContainer = styled(Form)`
     transition: color 0.2s linear;
   }
 `;
+const AutoRow = styled(Row)`
+  &&& {
+    height: calc(100vh - 250px);
+  }
+`;
 
-const makeGetAllCompanies = () => getAllCompanies;
-export const AllCompaniesItems = () => {
-  const getAllUsers = React.useMemo(makeGetAllCompanies, []);
-  const allUsers = useSelector(state => getAllUsers(state));
-  return allUsers;
+const makeGetAllCustomers = () => getAllCustomers;
+export const AllCustomersItems = () => {
+  const allCachedCustomers = React.useMemo(makeGetAllCustomers, []);
+  const allCustomers = useSelector(state => allCachedCustomers(state));
+  return allCustomers;
 };
 
 const Dashboard = props => {
   const {
-    apiReducer: { loading, filter }
-  } = useSelector(({ apiReducer }) => ({
-    apiReducer
+    customersReducer: { loading, filter }
+  } = useSelector(({ customersReducer }) => ({
+    customersReducer
   }));
 
   const dispatch = useDispatch();
-  const items = AllCompaniesItems();
+  const items = AllCustomersItems();
 
   React.useEffect(() => {
-    dispatch(getCompanies());
-  }, [dispatch, getCompanies]);
+    dispatch(getCustomers());
+  }, [dispatch, getCustomers]);
 
   if (loading) {
     return <Loading />;
@@ -94,9 +99,9 @@ const Dashboard = props => {
           />
         </FormContainer>
       </Row>
-      <Row className="px-5">
+      <AutoRow className="px-5">
         <DashboardTable items={items} />
-      </Row>
+      </AutoRow>
     </MainContainer>
   );
 };

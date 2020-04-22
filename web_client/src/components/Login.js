@@ -40,9 +40,7 @@ const Login = props => {
   }));
   const dispatch = useDispatch();
   React.useEffect(() => {
-    if (token) {
-      dispatch(jwtLogin(token));
-    }
+    dispatch(jwtLogin(token));
   }, [dispatch, jwtLogin, token]);
   if (JWTLoading && !isAuthenticated) {
     return <Loading />;

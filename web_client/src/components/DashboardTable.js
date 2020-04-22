@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import styled from 'styled-components';
@@ -11,7 +12,7 @@ import { areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 import { actionsBox, scopes } from '../constants';
-import AddEditDelCompany from './AddEditDelCompany';
+import AddEditDelCustomer from './AddEditDelCustomer';
 import VirtualTable from './VirtualTable';
 
 const MainTableContainer = styled.div`
@@ -33,6 +34,7 @@ const MainTableContainer = styled.div`
 
     &&& tr {
       border: 1px solid #ccc;
+      height: 1028px;
     }
 
     &&& td {
@@ -40,7 +42,7 @@ const MainTableContainer = styled.div`
       border-bottom: 1px solid #f8f8f8;
       position: relative;
       padding-left: 50%;
-      white-space: normal;
+      white-space: nowrap;
       text-align: left;
     }
 
@@ -78,6 +80,8 @@ const RowItem = styled.tr`
     transition: all 0.2s linear;
     border-bottom: 3px solid #f8f8f8;
     background-color: #fff;
+    white-space: nowrap;
+    height: 63px;
   }
   &&&.selected {
     background-color: #0e5181;
@@ -96,7 +100,6 @@ const PLHead = styled.tr`
     margin-bottom: 20px;
   }
   &&& th {
-    height: 54px;
     position: relative;
     color: #00355c;
     font-weight: 600;
@@ -126,6 +129,11 @@ const ButtonAction = styled(Button)`
   }
 `;
 
+const dynamicRenderHeaders = items => {
+  const item = items[0];
+  return Object.keys(item).map(k => <th key={k}>{k}</th>);
+};
+
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index }) => {
   const {
@@ -134,6 +142,13 @@ const renderItems = React.memo(({ data, index }) => {
     setState,
     state: { selected }
   } = data;
+  const entries = obj => {
+    const ownProps = Object.keys(obj);
+    let i = ownProps.length;
+    const resArray = new Array(i);
+    while (i--) resArray[i] = [ownProps[i], obj[ownProps[i]]];
+    return resArray;
+  };
   const company = companies[index];
   const HandleItemClick = () => {
     if (selected.indexOf(company) > -1) {
@@ -153,21 +168,18 @@ const renderItems = React.memo(({ data, index }) => {
       key={company._id}
       onClick={HandleItemClick}
     >
-      <td data-title="Client Name">{company.clientName}</td>
-      <td data-title="Segment">{company.segment}</td>
-      <td data-title="Category">{company.category}</td>
-      <td data-title="Hours">{company.hours}</td>
-      <td data-title="Status">{company.status}</td>
-      <td data-title="Start">{company.start}</td>
-      <td data-title="End">{company.end}</td>
-      <td data-title="Project Resource">{company.projectResource}</td>
+      {entries(company).map(([k, v]) => (
+        <td key={k} data-title={k}>
+          {v}
+        </td>
+      ))}
     </RowItem>
   );
 }, areEqual);
 
 const checkBreakpoint = () => {
   const { innerWidth: width } = window;
-  return width <= 1100 ? 442 : 78;
+  return width <= 1100 ? 1028 : 63;
 };
 
 const DashboardTable = ({ items }) => {
@@ -188,7 +200,7 @@ const DashboardTable = ({ items }) => {
   const setVisibility = visibility =>
     setState({ ...state, action: { ...action, visibility } });
   const renderModals = () =>
-    action.name === actionsBox.NONE ? null : <AddEditDelCompany {...action} />;
+    action.name === actionsBox.NONE ? null : <AddEditDelCustomer {...action} />;
 
   const renderButtons = () => {
     if (user.scope === scopes.SUB) {
@@ -297,7 +309,7 @@ const DashboardTable = ({ items }) => {
   };
 
   return (
-    <VHContainer fluid>
+    <VHContainer fluid className="h-100">
       {renderModals()}
       <MainTableContainer className="h-100">
         <ActionBox>{renderButtons()}</ActionBox>
@@ -308,16 +320,7 @@ const DashboardTable = ({ items }) => {
               height={height}
               header={
                 <thead>
-                  <PLHead>
-                    <th>Client Name</th>
-                    <th>Segment</th>
-                    <th>Category</th>
-                    <th>Hours</th>
-                    <th>Status</th>
-                    <th>Start</th>
-                    <th>End</th>
-                    <th>Project resource</th>
-                  </PLHead>
+                  <PLHead>{dynamicRenderHeaders(items)}</PLHead>
                 </thead>
               }
               row={renderItems}

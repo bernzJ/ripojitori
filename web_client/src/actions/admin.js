@@ -22,8 +22,7 @@ const getUsers = () => async (dispatch, getState) => {
         user: { token }
       }
     } = getState();
-    console.log(endpoints);
-    const { data } = await axios.post(`${endpoints.PROD}/admin/users`, {
+    const { data } = await axios.post(`${endpoints.DEV}/admin/users`, {
       'x-auth-token': token
     });
     if (data.users) {
@@ -46,7 +45,7 @@ const delUsers = users => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.PROD}/admin/users/del`, {
+    const { data } = await axios.post(`${endpoints.DEV}/admin/users/del`, {
       'x-auth-token': token,
       users
     });
@@ -78,9 +77,16 @@ const addUser = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post(`${endpoints.PROD}/admin/users/create`, {
+    const { data } = await axios.post(`${endpoints.DEV}/admin/users/create`, {
       'x-auth-token': token,
-      user: { _id, email, password, firstName, lastName, scope }
+      user: {
+        _id,
+        email,
+        password,
+        ...{ first_name: firstName },
+        ...{ last_name: lastName },
+        scope
+      }
     });
     if (data.message) {
       addError({ text: data.message, data: 'admin.js addUser data.message' });
