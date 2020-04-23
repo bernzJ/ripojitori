@@ -50,7 +50,7 @@ const FormContainer = styled(Form)`
 `;
 const AutoRow = styled(Row)`
   &&& {
-    height: calc(100vh - 250px);
+    height: calc(100vh - 525px);
   }
 `;
 

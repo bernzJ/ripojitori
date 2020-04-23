@@ -36,6 +36,7 @@ const getCustomers = () => async (dispatch, getState) => {
         text: data.message,
         data: 'api.js getCustomers data.customers'
       });
+      dispatch(apiLogout());
     }
   } catch ({ message }) {
     dispatch(apiLogout());

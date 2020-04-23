@@ -14,6 +14,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { actionsBox, scopes } from '../constants';
 import AddEditDelCustomer from './AddEditDelCustomer';
 import VirtualTable from './VirtualTable';
+import DashboardTabs from './DashboardTabs';
 
 const MainTableContainer = styled.div`
   @media only screen and (max-width: 1100px) {
@@ -129,10 +130,13 @@ const ButtonAction = styled(Button)`
   }
 `;
 
-const dynamicRenderHeaders = items => {
+/* const dynamicRenderHeaders = items => {
   const item = items[0];
-  return Object.keys(item).map(k => <th key={k}>{k}</th>);
-};
+  if (item) {
+    return Object.keys(item).map(k => <th key={k}>{k}</th>);
+  }
+  return null;
+}; */
 
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index }) => {
@@ -142,6 +146,7 @@ const renderItems = React.memo(({ data, index }) => {
     setState,
     state: { selected }
   } = data;
+  /* 
   const entries = obj => {
     const ownProps = Object.keys(obj);
     let i = ownProps.length;
@@ -149,6 +154,13 @@ const renderItems = React.memo(({ data, index }) => {
     while (i--) resArray[i] = [ownProps[i], obj[ownProps[i]]];
     return resArray;
   };
+ 
+   {entries(company).map(([k, v]) => (
+        <td key={k} data-title={k}>
+          {v}
+        </td>
+      ))}
+  */
   const company = companies[index];
   const HandleItemClick = () => {
     if (selected.indexOf(company) > -1) {
@@ -168,11 +180,12 @@ const renderItems = React.memo(({ data, index }) => {
       key={company._id}
       onClick={HandleItemClick}
     >
-      {entries(company).map(([k, v]) => (
-        <td key={k} data-title={k}>
-          {v}
-        </td>
-      ))}
+      <td data-title="ID">{company.ID}</td>
+      <td data-title="Company Name">{company['Company Name']}</td>
+      <td data-title="Country">{company.Country}</td>
+      <td data-title="LG Owner">{company['LG Owner']}</td>
+      <td data-title="OMS Service Type">{company['OMS Service Type']}</td>
+      <td data-title="Active Projects">{company['Active Projects']}</td>
     </RowItem>
   );
 }, areEqual);
@@ -320,7 +333,14 @@ const DashboardTable = ({ items }) => {
               height={height}
               header={
                 <thead>
-                  <PLHead>{dynamicRenderHeaders(items)}</PLHead>
+                  <PLHead>
+                    <th>ID</th>
+                    <th>Company Name</th>
+                    <th>Country</th>
+                    <th>LG Owner</th>
+                    <th>OMS Service Type</th>
+                    <th>Active Projects</th>
+                  </PLHead>
                 </thead>
               }
               row={renderItems}
@@ -335,6 +355,7 @@ const DashboardTable = ({ items }) => {
           )}
         </AutoSizer>
       </MainTableContainer>
+      <DashboardTabs />
     </VHContainer>
   );
 };
