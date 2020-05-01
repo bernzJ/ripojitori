@@ -7,29 +7,29 @@ const { User } = require('../utils');
 
 const passportLogin = new PassportLocalStrategy(
   {
-    usernameField: 'email',
-    passwordField: 'password',
+    usernameField: 'Email',
+    passwordField: 'Password',
     session: false
   },
-  async (email, password, done) => {
+  async (Email, Password, done) => {
     const schema = Joi.object({
-      email: Joi.string()
+      Email: Joi.string()
         .email()
         .required(),
-      password: Joi.string()
+      Password: Joi.string()
         .min(5)
         .max(12)
         .required()
     });
     const ps = new sql.PreparedStatement();
     try {
-      const userSchema = await schema.validateAsync({ email, password });
+      const userSchema = await schema.validateAsync({ Email, Password });
       var user = null;
       // const user = await User.findOne({ email: userSchema.email }, "-__v");
 
-      ps.input('email', sql.VarChar(50));
-      await ps.prepare("SELECT * FROM users WHERE email = @email FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER;");
-      const result = await ps.execute({ email: userSchema.email });
+      ps.input('Email', sql.VarChar(50));
+      await ps.prepare("SELECT * FROM Users WHERE Email = @Email FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER;");
+      const result = await ps.execute({ Email: userSchema.Email });
       await ps.unprepare();
 
       user = result.recordset[0];
@@ -39,11 +39,13 @@ const passportLogin = new PassportLocalStrategy(
         done(null, false, "Email does not exists.");
         return;
       }
-      const isMatch = await User.comparePassword(userSchema.password, user.password);
+      
+      const isMatch = await User.comparePassword(userSchema.Password, user.Password);
       if (!isMatch) {
         done(null, false, "Incorrect password.");
         return;
       }
+      delete user.Password;
       done(null, user);
     } catch ({ message }) {
       done(null, false, message);

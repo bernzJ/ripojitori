@@ -5,8 +5,8 @@ import { Button, Form } from 'react-bootstrap';
 const LoginFields = props => {
   const { handleSubmit } = props;
   const [fields, setState] = React.useState({
-    email: '',
-    password: ''
+    Email: '',
+    Password: ''
   });
   const submitPressed = React.useCallback(() => handleSubmit(fields), [
     handleSubmit,
@@ -17,11 +17,11 @@ const LoginFields = props => {
       <Form.Group controlId="formBasicEmail">
         <Form.Label>Email address</Form.Label>
         <Form.Control
-          value={fields.email}
+          value={fields.Email}
           onChange={e =>
             setState({
               ...fields,
-              email: e.target.value
+              Email: e.target.value
             })
           }
           type="email"
@@ -34,11 +34,11 @@ const LoginFields = props => {
       <Form.Group controlId="formBasicPassword">
         <Form.Label>Password</Form.Label>
         <Form.Control
-          value={fields.password}
+          value={fields.Password}
           onChange={e =>
             setState({
               ...fields,
-              password: e.target.value
+              Password: e.target.value
             })
           }
           type="password"

@@ -146,46 +146,26 @@ const renderItems = React.memo(({ data, index }) => {
     setState,
     state: { selected }
   } = data;
-  /* 
-  const entries = obj => {
-    const ownProps = Object.keys(obj);
-    let i = ownProps.length;
-    const resArray = new Array(i);
-    while (i--) resArray[i] = [ownProps[i], obj[ownProps[i]]];
-    return resArray;
-  };
- 
-   {entries(company).map(([k, v]) => (
-        <td key={k} data-title={k}>
-          {v}
-        </td>
-      ))}
-  */
   const company = companies[index];
   const HandleItemClick = () => {
-    if (selected.indexOf(company) > -1) {
-      setState({
-        ...state,
-        selected: [...selected.filter(s => s._id !== company._id)]
-      });
-    } else {
-      setState({ ...state, selected: [...selected, company] });
-    }
+    setState({ ...state, selected: company });
   };
   return (
     <RowItem
       className={classNames({
-        selected: selected.indexOf(company) > -1
+        selected: selected ? selected.Id === company.Id : false
       })}
-      key={company._id}
+      key={company.Id}
       onClick={HandleItemClick}
     >
-      <td data-title="ID">{company.ID}</td>
-      <td data-title="Company Name">{company['Company Name']}</td>
+      <td data-title="Id">{company.Id}</td>
+      <td data-title="Name">{company.Name}</td>
       <td data-title="Country">{company.Country}</td>
-      <td data-title="LG Owner">{company['LG Owner']}</td>
-      <td data-title="OMS Service Type">{company['OMS Service Type']}</td>
-      <td data-title="Active Projects">{company['Active Projects']}</td>
+      <td data-title="LGOwner">{company.LGOwner}</td>
+      <td data-title="OMSType">{company.OMSType}</td>
+      <td data-title="ActiveProjects">
+        {company.ActiveProjects ? 'True' : 'False'}
+      </td>
     </RowItem>
   );
 }, areEqual);
@@ -197,7 +177,7 @@ const checkBreakpoint = () => {
 
 const DashboardTable = ({ items }) => {
   const [state, setState] = React.useState({
-    selected: [],
+    selected: null,
     action: {
       name: actionsBox.NONE,
       visibility: false,
@@ -206,6 +186,7 @@ const DashboardTable = ({ items }) => {
     }
   });
   const { user } = useSelector(({ authReducer: user }) => user);
+  const { selected } = state;
   /* if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   } */
@@ -216,7 +197,7 @@ const DashboardTable = ({ items }) => {
     action.name === actionsBox.NONE ? null : <AddEditDelCustomer {...action} />;
 
   const renderButtons = () => {
-    if (user.scope === scopes.SUB) {
+    if (user.Scope === scopes.SUB) {
       return (
         <Row className="px-0 m-0">
           <ButtonAction
@@ -236,7 +217,7 @@ const DashboardTable = ({ items }) => {
           <ButtonAction
             onClick={() => {
               const { selected } = state;
-              if (selected.length > 0) {
+              if (selected) {
                 setState({
                   ...state,
                   action: {
@@ -244,7 +225,7 @@ const DashboardTable = ({ items }) => {
                     visibility: true,
                     toggle: setVisibility,
                     params: {
-                      selected: selected[0]
+                      selected
                     }
                   }
                 });
@@ -256,7 +237,7 @@ const DashboardTable = ({ items }) => {
         </Row>
       );
     }
-    if (user.scope === scopes.ADMIN) {
+    if (user.Scope === scopes.ADMIN) {
       return (
         <Row className="px-0 m-0">
           <ButtonAction
@@ -276,7 +257,7 @@ const DashboardTable = ({ items }) => {
           <ButtonAction
             onClick={() => {
               const { selected } = state;
-              if (selected.length > 0) {
+              if (selected) {
                 setState({
                   ...state,
                   action: {
@@ -284,7 +265,7 @@ const DashboardTable = ({ items }) => {
                     visibility: true,
                     toggle: setVisibility,
                     params: {
-                      selected: selected[0]
+                      selected
                     }
                   }
                 });
@@ -296,7 +277,7 @@ const DashboardTable = ({ items }) => {
           <ButtonAction
             onClick={() => {
               const { selected } = state;
-              if (selected.length > 0) {
+              if (selected) {
                 setState({
                   ...state,
                   action: {
@@ -306,7 +287,7 @@ const DashboardTable = ({ items }) => {
                     params: {
                       selected,
                       title: 'Are you sure ?',
-                      message: 'Deleting selected companies is permanent.'
+                      message: 'Deleting selected customer is permanent.'
                     }
                   }
                 });
@@ -355,7 +336,7 @@ const DashboardTable = ({ items }) => {
           )}
         </AutoSizer>
       </MainTableContainer>
-      <DashboardTabs />
+      <DashboardTabs selected={selected} />
     </VHContainer>
   );
 };

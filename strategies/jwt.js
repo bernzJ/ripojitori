@@ -17,13 +17,14 @@ const jwtLogin = new JwtStrategy(
     const ps = new sql.PreparedStatement();
     try {
       // const user = await User.findById(payload.sub);
-      ps.input('_id', sql.Int);
-      await ps.prepare("SELECT * FROM users WHERE _id = @_id FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER;");
-      const result = await ps.execute({ _id: payload.sub });
+      ps.input('Id', sql.Int);
+      await ps.prepare("SELECT * FROM Users WHERE Id = @Id FOR JSON AUTO, WITHOUT_ARRAY_WRAPPER;");
+      const result = await ps.execute({ Id: payload.sub });
       await ps.unprepare();
 
       const user = result.recordset[0];
       if (user) {
+        delete user.Password;
         done(null, user);
       } else {
         done(null, false);

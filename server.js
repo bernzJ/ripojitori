@@ -20,6 +20,8 @@ const keys = require("./config/keys");
 const authRoutes = require("./routes/auth");
 const apiRoutes = require("./routes/customers");
 const adminRoutes = require("./routes/admin");
+const industries = require("./routes/industries");
+const timezones = require("./routes/timezones");
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -42,7 +44,7 @@ require("./strategies/local");
 // Connect to SQL Server
 sql.connect({
   server: 'SCALYBOI\\CLIENTDATABASE',
-  database: 'clientdb',
+  database: 'cdb',
   parseJSON: true,
   driver: "msnodesqlv8",
   options: {
@@ -59,6 +61,8 @@ sql.connect({
 app.use("/", authRoutes);
 app.use("/", apiRoutes);
 app.use("/", adminRoutes);
+app.use("/", industries);
+app.use("/", timezones);
 app.use("/static", express.static(__dirname + "/static"));
 
 // Serve static assets if in production

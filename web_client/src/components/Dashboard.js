@@ -9,8 +9,9 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import DashboardTable from './DashboardTable';
 import Loading from './Loading';
 import FlashMessage from './FlashMessage';
-import getAllCustomers from '../selectors/customers';
-import { getCustomers, setFilter } from '../actions/customers';
+import { getCustomers } from '../actions/customers';
+import { getIndustries } from '../actions/industries';
+import { getTimezones } from '../actions/timezones';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -54,28 +55,41 @@ const AutoRow = styled(Row)`
   }
 `;
 
-const makeGetAllCustomers = () => getAllCustomers;
-export const AllCustomersItems = () => {
-  const allCachedCustomers = React.useMemo(makeGetAllCustomers, []);
-  const allCustomers = useSelector(state => allCachedCustomers(state));
-  return allCustomers;
-};
-
 const Dashboard = props => {
   const {
-    customersReducer: { loading, filter }
-  } = useSelector(({ customersReducer }) => ({
-    customersReducer
+    customersReducer: { loading, customers },
+    indLoading,
+    tsLoading
+  } = useSelector(state => ({
+    customersReducer: state.customersReducer,
+    indLoading: state.industriesReducer.loading,
+    tsLoading: state.timezonesReducer.loading
   }));
 
   const dispatch = useDispatch();
-  const items = AllCustomersItems();
+  const [items, setItems] = React.useState(customers);
 
   React.useEffect(() => {
     dispatch(getCustomers());
-  }, [dispatch, getCustomers]);
+    dispatch(getIndustries());
+    dispatch(getTimezones());
+  }, [dispatch]);
 
-  if (loading) {
+  const filterData = filter => {
+    setItems(
+      customers.filter(customer =>
+        Object.keys(customer).find(
+          key =>
+            customer[key]
+              .toString()
+              .toLowerCase()
+              .indexOf(filter) > -1
+        )
+      )
+    );
+  };
+
+  if (loading || indLoading || tsLoading) {
     return <Loading />;
   }
 
@@ -94,8 +108,7 @@ const Dashboard = props => {
           <Form.Control
             className="round"
             placeholder="Search"
-            value={filter}
-            onChange={e => dispatch(setFilter(e.target.value))}
+            onChange={e => filterData(e.target.value)}
           />
         </FormContainer>
       </Row>

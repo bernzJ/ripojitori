@@ -10,11 +10,10 @@ const hashPassword = async function (password) {
   const hash = await getHash(password);
   return hash;
 };
-
+// @NOTE: fix this if we use.
 const registerUser = async function (password) {
   const hash = await getHash(password);
   password = hash;
-  await this.save();
 };
 
 const comparePassword = async function (candidatePassword, password) {

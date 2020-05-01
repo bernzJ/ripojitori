@@ -10,7 +10,7 @@ const requireJwtAuth = require("../middleware/requireJwtAuth");
 const tokenFromUser = user => {
   const token = jwt.sign({}, keys.secretOrKey, {
     expiresIn: "12h",
-    subject: user._id.toString()
+    subject: user.Id.toString()
   });
   return token;
 };
@@ -36,7 +36,7 @@ const tokenFromUser = user => {
 //local login
 router.post("/auth/login", requireLocalAuth, (req, res) => {
   const token = tokenFromUser(req.user);
-  delete req.user._id;
+  delete req.user.Id;
   // res.cookie("x-auth-cookie", token);
   res.json({ user: { ...req.user, token } });
 });
@@ -44,7 +44,7 @@ router.post("/auth/login", requireLocalAuth, (req, res) => {
 //JWT login
 router.post("/auth/jwt-login", requireJwtAuth, (req, res) => {
   const token = tokenFromUser(req.user);
-  delete req.user._id;
+  delete req.user.Id;
   // res.cookie("x-auth-cookie", token);
   res.json({ user: { ...req.user, token } });
 });

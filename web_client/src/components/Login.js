@@ -60,23 +60,23 @@ const Login = props => {
   }
 
   const handleSubmit = fields => {
-    const { email, password } = fields;
+    const { Email, Password } = fields;
     const re = /\S+@\S+\.\S+/;
-    if (!re.test(email)) {
+    if (!re.test(Email)) {
       addError({
         text: 'Invalid email.',
         data: 'Login.js handleSubmit !re.test(email)'
       });
       return;
     }
-    if (password.length < 5) {
+    if (Password.length < 5) {
       addError({
         text: 'Invalid password.',
         data: 'Login.js handleSubmit password.length < 5'
       });
       return;
     }
-    dispatch(login({ email, password }));
+    dispatch(login({ Email, Password }));
   };
 
   return (

@@ -7,7 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import AdminTable from './AdminTable';
 import Loading from './Loading';
 import FlashMessage from './FlashMessage';
-import AdminSelector from '../selectors/admin';
 import { getUsers } from '../actions/admin';
 
 const MainContainer = styled(Container)`
@@ -16,26 +15,18 @@ const MainContainer = styled(Container)`
   }
 `;
 
-const makeGetAllUsers = () => AdminSelector;
-export const AllUsersItems = () => {
-  const getAllUsers = React.useMemo(makeGetAllUsers, []);
-  const allUsers = useSelector(state => getAllUsers(state));
-  return allUsers;
-};
-
 const Admin = props => {
   const {
-    adminReducer: { loading }
+    adminReducer: { loading, users }
   } = useSelector(({ authReducer, adminReducer }) => ({
     authReducer,
     adminReducer
   }));
   const dispatch = useDispatch();
-  const items = AllUsersItems();
 
   React.useEffect(() => {
     dispatch(getUsers());
-  }, [dispatch, getUsers]);
+  }, [dispatch]);
 
   if (loading) {
     return <Loading />;
@@ -46,7 +37,7 @@ const Admin = props => {
         <FlashMessage />
       </Row>
       <Row className="px-5">
-        <AdminTable items={items} />
+        <AdminTable items={users} />
       </Row>
     </MainContainer>
   );

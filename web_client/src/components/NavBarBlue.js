@@ -52,9 +52,9 @@ const NavBarBlue = props => {
   const userScope = useSelector(
     ({
       authReducer: {
-        user: { scope }
+        user: { Scope }
       }
-    }) => scope
+    }) => Scope
   );
   if (pathname === routes.LOGIN) {
     return null;

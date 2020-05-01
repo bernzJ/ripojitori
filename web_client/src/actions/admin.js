@@ -14,9 +14,14 @@ const setUsers = payload => ({
   payload
 });
 
+const setLoading = payload => ({
+  type: TYPES.IS_LOADING,
+  payload
+});
+
 const getUsers = () => async (dispatch, getState) => {
   try {
-    dispatch({ type: TYPES.IS_LOADING, payload: true });
+    dispatch(setLoading(true));
     const {
       authReducer: {
         user: { token }
@@ -33,12 +38,14 @@ const getUsers = () => async (dispatch, getState) => {
   } catch ({ message }) {
     dispatch(apiLogout());
     addError({ text: message, data: 'admin.js getUsers catch' });
+  } finally {
+    dispatch(setLoading(false));
   }
 };
 
 const delUsers = users => async (dispatch, getState) => {
   try {
-    dispatch({ type: TYPES.IS_LOADING, payload: true });
+    dispatch(setLoading(true));
     const {
       authReducer: {
         user: { token }
@@ -58,20 +65,14 @@ const delUsers = users => async (dispatch, getState) => {
   } catch ({ message }) {
     dispatch(apiLogout());
     addError({ text: message, data: 'admin.js delUsers catch' });
+  } finally {
+    dispatch(setLoading(false));
   }
 };
 
-// @NOTE: this upsert, so if _id is not here, its created.
-const addUser = ({
-  _id,
-  email,
-  password,
-  firstName,
-  lastName,
-  scope
-}) => async (dispatch, getState) => {
+const addUser = newUser => async (dispatch, getState) => {
   try {
-    dispatch({ type: TYPES.IS_LOADING, payload: true });
+    dispatch(setLoading(true));
     const {
       authReducer: {
         user: { token }
@@ -79,14 +80,7 @@ const addUser = ({
     } = getState();
     const { data } = await axios.post(`${endpoints.DEV}/admin/users/create`, {
       'x-auth-token': token,
-      user: {
-        _id,
-        email,
-        password,
-        ...{ first_name: firstName },
-        ...{ last_name: lastName },
-        scope
-      }
+      user: newUser
     });
     if (data.message) {
       addError({ text: data.message, data: 'admin.js addUser data.message' });
@@ -97,6 +91,8 @@ const addUser = ({
   } catch ({ message }) {
     dispatch(apiLogout());
     addError({ text: message, data: 'admin.js addUser catch' });
+  } finally {
+    dispatch(setLoading(false));
   }
 };
 

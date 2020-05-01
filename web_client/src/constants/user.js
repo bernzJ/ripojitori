@@ -1,10 +1,10 @@
 const user = {
-  _id: -1,
-  email: '',
-  password: '',
-  firstName: '',
-  lastName: '',
-  scope: 0
+  Id: -1,
+  Email: '',
+  Password: '',
+  FirstName: '',
+  LastName: '',
+  Scope: 0
 };
 
 export default user;

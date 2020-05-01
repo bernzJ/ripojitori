@@ -16,7 +16,7 @@ router.use((req, res, next) => {
 
 router.post("/admin/users", requireJwtAuth, requireScope, async (req, res) => {
   try {
-    const result = await new sql.Request().query('SELECT _id, email, firstName, lastName, scope FROM users FOR JSON AUTO;'); //await User.find({}, "-password");
+    const result = await new sql.Request().query('SELECT Id, Email, [FirstName], [LastName], Scope FROM Users FOR JSON AUTO;'); //await User.find({}, "-password");
     res.send({
       users: result.recordset[0]
     });
@@ -30,43 +30,43 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
   try {
     const { user } = req.body;
 
-    if (!user.password || user.password.length < 4) {
-      delete user.password;
+    if (!user.Password || user.Password.length < 4) {
+      delete user.Password;
     }
 
     const schema = Joi.object({
-      _id: Joi.number()
+      Id: Joi.number()
         .default(-1),
-      email: Joi.string()
+      Email: Joi.string()
         .email()
         .required(),
-      password: Joi.string()
+      Password: Joi.string()
         .min(5)
         .max(12),
-      first_name: Joi.string()
+      FirstName: Joi.string()
         .required(),
-      last_name: Joi.string()
+      LastName: Joi.string()
         .required(),
-      scope: Joi.number()
+      Scope: Joi.number()
         .required()
     });
     const userSchema = await schema.validateAsync(user);
    
-    if (userSchema.password) {
-      userSchema.password = await User.hashPassword(userSchema.password);
+    if (userSchema.Password) {
+      userSchema.Password = await User.hashPassword(userSchema.Password);
     } else {
-      userSchema.password = '';
+      userSchema.Password = '';
     }
 
-    ps.input('_id', sql.Int);
-    ps.input('first_name', sql.VarChar(50));
-    ps.input('last_name', sql.VarChar(50));
-    ps.input('email', sql.VarChar(50));
-    ps.input('scope', sql.Int);
-    ps.input('password', sql.VarChar(255));
+    ps.input('Id', sql.Int);
+    ps.input('FirstName', sql.VarChar(50));
+    ps.input('LastName', sql.VarChar(50));
+    ps.input('Email', sql.VarChar(50));
+    ps.input('Scope', sql.Int);
+    ps.input('Password', sql.VarChar(255));
 
 
-    await ps.prepare(`EXEC [dbo].[update_user] @_id, @email, @password, @first_name, @last_name, @scope`);
+    await ps.prepare(`EXEC [dbo].[update_user] @Id, @Email, @Password, @FirstName, @LastName, @Scope`);
 
     await ps.execute(userSchema);
     await ps.unprepare();
@@ -92,7 +92,7 @@ router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res) =
       return obj;
     }, {});
     // Manually insert the params' arbitrary keys into the statement
-    var stmt = "DELETE from users where _id in (" + Object.keys(paramsObj).map((o) => { return '@' + o }).join(',') + ')';
+    var stmt = "DELETE from Users where Id in (" + Object.keys(paramsObj).map((o) => { return '@' + o }).join(',') + ')';
     await ps.prepare(stmt);
     const result = await ps.execute(paramsObj);
     await ps.unprepare();

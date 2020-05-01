@@ -3,13 +3,17 @@ import { flashMessage } from 'redux-flash-messages';
 import authReducer from './authReducer';
 import adminReducer from './adminReducer';
 import customersReducer from './customersReducer';
+import industriesReducer from './industriesReducer';
+import timezonesReducer from './timezonesReducer';
 
 const createRootReducer = () => {
   return combineReducers({
     flashMessage,
     authReducer,
     adminReducer,
-    customersReducer
+    customersReducer,
+    industriesReducer,
+    timezonesReducer
   });
 };
 

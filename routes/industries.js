@@ -16,19 +16,19 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post("/customers", requireJwtAuth, requireScope, async (req, res) => {
+router.post("/industries", requireJwtAuth, requireScope, async (req, res) => {
   try {
     //SELECT _id, projectResource, clientName, segment, category, status, hours, start, "end"${req.user.scope === scopes.ADMIN ? ", scope" : ""} FROM companies FOR JSON AUTO;
-    const result = await new sql.Request().query(`SELECT * FROM [dbo].[main_customers] FOR JSON AUTO;`);
+    const result = await new sql.Request().query(`SELECT * FROM [dbo].[Industries] FOR JSON AUTO;`);
     res.send({
-      customers: result.recordset[0]
+      industries: result.recordset[0]
     });
   } catch ({ message }) {
     res.send({ message })
   }
 });
 
-router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope <= scopes.PLEB ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
+router.post("/industries/create", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope <= scopes.PLEB ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
   const ps = new sql.PreparedStatement();
   try {
     const user = req.user;
@@ -95,7 +95,7 @@ router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next)
   }
 });
 
-router.post("/customers/del", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope !== scopes.ADMIN ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
+router.post("/industries/del", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope !== scopes.ADMIN ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
   const ps = new sql.PreparedStatement();
   try {
     const { companies } = req.body;

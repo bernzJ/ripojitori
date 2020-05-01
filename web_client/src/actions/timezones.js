@@ -6,11 +6,11 @@ import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
-  GET_CUSTOMERS: 'GET_CUSTOMERS'
+  GET_TIMEZONES: 'GET_TIMEZONES'
 };
 
-const setCustomers = payload => ({
-  type: TYPES.GET_CUSTOMERS,
+const setTimezones = payload => ({
+  type: TYPES.GET_TIMEZONES,
   payload
 });
 
@@ -19,7 +19,7 @@ const setLoading = payload => ({
   payload
 });
 
-const getCustomers = () => async (dispatch, getState) => {
+const getTimezones = () => async (dispatch, getState) => {
   try {
     dispatch(setLoading(true));
     const {
@@ -28,105 +28,83 @@ const getCustomers = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.DEV}/customers`, {
+    const { data } = await axios.post(`${endpoints.DEV}/timezones`, {
       'x-auth-token': token
     });
-    if (data.customers) {
-      dispatch(setCustomers(data.customers));
+    if (data.timezones) {
+      dispatch(setTimezones(data.timezones));
     } else if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js getCustomers data.customers'
+        data: 'api.js getTimezones data.timezones'
       });
       dispatch(apiLogout());
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js getCustomers catch' });
+    addError({ text: message, data: 'api.js getTimezones catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-const delCustomers = customers => async (dispatch, getState) => {
+const delTimezone = timezone => async (dispatch, getState) => {
   try {
-    dispatch(setLoading(true));
+    dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
       authReducer: {
         user: { token }
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.DEV}/customers/del`, {
+    const { data } = await axios.post(`${endpoints.DEV}/timezones/del`, {
       'x-auth-token': token,
-      customers
+      timezone
     });
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js delCustomers data.message'
+        data: 'api.js delTimezone data.message'
       });
     } else {
-      dispatch(getCustomers());
+      dispatch(getTimezones());
       addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js delCustomers catch' });
-  } finally {
-    dispatch(setLoading(false));
-  }
-};
-// @TODO: fix this (params)
-const addCustomer = ({
-  _id,
-  projectResource,
-  clientName,
-  segment,
-  category,
-  status,
-  hours,
-  start,
-  end,
-  scope
-}) => async (dispatch, getState) => {
-  try {
-    dispatch(setLoading(true));
-    const {
-      authReducer: {
-        user: { token }
-      }
-    } = getState();
-    const { data } = await axios.post(`${endpoints.DEV}/api/customers/create`, {
-      'x-auth-token': token,
-      customer: {
-        _id,
-        projectResource,
-        clientName,
-        segment,
-        category,
-        status,
-        hours,
-        start,
-        end,
-        scope
-      }
-    });
-    if (data.message) {
-      addError({
-        text: data.message,
-        data: 'api.js addCustomer data.message'
-      });
-    } else {
-      dispatch(getCustomers());
-      addSuccess({ text: 'Saved changes.' });
-    }
-  } catch ({ message }) {
-    dispatch(apiLogout());
-    addError({ text: message, data: 'api.js addCustomer catch' });
+    addError({ text: message, data: 'api.js delTimezone catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-export { TYPES, getCustomers, addCustomer, delCustomers, setCustomers };
+const addTimezone = timezone => async (dispatch, getState) => {
+  try {
+    dispatch({ type: TYPES.IS_LOADING, payload: true });
+    const {
+      authReducer: {
+        user: { token }
+      }
+    } = getState();
+    const { data } = await axios.post(`${endpoints.DEV}/api/timezones/create`, {
+      'x-auth-token': token,
+      timezone
+    });
+    if (data.message) {
+      addError({
+        text: data.message,
+        data: 'api.js addTimezone data.message'
+      });
+    } else {
+      dispatch(getTimezones());
+      addSuccess({ text: 'Saved changes.' });
+    }
+  } catch ({ message }) {
+    dispatch(apiLogout());
+    addError({ text: message, data: 'api.js addTimezone catch' });
+  } finally {
+    dispatch(setLoading(false));
+  }
+};
+
+export { TYPES, getTimezones, addTimezone, delTimezone, setTimezones };

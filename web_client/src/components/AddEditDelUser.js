@@ -61,7 +61,7 @@ const CancelButton = styled(Button)`
 
 const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
   const initialState = {
-    user: params.selected ? { ...params.selected, password: '' } : user
+    user: params.selected ? { ...params.selected, Password: '' } : user
   };
   const [state, setState] = React.useState(initialState);
   const dispatch = useDispatch();
@@ -70,7 +70,7 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
     const { selected, title, message } = params;
     const handleResponse = confirm => {
       if (confirm) {
-        dispatch(delUsers(selected.map(u => u._id)));
+        dispatch(delUsers(selected.map(u => u.Id)));
       }
     };
     return (
@@ -94,26 +94,26 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
         <Modal.Title>
           {mode === actionsBox.CREATE
             ? 'Adding'
-            : `Editing ${currentUser.email}`}
+            : `Editing ${currentUser.Email}`}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Form>
           <Row className="py-2">
             <Col>
-              <Form.Label>First name</Form.Label>
+              <Form.Label>First Name</Form.Label>
               <Form.Control
-                placeholder="First name"
-                value={currentUser.firstName}
-                onChange={e => setUserParam({ firstName: e.target.value })}
+                placeholder="First Name"
+                value={currentUser.FirstName}
+                onChange={e => setUserParam({ FirstName: e.target.value })}
               />
             </Col>
             <Col>
-              <Form.Label>Last name</Form.Label>
+              <Form.Label>Last Name</Form.Label>
               <Form.Control
-                placeholder="Last name"
-                value={currentUser.lastName}
-                onChange={e => setUserParam({ lastName: e.target.value })}
+                placeholder="Last Name"
+                value={currentUser.LastName}
+                onChange={e => setUserParam({ LastName: e.target.value })}
               />
             </Col>
           </Row>
@@ -122,8 +122,8 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
               <Form.Label>Password</Form.Label>
               <Form.Control
                 placeholder="Password"
-                value={currentUser.password}
-                onChange={e => setUserParam({ password: e.target.value })}
+                value={currentUser.Password}
+                onChange={e => setUserParam({ Password: e.target.value })}
               />
             </Col>
           </Row>
@@ -132,15 +132,15 @@ const AddEditDelUser = ({ visibility, toggle, mode, params }) => {
               <Form.Label>Email</Form.Label>
               <Form.Control
                 placeholder="Email"
-                value={currentUser.email}
-                onChange={e => setUserParam({ email: e.target.value })}
+                value={currentUser.Email}
+                onChange={e => setUserParam({ Email: e.target.value })}
               />
             </Col>
             <Col>
               <Form.Label>Permission</Form.Label>
-              <Dropdown onSelect={scope => setUserParam({ scope })}>
+              <Dropdown onSelect={Scope => setUserParam({ Scope })}>
                 <Dropdown.Toggle variant="Secondary" id="dropdown-scopes">
-                  {intScopeToString(currentUser.scope)}
+                  {intScopeToString(currentUser.Scope)}
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>

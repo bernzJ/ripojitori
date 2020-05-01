@@ -1,21 +1,21 @@
-import { TYPES } from '../actions/customers';
+import { TYPES } from '../actions/timezones';
 import { TYPES as AUTH_TYPES } from '../actions/auth';
 
 const initialState = {
-  customers: [],
+  timezones: [],
   loading: true
 };
 
-const customersReducer = (state = initialState, action) => {
+const timezonesReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
     case TYPES.IS_LOADING:
       return { ...state, loading: payload };
-    case TYPES.GET_CUSTOMERS:
+    case TYPES.GET_TIMEZONES:
       return {
         ...state,
         loading: false,
-        customers: payload
+        timezones: payload
       };
     case AUTH_TYPES.LOGOUT_USER:
       return initialState;
@@ -24,4 +24,4 @@ const customersReducer = (state = initialState, action) => {
   }
 };
 
-export default customersReducer;
+export default timezonesReducer;

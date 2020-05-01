@@ -156,11 +156,11 @@ const renderItems = React.memo(({ data, index }) => {
       key={user._id}
       onClick={HandleItemClick}
     >
-      <td data-title="ID">{user._id}</td>
-      <td data-title="Email">{user.email}</td>
-      <td data-title="First Name">{user.firstName}</td>
-      <td data-title="Last Name">{user.lastName}</td>
-      <td data-title="Permission">{intScopeToString(user.scope)}</td>
+      <td data-title="ID">{user.Id}</td>
+      <td data-title="Email">{user.Email}</td>
+      <td data-title="First Name">{user.FirstName}</td>
+      <td data-title="Last Name">{user.LastName}</td>
+      <td data-title="Permission">{intScopeToString(user.Scope)}</td>
     </RowItem>
   );
 }, areEqual);
