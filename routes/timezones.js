@@ -32,7 +32,7 @@ router.post("/timezones/create", requireJwtAuth, requireScope, ((req, res, next)
   const ps = new sql.PreparedStatement();
   try {
     const user = req.user;
-    const { company } = req.body;
+    const { Timezone } = req.body;
     const schema = Joi.object({
       _id: Joi.number()
         .default(-1),

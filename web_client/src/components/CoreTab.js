@@ -1,11 +1,17 @@
 import React from 'react';
 import styled from 'styled-components';
+import classNames from 'classnames';
 import { Dropdown, Container, Col, Row } from 'react-bootstrap';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
 
 import { customer } from '../constants';
+import { addCustomer, setCurrent } from '../actions/customers';
+import { addIndustry } from '../actions/industries';
+import { addTimezone } from '../actions/timezones';
 
 const FormInput = styled.input`
   &&& {
@@ -54,69 +60,143 @@ const CreatableSelectCustom = styled(CreatableSelect)`
     width: 100%;
   }
 `;
+const SaveIconContainer = styled.div`
+  &&& {
+    position: absolute;
+    right: 50px;
+    padding: 12px;
+    cursor: pointer;
+  }
+`;
 
-const buildSelectDefaultValues = values => {
+const buildSelectDefaultValues = (
+  values,
+  select = { value: 'Name', label: 'Name' }
+) => {
   if (!values) {
     return [];
   }
   return values.reduce((acc, cur) => {
-    acc.push({ value: cur.Name, label: cur.Name });
+    acc.push({ value: cur[select.value], label: cur[select.label] });
     return acc;
   }, []);
 };
 
-const CoreTab = ({ selected }) => {
-  // @TODO: create core table constant
-  const { industries, timezones } = useSelector(state => ({
+const CoreTab = props => {
+  const { indLoading, industries, timezones, current } = useSelector(state => ({
     industries: state.industriesReducer.industries,
-    timezones: state.timezonesReducer.timezones
+    indLoading: state.industriesReducer.loading,
+    timezones: state.timezonesReducer.timezones,
+    current: state.customersReducer.current
   }));
+
   const [state, setState] = React.useState({
     data: customer,
+    shouldUpdate: false,
     industriesDefaultValues: [],
     timezonesDefaultValues: []
   });
+  const dispatch = useDispatch();
 
   React.useEffect(() => {
-    if (selected) {
+    if (current) {
       setState({
-        data: selected,
-        industriesDefaultValues: buildSelectDefaultValues(industries),
-        timezonesDefaultValues: buildSelectDefaultValues(timezones)
+        ...state,
+        data: current,
+        industriesDefaultValues: buildSelectDefaultValues(industries, {
+          value: 'Id',
+          label: 'Name'
+        }),
+        timezonesDefaultValues: buildSelectDefaultValues(timezones, {
+          value: 'Id',
+          label: 'Name'
+        })
       });
     }
-  }, [selected, buildSelectDefaultValues, industries, timezones]);
+  }, [current, industries, timezones]);
 
-  const { data, industriesDefaultValues, timezonesDefaultValues } = state;
+  const {
+    data,
+    industriesDefaultValues,
+    timezonesDefaultValues,
+    shouldUpdate
+  } = state;
   if (!data.Id) {
     return <div>Nothing selected</div>;
   }
+  const setDataParam = kv =>
+    setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
 
-  const setDataParam = kv => setState({ ...state, data: { ...data, ...kv } });
-  const handleIndSelectChange = newValue => {
-    if (newValue) {
+  console.log(data, industriesDefaultValues);
+
+  // Click handlers
+  const handleSaveButton = () => {
+    dispatch(addCustomer(state.data));
+  };
+
+  // @NOTE: this is iffy.
+  const handleIndSelectCreate = Name => {
+    dispatch(setCurrent(state.data));
+    dispatch(addIndustry({ Name }));
+  };
+  // @NOTE: add if needed
+  // eslint-disable-next-line no-unused-vars
+  const handleTzSelectCreate = Name => {
+    dispatch(setCurrent(state.data));
+    dispatch(addTimezone({ Name }));
+  };
+
+  const handleIndSelectChange = (newValue, actionMeta) => {
+    if (actionMeta.action === 'clear') {
       setState({
         ...state,
-        data: { ...data, Industry: newValue.value },
-        industriesDefaultValues: newValue.__isNew__
-          ? [...industriesDefaultValues, newValue]
-          : industriesDefaultValues
+        data: { ...data, IndustryId: null },
+        shouldUpdate: true
+      });
+    }
+    if (actionMeta.action === 'select-option') {
+      setState({
+        ...state,
+        data: {
+          ...data,
+          IndustryId: newValue.value,
+          IndustryName: newValue.label
+        },
+        shouldUpdate: true
       });
     }
   };
-  const handleTzSelectChange = newValue => {
-    if (newValue) {
+
+  const handleTzSelectChange = (newValue, actionMeta) => {
+    if (actionMeta.action === 'clear') {
       setState({
         ...state,
-        data: { ...data, Timezone: newValue.value },
-        timezonesDefaultValues: newValue.__isNew__
-          ? [...timezonesDefaultValues, newValue]
-          : timezonesDefaultValues
+        data: { ...data, TimezoneId: null },
+        shouldUpdate: true
+      });
+    }
+    if (actionMeta.action === 'select-option') {
+      setState({
+        ...state,
+        data: {
+          ...data,
+          TimezoneId: newValue.value,
+          TimezoneName: newValue.label
+        },
+        shouldUpdate: true
       });
     }
   };
   return (
     <Container className="p-5" fluid>
+      <SaveIconContainer
+        className={classNames({
+          'd-none': !shouldUpdate
+        })}
+        onClick={handleSaveButton}
+      >
+        <FontAwesomeIcon color="#757575" size="3x" icon={faSave} />
+      </SaveIconContainer>
       <MainItemRow className="justify-content-start">
         <Col xl={3} className="mx-3">
           <Row>
@@ -127,10 +207,15 @@ const CoreTab = ({ selected }) => {
               classNamePrefix="react-select"
               isClearable
               value={
-                industriesDefaultValues.find(i => i.value === data.Industry) ||
-                ''
+                industriesDefaultValues.find(
+                  i => i.value === data.IndustryId
+                ) || ''
               }
-              onChange={newItem => handleIndSelectChange(newItem)}
+              isLoading={indLoading}
+              onCreateOption={handleIndSelectCreate}
+              onChange={(newItem, actionMeta) =>
+                handleIndSelectChange(newItem, actionMeta)
+              }
               options={industriesDefaultValues}
             />
           </Row>
@@ -214,10 +299,12 @@ const CoreTab = ({ selected }) => {
               isClearable
               className="w-100"
               value={
-                timezonesDefaultValues.find(i => i.value === data.Timezone) ||
+                timezonesDefaultValues.find(i => i.value === data.TimezoneId) ||
                 ''
               }
-              onChange={newItem => handleTzSelectChange(newItem)}
+              onChange={(newItem, actionMeta) =>
+                handleTzSelectChange(newItem, actionMeta)
+              }
               options={timezonesDefaultValues}
             />
           </Row>

@@ -34,18 +34,20 @@ router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next)
     const user = req.user;
     const { company } = req.body;
     const schema = Joi.object({
-      _id: Joi.number()
+      Id: Joi.number()
         .default(-1),
-      projectResource: Joi.string()
+      Name: Joi.string()
         .required(),
-      clientName: Joi.string()
+      Website: Joi.string(),
+      Timezone: Joi.number()
         .required(),
-      segment: Joi.string()
-        .required(),
-      category: Joi.string()
-        .required(),
-      status: Joi.string()
-        .required(),
+      FiscalYearBegin: Joi.string(),
+      FiscalYearEnd: Joi.string(),
+      EmployeesCount: Joi.number(),
+      OMSType: Joi.number(),
+      ActiveProjects: Joi.boolean()
+      .required(),
+      FinancialPlatform: Joi.number(),
       hours: Joi.string()
         .required(),
       start: Joi.date()

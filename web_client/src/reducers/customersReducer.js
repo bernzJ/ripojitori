@@ -3,6 +3,7 @@ import { TYPES as AUTH_TYPES } from '../actions/auth';
 
 const initialState = {
   customers: [],
+  current: null,
   loading: true
 };
 
@@ -11,6 +12,8 @@ const customersReducer = (state = initialState, action) => {
   switch (type) {
     case TYPES.IS_LOADING:
       return { ...state, loading: payload };
+    case TYPES.GET_CURRENT:
+      return { ...state, current: payload };
     case TYPES.GET_CUSTOMERS:
       return {
         ...state,

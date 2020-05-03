@@ -6,11 +6,17 @@ import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
-  GET_CUSTOMERS: 'GET_CUSTOMERS'
+  GET_CUSTOMERS: 'GET_CUSTOMERS',
+  GET_CURRENT: 'GET_CURRENT'
 };
 
 const setCustomers = payload => ({
   type: TYPES.GET_CUSTOMERS,
+  payload
+});
+
+const setCurrent = payload => ({
+  type: TYPES.GET_CURRENT,
   payload
 });
 
@@ -36,13 +42,13 @@ const getCustomers = () => async (dispatch, getState) => {
     } else if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js getCustomers data.customers'
+        data: 'customers.js getCustomers data.customers'
       });
       dispatch(apiLogout());
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js getCustomers catch' });
+    addError({ text: message, data: 'customers.js getCustomers catch' });
   } finally {
     dispatch(setLoading(false));
   }
@@ -64,7 +70,7 @@ const delCustomers = customers => async (dispatch, getState) => {
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js delCustomers data.message'
+        data: 'customers.js delCustomers data.message'
       });
     } else {
       dispatch(getCustomers());
@@ -72,24 +78,13 @@ const delCustomers = customers => async (dispatch, getState) => {
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js delCustomers catch' });
+    addError({ text: message, data: 'customers.js delCustomers catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
-// @TODO: fix this (params)
-const addCustomer = ({
-  _id,
-  projectResource,
-  clientName,
-  segment,
-  category,
-  status,
-  hours,
-  start,
-  end,
-  scope
-}) => async (dispatch, getState) => {
+
+const addCustomer = customer => async (dispatch, getState) => {
   try {
     dispatch(setLoading(true));
     const {
@@ -97,25 +92,14 @@ const addCustomer = ({
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post(`${endpoints.DEV}/api/customers/create`, {
+    const { data } = await axios.post(`${endpoints.DEV}/customers/create`, {
       'x-auth-token': token,
-      customer: {
-        _id,
-        projectResource,
-        clientName,
-        segment,
-        category,
-        status,
-        hours,
-        start,
-        end,
-        scope
-      }
+      customer
     });
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js addCustomer data.message'
+        data: 'customers.js addCustomer data.message'
       });
     } else {
       dispatch(getCustomers());
@@ -123,10 +107,17 @@ const addCustomer = ({
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js addCustomer catch' });
+    addError({ text: message, data: 'customers.js addCustomer catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-export { TYPES, getCustomers, addCustomer, delCustomers, setCustomers };
+export {
+  TYPES,
+  getCustomers,
+  addCustomer,
+  delCustomers,
+  setCustomers,
+  setCurrent
+};

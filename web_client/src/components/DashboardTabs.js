@@ -36,12 +36,12 @@ const MainTab = styled(Tabs)`
     padding-left: 30px;
   }
 `;
-const DashboardTabs = ({ selected }) => {
+const DashboardTabs = props => {
   return (
     <MainContainer fluid>
       <MainTab id="Extra" defaultActiveKey="1">
         <Tab eventKey="1" title="Company">
-          <CoreTab selected={selected} />
+          <CoreTab />
         </Tab>
         <Tab eventKey="2" title="Products">
           2

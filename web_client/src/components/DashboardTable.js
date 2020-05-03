@@ -2,7 +2,7 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import styled from 'styled-components';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faMinus, faEdit } from '@fortawesome/free-solid-svg-icons';
 import { Button, Container, Row } from 'react-bootstrap';
@@ -15,6 +15,7 @@ import { actionsBox, scopes } from '../constants';
 import AddEditDelCustomer from './AddEditDelCustomer';
 import VirtualTable from './VirtualTable';
 import DashboardTabs from './DashboardTabs';
+import { setCurrent } from '../actions/customers';
 
 const MainTableContainer = styled.div`
   @media only screen and (max-width: 1100px) {
@@ -140,20 +141,15 @@ const ButtonAction = styled(Button)`
 
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index }) => {
-  const {
-    companies,
-    state,
-    setState,
-    state: { selected }
-  } = data;
+  const { companies, dispatch, currentId } = data;
   const company = companies[index];
   const HandleItemClick = () => {
-    setState({ ...state, selected: company });
+    dispatch(setCurrent(company));
   };
   return (
     <RowItem
       className={classNames({
-        selected: selected ? selected.Id === company.Id : false
+        selected: currentId === company.Id
       })}
       key={company.Id}
       onClick={HandleItemClick}
@@ -177,7 +173,6 @@ const checkBreakpoint = () => {
 
 const DashboardTable = ({ items }) => {
   const [state, setState] = React.useState({
-    selected: null,
     action: {
       name: actionsBox.NONE,
       visibility: false,
@@ -185,8 +180,11 @@ const DashboardTable = ({ items }) => {
       params: {}
     }
   });
-  const { user } = useSelector(({ authReducer: user }) => user);
-  const { selected } = state;
+  const dispatch = useDispatch();
+  const { user, current } = useSelector(state => ({
+    user: state.authReducer.user,
+    current: state.customersReducer.current
+  }));
   /* if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   } */
@@ -216,8 +214,7 @@ const DashboardTable = ({ items }) => {
           </ButtonAction>
           <ButtonAction
             onClick={() => {
-              const { selected } = state;
-              if (selected) {
+              if (current) {
                 setState({
                   ...state,
                   action: {
@@ -225,7 +222,7 @@ const DashboardTable = ({ items }) => {
                     visibility: true,
                     toggle: setVisibility,
                     params: {
-                      selected
+                      current
                     }
                   }
                 });
@@ -256,8 +253,7 @@ const DashboardTable = ({ items }) => {
           </ButtonAction>
           <ButtonAction
             onClick={() => {
-              const { selected } = state;
-              if (selected) {
+              if (current) {
                 setState({
                   ...state,
                   action: {
@@ -265,7 +261,7 @@ const DashboardTable = ({ items }) => {
                     visibility: true,
                     toggle: setVisibility,
                     params: {
-                      selected
+                      current
                     }
                   }
                 });
@@ -276,8 +272,7 @@ const DashboardTable = ({ items }) => {
           </ButtonAction>
           <ButtonAction
             onClick={() => {
-              const { selected } = state;
-              if (selected) {
+              if (current) {
                 setState({
                   ...state,
                   action: {
@@ -285,7 +280,7 @@ const DashboardTable = ({ items }) => {
                     visibility: true,
                     toggle: setVisibility,
                     params: {
-                      selected,
+                      current,
                       title: 'Are you sure ?',
                       message: 'Deleting selected customer is permanent.'
                     }
@@ -327,8 +322,8 @@ const DashboardTable = ({ items }) => {
               row={renderItems}
               itemData={{
                 companies: items,
-                state,
-                setState
+                dispatch,
+                currentId: current ? current.Id : -1
               }}
               itemCount={items.length}
               itemSize={checkBreakpoint()}
@@ -336,7 +331,7 @@ const DashboardTable = ({ items }) => {
           )}
         </AutoSizer>
       </MainTableContainer>
-      <DashboardTabs selected={selected} />
+      <DashboardTabs />
     </VHContainer>
   );
 };

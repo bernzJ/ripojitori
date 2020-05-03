@@ -31,60 +31,22 @@ router.post("/industries", requireJwtAuth, requireScope, async (req, res) => {
 router.post("/industries/create", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope <= scopes.PLEB ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
   const ps = new sql.PreparedStatement();
   try {
-    const user = req.user;
-    const { company } = req.body;
+
+    const { Industry } = req.body;
     const schema = Joi.object({
-      _id: Joi.number()
+      Id: Joi.number()
         .default(-1),
-      projectResource: Joi.string()
-        .required(),
-      clientName: Joi.string()
-        .required(),
-      segment: Joi.string()
-        .required(),
-      category: Joi.string()
-        .required(),
-      status: Joi.string()
-        .required(),
-      hours: Joi.string()
-        .required(),
-      start: Joi.date()
-        .required(),
-      end: Joi.date()
-        .required(),
-      scope: Joi.number()
+      Name: Joi.string()
+        .required()
     });
-    const companySchema = await schema.validateAsync(company);
+    const industrySchema = await schema.validateAsync(Industry);
 
-    if (user.scope !== scopes.ADMIN) {
-      //delete companySchema.scope;
-      companySchema.scope = 0;
-    }
-
-    ps.input('_id', sql.Int);
-    ps.input('projectResource', sql.VarChar(50));
-    ps.input('clientName', sql.VarChar(50));
-    ps.input('segment', sql.VarChar(50));
-    ps.input('category', sql.VarChar(50));
-    ps.input('status', sql.VarChar(50));
-    ps.input('hours', sql.VarChar(50));
-    ps.input('start', sql.DateTime);
-    ps.input('end', sql.DateTime);
-    ps.input('scope', sql.Int);
+    // ps.input('Id', sql.Int);
+    ps.input('Name', sql.VarChar(50));
 
     // await Company.updateOne({ _id }, companySchema, { upsert: true });
-    await ps.prepare(`
-      IF NOT EXISTS (SELECT * FROM companies WHERE _id = @_id)
-
-          INSERT INTO companies (projectResource, clientName, segment, category, status, hours, start, "end", scope)
-          VALUES (@projectResource, @clientName, @segment, @category, @status, @hours, @start, @end, @scope)
-
-      ELSE
-          UPDATE companies
-          SET projectResource = @projectResource, clientName = @clientName, segment = @segment, category = @category, status = @status, hours = @hours, start = @start, "end" = @end, scope = @scope
-          WHERE _id = @_id
-     `);
-    await ps.execute(companySchema);
+    await ps.prepare(`INSERT INTO [dbo].[Industries] ([Name]) VALUES(@Name)`);
+    await ps.execute(industrySchema);
     await ps.unprepare();
 
     res.send({
