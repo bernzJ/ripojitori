@@ -6,11 +6,11 @@ import { apiLogout } from './auth';
 
 const TYPES = {
   IS_LOADING: 'IS_LOADING',
-  GET_TIMEZONES: 'GET_TIMEZONES'
+  GET_OMS: 'GET_OMS'
 };
 
-const setTimezones = payload => ({
-  type: TYPES.GET_TIMEZONES,
+const setOMS = payload => ({
+  type: TYPES.GET_OMS,
   payload
 });
 
@@ -19,7 +19,7 @@ const setLoading = payload => ({
   payload
 });
 
-const getTimezones = () => async (dispatch, getState) => {
+const getOMS = () => async (dispatch, getState) => {
   try {
     dispatch(setLoading(true));
     const {
@@ -28,27 +28,27 @@ const getTimezones = () => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.DEV}/timezones`, {
+    const { data } = await axios.post(`${endpoints.DEV}/oms`, {
       'x-auth-token': token
     });
-    if (data.timezones) {
-      dispatch(setTimezones(data.timezones));
+    if (data.oms) {
+      dispatch(setOMS(data.oms));
     } else if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js getTimezones data.timezones'
+        data: 'OMS.js getOMS data.OMS'
       });
       dispatch(apiLogout());
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js getTimezones catch' });
+    addError({ text: message, data: 'OMS.js getOMS catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-const delTimezone = timezone => async (dispatch, getState) => {
+const delOMS = oms => async (dispatch, getState) => {
   try {
     dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
@@ -57,28 +57,28 @@ const delTimezone = timezone => async (dispatch, getState) => {
       }
     } = getState();
 
-    const { data } = await axios.post(`${endpoints.DEV}/timezones/del`, {
+    const { data } = await axios.post(`${endpoints.DEV}/OMS/del`, {
       'x-auth-token': token,
-      timezone
+      oms
     });
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js delTimezone data.message'
+        data: 'OMS.js delOMS data.message'
       });
     } else {
-      dispatch(getTimezones());
+      dispatch(getOMS());
       addSuccess({ text: `Sent query: ${JSON.stringify(data)}.` });
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js delTimezone catch' });
+    addError({ text: message, data: 'OMS.js delOMS catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-const addTimezone = timezone => async (dispatch, getState) => {
+const addOMS = oms => async (dispatch, getState) => {
   try {
     dispatch({ type: TYPES.IS_LOADING, payload: true });
     const {
@@ -86,25 +86,25 @@ const addTimezone = timezone => async (dispatch, getState) => {
         user: { token }
       }
     } = getState();
-    const { data } = await axios.post(`${endpoints.DEV}/timezones/create`, {
+    const { data } = await axios.post(`${endpoints.DEV}/OMS/create`, {
       'x-auth-token': token,
-      timezone
+      oms
     });
     if (data.message) {
       addError({
         text: data.message,
-        data: 'api.js addTimezone data.message'
+        data: 'OMS.js addOMS data.message'
       });
     } else {
-      dispatch(getTimezones());
+      dispatch(getOMS());
       addSuccess({ text: 'Saved changes.' });
     }
   } catch ({ message }) {
     dispatch(apiLogout());
-    addError({ text: message, data: 'api.js addTimezone catch' });
+    addError({ text: message, data: 'OMS.js addOMS catch' });
   } finally {
     dispatch(setLoading(false));
   }
 };
 
-export { TYPES, getTimezones, addTimezone, delTimezone, setTimezones };
+export { TYPES, getOMS, addOMS, delOMS, setOMS };

@@ -5,6 +5,8 @@ import adminReducer from './adminReducer';
 import customersReducer from './customersReducer';
 import industriesReducer from './industriesReducer';
 import timezonesReducer from './timezonesReducer';
+import countriesReducer from './countriesReducer';
+import OMSReducer from './OMSReducer';
 
 const createRootReducer = () => {
   return combineReducers({
@@ -13,7 +15,9 @@ const createRootReducer = () => {
     adminReducer,
     customersReducer,
     industriesReducer,
-    timezonesReducer
+    timezonesReducer,
+    countriesReducer,
+    OMSReducer
   });
 };
 

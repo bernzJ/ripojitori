@@ -22,6 +22,8 @@ const apiRoutes = require("./routes/customers");
 const adminRoutes = require("./routes/admin");
 const industries = require("./routes/industries");
 const timezones = require("./routes/timezones");
+const countries = require("./routes/countries");
+const oms = require("./routes/oms");
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -63,6 +65,8 @@ app.use("/", apiRoutes);
 app.use("/", adminRoutes);
 app.use("/", industries);
 app.use("/", timezones);
+app.use("/", countries);
+app.use("/", oms);
 app.use("/static", express.static(__dirname + "/static"));
 
 // Serve static assets if in production

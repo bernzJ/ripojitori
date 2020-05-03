@@ -12,6 +12,8 @@ import FlashMessage from './FlashMessage';
 import { getCustomers } from '../actions/customers';
 import { getIndustries } from '../actions/industries';
 import { getTimezones } from '../actions/timezones';
+import { getCountries } from '../actions/countries';
+import { getOMS } from '../actions/OMS';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -69,10 +71,13 @@ const Dashboard = props => {
   const dispatch = useDispatch();
   const [items, setItems] = React.useState(customers);
 
+  // @TODO: move this accordingly
   React.useEffect(() => {
     dispatch(getCustomers());
     dispatch(getIndustries());
     dispatch(getTimezones());
+    dispatch(getCountries());
+    dispatch(getOMS());
   }, [dispatch]);
 
   const filterData = filter => {

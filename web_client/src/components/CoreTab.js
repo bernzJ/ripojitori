@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import classNames from 'classnames';
-import { Dropdown, Container, Col, Row } from 'react-bootstrap';
+import { Dropdown, Container, Col, FormCheck, Row } from 'react-bootstrap';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
 import { useSelector, useDispatch } from 'react-redux';
@@ -83,10 +83,25 @@ const buildSelectDefaultValues = (
 };
 
 const CoreTab = props => {
-  const { indLoading, industries, timezones, current } = useSelector(state => ({
+  const {
+    industriesLoading,
+    timezonesLoading,
+    countriesLoading,
+    OMSLoading,
+    industries,
+    timezones,
+    OMS,
+    current,
+    countries
+  } = useSelector(state => ({
     industries: state.industriesReducer.industries,
-    indLoading: state.industriesReducer.loading,
+    industriesLoading: state.industriesReducer.loading,
     timezones: state.timezonesReducer.timezones,
+    timezonesLoading: state.timezonesReducer.loading,
+    countries: state.countriesReducer.countries,
+    countriesLoading: state.countriesReducer.loading,
+    OMS: state.OMSReducer.OMS,
+    OMSLoading: state.OMSReducer.loading,
     current: state.customersReducer.current
   }));
 
@@ -94,7 +109,9 @@ const CoreTab = props => {
     data: customer,
     shouldUpdate: false,
     industriesDefaultValues: [],
-    timezonesDefaultValues: []
+    timezonesDefaultValues: [],
+    countriesDefaultValues: [],
+    OMSDefaultValues: []
   });
   const dispatch = useDispatch();
 
@@ -110,39 +127,57 @@ const CoreTab = props => {
         timezonesDefaultValues: buildSelectDefaultValues(timezones, {
           value: 'Id',
           label: 'Name'
+        }),
+        countriesDefaultValues: buildSelectDefaultValues(countries, {
+          value: 'Id',
+          label: 'CountryName'
+        }),
+        OMSDefaultValues: buildSelectDefaultValues(OMS, {
+          value: 'Id',
+          label: 'Type'
         })
       });
     }
-  }, [current, industries, timezones]);
+  }, [
+    buildSelectDefaultValues,
+    current,
+    industries,
+    timezones,
+    countries,
+    OMS
+  ]);
 
   const {
     data,
     industriesDefaultValues,
     timezonesDefaultValues,
+    countriesDefaultValues,
+    OMSDefaultValues,
     shouldUpdate
   } = state;
+
   if (!data.Id) {
     return <div>Nothing selected</div>;
   }
+
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
 
-  console.log(data, industriesDefaultValues);
-
   // Click handlers
   const handleSaveButton = () => {
-    dispatch(addCustomer(state.data));
+    console.log(data);
+    // dispatch(addCustomer(data));
   };
 
   // @NOTE: this is iffy.
   const handleIndSelectCreate = Name => {
-    dispatch(setCurrent(state.data));
+    dispatch(setCurrent(data));
     dispatch(addIndustry({ Name }));
   };
   // @NOTE: add if needed
   // eslint-disable-next-line no-unused-vars
   const handleTzSelectCreate = Name => {
-    dispatch(setCurrent(state.data));
+    dispatch(setCurrent(data));
     dispatch(addTimezone({ Name }));
   };
 
@@ -187,6 +222,49 @@ const CoreTab = props => {
       });
     }
   };
+
+  const handleCnSelectChange = (newValue, actionMeta) => {
+    if (actionMeta.action === 'clear') {
+      setState({
+        ...state,
+        data: { ...data, CountryId: null },
+        shouldUpdate: true
+      });
+    }
+    if (actionMeta.action === 'select-option') {
+      setState({
+        ...state,
+        data: {
+          ...data,
+          CountryId: newValue.value,
+          CountryName: newValue.label
+        },
+        shouldUpdate: true
+      });
+    }
+  };
+
+  const handleOMSSelectChange = (newValue, actionMeta) => {
+    if (actionMeta.action === 'clear') {
+      setState({
+        ...state,
+        data: { ...data, OMSId: null },
+        shouldUpdate: true
+      });
+    }
+    if (actionMeta.action === 'select-option') {
+      setState({
+        ...state,
+        data: {
+          ...data,
+          OMSId: newValue.value,
+          OMSType: newValue.label
+        },
+        shouldUpdate: true
+      });
+    }
+  };
+
   return (
     <Container className="p-5" fluid>
       <SaveIconContainer
@@ -200,18 +278,104 @@ const CoreTab = props => {
       <MainItemRow className="justify-content-start">
         <Col xl={3} className="mx-3">
           <Row>
+            <Labby>Company Name</Labby>
+          </Row>
+          <Row>
+            <FormInput
+              className="w-100"
+              placeholder="Company Name"
+              value={data.Name || ''}
+              onChange={e => setDataParam({ Name: e.target.value })}
+            />
+          </Row>
+        </Col>
+        <Col xl={2} className="mx-3">
+          <Row>
+            <Labby>Country</Labby>
+          </Row>
+          <Row>
+            <Select
+              isClearable
+              className="w-100"
+              isLoading={countriesLoading}
+              value={
+                countriesDefaultValues.find(i => i.value === data.CountryId) ||
+                ''
+              }
+              onChange={(newItem, actionMeta) =>
+                handleCnSelectChange(newItem, actionMeta)
+              }
+              options={countriesDefaultValues}
+            />
+          </Row>
+        </Col>
+        <Col xl={4} className="mx-3">
+          <Row>
+            <Col className="mr-3">
+              <Row>
+                <Labby>LG Owner</Labby>
+              </Row>
+              <Row>
+                <FormInput
+                  className="w-100"
+                  placeholder="LG Owner"
+                  value={data.LGOwner || ''}
+                  onChange={e => setDataParam({ LGOwner: e.target.value })}
+                />
+              </Row>
+            </Col>
+            <Col>
+              <Row>
+                <Labby>OMS</Labby>
+              </Row>
+              <Row>
+                <Select
+                  isClearable
+                  className="w-100"
+                  isLoading={OMSLoading}
+                  value={
+                    OMSDefaultValues.find(i => i.value === data.OMSId) || ''
+                  }
+                  onChange={(newItem, actionMeta) =>
+                    handleOMSSelectChange(newItem, actionMeta)
+                  }
+                  options={OMSDefaultValues}
+                />
+              </Row>
+            </Col>
+          </Row>
+        </Col>
+        <Col xl={2} className="mx-3">
+          <Row>
+            <Labby />
+          </Row>
+          <Row>
+            <FormCheck
+              className="mt-4"
+              type="switch"
+              id="active-projects-switch"
+              label="Active Project"
+              onChange={e => setDataParam({ ActiveProjects: e.target.checked })}
+              checked={data.ActiveProjects}
+            />
+          </Row>
+        </Col>
+      </MainItemRow>
+      <MainItemRow className="justify-content-start">
+        <Col xl={3} className="mx-3">
+          <Row>
             <Labby>Industry</Labby>
           </Row>
           <Row>
             <CreatableSelectCustom
               classNamePrefix="react-select"
               isClearable
+              isLoading={industriesLoading}
               value={
                 industriesDefaultValues.find(
                   i => i.value === data.IndustryId
                 ) || ''
               }
-              isLoading={indLoading}
               onCreateOption={handleIndSelectCreate}
               onChange={(newItem, actionMeta) =>
                 handleIndSelectChange(newItem, actionMeta)
@@ -298,6 +462,7 @@ const CoreTab = props => {
             <Select
               isClearable
               className="w-100"
+              isLoading={timezonesLoading}
               value={
                 timezonesDefaultValues.find(i => i.value === data.TimezoneId) ||
                 ''
@@ -334,9 +499,11 @@ const CoreTab = props => {
                 <FormInput
                   placeholder="Month End Close Period"
                   className="w-100"
-                  value={data.MonthEndClosePeriod || ''}
+                  value={data.FiscalYearMonthEndClosePeriod || ''}
                   onChange={e =>
-                    setDataParam({ MonthEndClosePeriod: e.target.value })
+                    setDataParam({
+                      FiscalYearMonthEndClosePeriod: e.target.value
+                    })
                   }
                 />
               </Row>
@@ -349,9 +516,11 @@ const CoreTab = props => {
                 <FormInput
                   placeholder="Quarterly Close Cycle"
                   className="w-100"
-                  value={data.QuarterlyCloseCycle || ''}
+                  value={data.FiscalYearQuarterlyCloseCycle || ''}
                   onChange={e =>
-                    setDataParam({ QuarterlyCloseCycle: e.target.value })
+                    setDataParam({
+                      FiscalYearQuarterlyCloseCycle: e.target.value
+                    })
                   }
                 />
               </Row>

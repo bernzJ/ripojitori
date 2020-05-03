@@ -156,7 +156,7 @@ const renderItems = React.memo(({ data, index }) => {
     >
       <td data-title="Id">{company.Id}</td>
       <td data-title="Name">{company.Name}</td>
-      <td data-title="Country">{company.Country}</td>
+      <td data-title="Country">{company.CountryName}</td>
       <td data-title="LGOwner">{company.LGOwner}</td>
       <td data-title="OMSType">{company.OMSType}</td>
       <td data-title="ActiveProjects">
