@@ -14,7 +14,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { actionsBox, scopes } from '../constants';
 import AddEditDelCustomer from './AddEditDelCustomer';
 import VirtualTable from './VirtualTable';
-import DashboardTabs from './DashboardTabs';
+import ClientsDetailsTabs from './ClientsDetailsTabs';
 import { setCurrent } from '../actions/customers';
 
 const MainTableContainer = styled.div`
@@ -171,7 +171,7 @@ const checkBreakpoint = () => {
   return width <= 1100 ? 1028 : 63;
 };
 
-const DashboardTable = ({ items }) => {
+const ClientsDetailsTable = ({ items }) => {
   const [state, setState] = React.useState({
     action: {
       name: actionsBox.NONE,
@@ -331,13 +331,13 @@ const DashboardTable = ({ items }) => {
           )}
         </AutoSizer>
       </MainTableContainer>
-      <DashboardTabs />
+      <ClientsDetailsTabs />
     </VHContainer>
   );
 };
 
-DashboardTable.propTypes = {
+ClientsDetailsTable.propTypes = {
   items: PropTypes.arrayOf(PropTypes.object).isRequired
 };
 
-export default DashboardTable;
+export default ClientsDetailsTable;

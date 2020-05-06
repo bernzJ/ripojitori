@@ -44,7 +44,7 @@ const PrivateRoute = ({ component, children, scope, ...rest }) => {
           return (
             <Redirect
               to={{
-                pathname: routes.DASHBOARD,
+                pathname: routes.CLIENTS,
                 state: {
                   from: props.location
                 }

@@ -174,12 +174,6 @@ const CoreTab = props => {
     dispatch(setCurrent(data));
     dispatch(addIndustry({ Name }));
   };
-  // @NOTE: add if needed
-  // eslint-disable-next-line no-unused-vars
-  const handleTzSelectCreate = Name => {
-    dispatch(setCurrent(data));
-    dispatch(addTimezone({ Name }));
-  };
 
   const handleIndSelectChange = (newValue, actionMeta) => {
     if (actionMeta.action === 'clear') {

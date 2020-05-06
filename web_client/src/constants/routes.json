@@ -1,5 +1,6 @@
 {
   "DASHBOARD": "/",
+  "CLIENTS": "/clients",
   "LOGIN": "/login",
   "ADMIN": "/admin"
 }

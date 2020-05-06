@@ -50,7 +50,7 @@ const Login = props => {
     return (
       <Redirect
         to={{
-          pathname: routes.DASHBOARD,
+          pathname: routes.CLIENTS,
           state: {
             from: props.location
           }

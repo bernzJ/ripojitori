@@ -77,6 +77,15 @@ const NavBarBlue = props => {
             >
               Dashboard
             </Link>
+            <Link
+              className={classNames({
+                linky: true,
+                selected: pathname === routes.CLIENTS
+              })}
+              to={routes.CLIENTS}
+            >
+              Clients Details
+            </Link>
             {userScope === scopes.ADMIN ? (
               <Link
                 className={classNames({

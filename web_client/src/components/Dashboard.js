@@ -1,126 +1,282 @@
-/* eslint-disable react/no-array-index-key */
 import React from 'react';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Container, Form, Row } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch } from '@fortawesome/free-solid-svg-icons';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
+import { Button, Container, Col, Row } from 'react-bootstrap';
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
+import L from 'leaflet';
 
-import DashboardTable from './DashboardTable';
-import Loading from './Loading';
-import FlashMessage from './FlashMessage';
-import { getCustomers } from '../actions/customers';
-import { getIndustries } from '../actions/industries';
-import { getTimezones } from '../actions/timezones';
-import { getCountries } from '../actions/countries';
-import { getOMS } from '../actions/OMS';
+import { routes } from '../constants';
+import dotSVG from '../assets/svg/dot.svg';
+import dotShadow from '../assets/svg/dotshadow.svg';
 
-const MainContainer = styled(Container)`
+const Mappy = styled(Map)`
   &&& {
-    height: calc(100vh - 62px);
+    height: 400px;
+    width: 100%;
   }
 `;
-const FormContainer = styled(Form)`
+const dotIcon = new L.Icon({
+  iconUrl: dotSVG,
+  iconRetinaUrl: dotSVG,
+  iconAnchor: [14, 14],
+  popupAnchor: [185, 105],
+  iconSize: [28, 28],
+  shadowUrl: dotShadow,
+  shadowSize: [28, 28],
+  shadowAnchor: [14, 14]
+});
+
+const Poppy = styled(Popup)`
   &&& {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 5px;
-    border-radius: 25px;
-    border: #efefef 1px solid;
-    background-color: #fff;
+    width: 305px;
+    height: 179px;
   }
-  &&&:hover .search {
-    color: #4898cf;
-  }
-  &&& .round {
-    color: #a2a1a4;
-    transition: all 0.2s linear;
+  &&& .leaflet-popup-content-wrapper {
+    background-color: #435061;
     border: none;
-    box-shadow: none;
+    border-radius: 3px;
   }
-  &&& .round::placeholder {
-    color: #757575;
+  &&& .leaflet-popup-tip-container {
+    left: 0;
+    top: 42%;
+    width: auto;
+    height: auto;
+    margin-left: -10px;
   }
-  &&& .round:focus,
-  &&& .round:hover {
-    outline: none;
-  }
-  &&& .search {
-    display: inline-block;
-    transition: color 0.2s linear;
+  &&& .leaflet-popup-tip {
+    width: 0;
+    height: 0;
+    padding: 0;
+    margin: 0;
+    transform: none;
+    background-color: transparent;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-right: 10px solid #435061;
   }
 `;
-const AutoRow = styled(Row)`
+const PopupHeader = styled(Row)`
   &&& {
-    height: calc(100vh - 525px);
+    border-bottom: 1px solid #607183;
+    margin-top: 25px;
+    margin-bottom: 10px;
+  }
+`;
+const PopupFooter = styled(Row)`
+  &&& {
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+`;
+const TitleLabel = styled.label`
+  &&& {
+    font-family: 'Montserrat';
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+  }
+`;
+const PopupLabel = styled.label`
+  &&& {
+    font-family: 'Montserrat';
+    color: #d5e2f3;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 5px;
+  }
+`;
+const PopupField = styled.label`
+  &&& {
+    font-family: 'Montserrat';
+    color: #96a9c7;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 5px;
+  }
+`;
+const ButtonAction = styled(Link)`
+  &&& {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #fff;
+    background-color: #4898cf;
+    border: none;
+    width: 100%;
+    display: inline-block;
+    font-weight: 400;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out,
+      border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+  &&&:hover,
+  &&&:focus {
+    text-decoration: none;
+    background-color: #55b3f4;
+  }
+`;
+const StatsBoxContainer = styled(Row)`
+  &&& {
+    margin-left: 5%;
+    text-align: center;
+  }
+`;
+const Stats = styled(Row)`
+  &&& {
+    border-right: solid 1px #e6e8e7;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+`;
+const StatsLabelTop = styled.label`
+  &&& {
+    color: #80889b;
+    font-size: 41px;
+    font-weight: 300;
+    margin: 0;
+  }
+`;
+const StatsLabelBot = styled.label`
+  &&& {
+    color: #80889b;
+    font-weight: 600;
+    text-transform: uppercase;
   }
 `;
 
 const Dashboard = props => {
-  const {
-    customersReducer: { loading, customers },
-    indLoading,
-    tsLoading
-  } = useSelector(state => ({
-    customersReducer: state.customersReducer,
-    indLoading: state.industriesReducer.loading,
-    tsLoading: state.timezonesReducer.loading
-  }));
-
-  const dispatch = useDispatch();
-  const [items, setItems] = React.useState(customers);
-
-  // @TODO: move this accordingly
-  React.useEffect(() => {
-    dispatch(getCustomers());
-    dispatch(getIndustries());
-    dispatch(getTimezones());
-    dispatch(getCountries());
-    dispatch(getOMS());
-  }, [dispatch]);
-
-  const filterData = filter => {
-    setItems(
-      customers.filter(customer =>
-        Object.keys(customer).find(
-          key =>
-            customer[key]
-              .toString()
-              .toLowerCase()
-              .indexOf(filter) > -1
-        )
-      )
-    );
-  };
-
-  if (loading || indLoading || tsLoading) {
-    return <Loading />;
-  }
-
   return (
-    <MainContainer fluid>
-      <Row className="p-5 justify-content-center">
-        <FlashMessage />
-      </Row>
-      <Row className="justify-content-begin px-5">
-        <FormContainer>
-          <FontAwesomeIcon
-            icon={faSearch}
-            className="search mx-2"
-            color="#757575"
+    <Container fluid>
+      <StatsBoxContainer>
+        <Stats>
+          <Col lg="12">
+            <StatsLabelTop>219</StatsLabelTop>
+          </Col>
+          <Col lg="12">
+            <StatsLabelBot>Total clients</StatsLabelBot>
+          </Col>
+        </Stats>
+        <Stats>
+          <Col lg="12">
+            <StatsLabelTop>43</StatsLabelTop>
+          </Col>
+          <Col lg="12">
+            <StatsLabelBot>Total active clients</StatsLabelBot>
+          </Col>
+        </Stats>
+        <Stats>
+          <Col lg="12">
+            <StatsLabelTop>143</StatsLabelTop>
+          </Col>
+          <Col lg="12">
+            <StatsLabelBot>Total active projects</StatsLabelBot>
+          </Col>
+        </Stats>
+      </StatsBoxContainer>
+      <Row>
+        <Mappy
+          center={[51.505, -0.09]}
+          zoom={3}
+          zoomControl={false}
+          maxZoom={20}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
+            url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
           />
-          <Form.Control
-            className="round"
-            placeholder="Search"
-            onChange={e => filterData(e.target.value)}
-          />
-        </FormContainer>
+          <Marker icon={dotIcon} position={[51.505, -0.09]}>
+            <Poppy>
+              <Container fluid>
+                <PopupHeader>
+                  <TitleLabel>Snap, Inc.</TitleLabel>
+                </PopupHeader>
+                <Row>
+                  <Col lg="5">
+                    <PopupLabel>Address</PopupLabel>
+                  </Col>
+                  <Col lg="7">
+                    <PopupField>5550 Newbury Street</PopupField>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="5">
+                    <PopupLabel>Active</PopupLabel>
+                  </Col>
+                  <Col lg="7">
+                    <PopupField>Yes</PopupField>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="5">
+                    <PopupLabel>Oms type</PopupLabel>
+                  </Col>
+                  <Col lg="7">
+                    <PopupField>None</PopupField>
+                  </Col>
+                </Row>
+                <PopupFooter>
+                  <Col>
+                    <ButtonAction to={routes.CLIENTS}>
+                      See Details <FontAwesomeIcon icon={faArrowRight} />
+                    </ButtonAction>
+                  </Col>
+                </PopupFooter>
+              </Container>
+            </Poppy>
+          </Marker>
+          <Marker icon={dotIcon} position={[45.505, -0.09]}>
+            <Poppy>
+              <Container fluid>
+                <PopupHeader>
+                  <TitleLabel>Ecosystem Investment Partners (EIP)</TitleLabel>
+                </PopupHeader>
+                <Row>
+                  <Col lg="5">
+                    <PopupLabel>Address</PopupLabel>
+                  </Col>
+                  <Col lg="7">
+                    <PopupField>5550 Newbury Street</PopupField>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="5">
+                    <PopupLabel>Active</PopupLabel>
+                  </Col>
+                  <Col lg="7">
+                    <PopupField>Yes</PopupField>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col lg="5">
+                    <PopupLabel>Oms type</PopupLabel>
+                  </Col>
+                  <Col lg="7">
+                    <PopupField>Project</PopupField>
+                  </Col>
+                </Row>
+                <PopupFooter>
+                  <Col>
+                    <ButtonAction to={routes.CLIENTS}>
+                      See Details <FontAwesomeIcon icon={faArrowRight} />
+                    </ButtonAction>
+                  </Col>
+                </PopupFooter>
+              </Container>
+            </Poppy>
+          </Marker>
+        </Mappy>
       </Row>
-      <AutoRow className="px-5">
-        <DashboardTable items={items} />
-      </AutoRow>
-    </MainContainer>
+    </Container>
   );
 };
 

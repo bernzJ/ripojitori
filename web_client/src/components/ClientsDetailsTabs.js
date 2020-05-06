@@ -36,7 +36,7 @@ const MainTab = styled(Tabs)`
     padding-left: 30px;
   }
 `;
-const DashboardTabs = props => {
+const ClientsDetailsTabs = props => {
   return (
     <MainContainer fluid>
       <MainTab id="Extra" defaultActiveKey="1">
@@ -69,4 +69,4 @@ const DashboardTabs = props => {
   );
 };
 
-export default DashboardTabs;
+export default ClientsDetailsTabs;

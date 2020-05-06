@@ -1,5 +1,6 @@
 import { routes, scopes } from '../constants';
 import Dashboard from './Dashboard';
+import ClientsDetails from './ClientsDetails';
 import Admin from './Admin';
 import Login from './Login';
 
@@ -10,6 +11,13 @@ const Routes = [
     isPrivate: true,
     scope: scopes.PLEB,
     component: Dashboard
+  },
+  {
+    path: routes.CLIENTS,
+    name: 'CLIENTS',
+    isPrivate: true,
+    scope: scopes.PLEB,
+    component: ClientsDetails
   },
   {
     path: routes.ADMIN,
