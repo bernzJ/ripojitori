@@ -7,7 +7,7 @@ const requireJwtAuth = function (req, res, next) {
     }
     // @TODO: check what this returns.
     if (!user) {
-      return res.send({ message: info, invalidateSesssion: true });
+      return res.status(500).send({ message: info, invalidateSesssion: true });
     }
     req.user = user;
     next();

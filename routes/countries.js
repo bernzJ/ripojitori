@@ -16,7 +16,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post("/countries", requireJwtAuth, requireScope, async (req, res) => {
+router.post("/countries", requireJwtAuth, requireScope, async (req, res, next) => {
   try {
     //SELECT _id, projectResource, clientName, segment, category, status, hours, start, "end"${req.user.scope === scopes.ADMIN ? ", scope" : ""} FROM companies FOR JSON AUTO;
     const result = await new sql.Request().query(`SELECT Id, CountryName FROM [dbo].[Countries] FOR JSON AUTO;`);
@@ -24,101 +24,7 @@ router.post("/countries", requireJwtAuth, requireScope, async (req, res) => {
       countries: result.recordset[0]
     });
   } catch ({ message }) {
-    res.send({ message })
-  }
-});
-
-router.post("/countries/create", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope <= scopes.PLEB ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
-  const ps = new sql.PreparedStatement();
-  try {
-    const user = req.user;
-    const { company } = req.body;
-    const schema = Joi.object({
-      Id: Joi.number()
-        .default(-1),
-      Name: Joi.string()
-        .required(),
-      Website: Joi.string(),
-      Timezone: Joi.number()
-        .required(),
-      FiscalYearBegin: Joi.string(),
-      FiscalYearEnd: Joi.string(),
-      EmployeesCount: Joi.number(),
-      OMSType: Joi.number(),
-      ActiveProjects: Joi.boolean()
-      .required(),
-      FinancialPlatform: Joi.number(),
-      hours: Joi.string()
-        .required(),
-      start: Joi.date()
-        .required(),
-      end: Joi.date()
-        .required(),
-      scope: Joi.number()
-    });
-    const companySchema = await schema.validateAsync(company);
-
-    if (user.scope !== scopes.ADMIN) {
-      //delete companySchema.scope;
-      companySchema.scope = 0;
-    }
-
-    ps.input('_id', sql.Int);
-    ps.input('projectResource', sql.VarChar(50));
-    ps.input('clientName', sql.VarChar(50));
-    ps.input('segment', sql.VarChar(50));
-    ps.input('category', sql.VarChar(50));
-    ps.input('status', sql.VarChar(50));
-    ps.input('hours', sql.VarChar(50));
-    ps.input('start', sql.DateTime);
-    ps.input('end', sql.DateTime);
-    ps.input('scope', sql.Int);
-
-    // await Company.updateOne({ _id }, companySchema, { upsert: true });
-    await ps.prepare(`
-      IF NOT EXISTS (SELECT * FROM companies WHERE _id = @_id)
-
-          INSERT INTO companies (projectResource, clientName, segment, category, status, hours, start, "end", scope)
-          VALUES (@projectResource, @clientName, @segment, @category, @status, @hours, @start, @end, @scope)
-
-      ELSE
-          UPDATE companies
-          SET projectResource = @projectResource, clientName = @clientName, segment = @segment, category = @category, status = @status, hours = @hours, start = @start, "end" = @end, scope = @scope
-          WHERE _id = @_id
-     `);
-    await ps.execute(companySchema);
-    await ps.unprepare();
-
-    res.send({
-      result: "Saved"
-    });
-  } catch ({ message }) {
-    res.send({ message })
-  }
-});
-
-router.post("/countries/del", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope !== scopes.ADMIN ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
-  const ps = new sql.PreparedStatement();
-  try {
-    const { companies } = req.body;
-    //const result = await Company.deleteMany({ _id: companies });
-
-    var paramsObj = companies.reduce((obj, val, idx) => {
-      obj[`id${idx}`] = val;
-      ps.input(`id${idx}`, sql.Int);
-      return obj;
-    }, {});
-    // Manually insert the params' arbitrary keys into the statement
-    var stmt = "DELETE from companies where _id in (" + Object.keys(paramsObj).map((o) => { return '@' + o }).join(',') + ')';
-    await ps.prepare(stmt);
-    const result = await ps.execute(paramsObj);
-    await ps.unprepare();
-
-    res.send({
-      result
-    });
-  } catch ({ message }) {
-    res.send({ message })
+    res.status(500).send({ message });;
   }
 });
 

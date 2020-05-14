@@ -1,13 +1,16 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Container, Row } from 'react-bootstrap';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 
 import AdminTable from './AdminTable';
 import Loading from './Loading';
 import FlashMessage from './FlashMessage';
-import { getUsers } from '../actions/admin';
+import { useApi } from '../actions/useApi';
+import { api } from '../constants';
+import { logout } from '../actions/auth';
+import { setUsers } from '../actions/admin';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -16,20 +19,40 @@ const MainContainer = styled(Container)`
 `;
 
 const Admin = props => {
-  const {
-    adminReducer: { loading, users }
-  } = useSelector(({ authReducer, adminReducer }) => ({
-    authReducer,
-    adminReducer
-  }));
+  const { users, token } = useSelector(
+    state => ({
+      users: state.adminReducer.users,
+      token: state.authReducer.user.token
+    }),
+    shallowEqual
+  );
   const dispatch = useDispatch();
 
-  React.useEffect(() => {
-    dispatch(getUsers());
-  }, [dispatch]);
+  const [{ data, isLoading, isError }, doFetch] = useApi(api.admin.get, {
+    'x-auth-token': token
+  });
+  useEffect(() => {
+    if (!isLoading && !isError && data.users) {
+      dispatch(setUsers(data.users));
+    }
+  }, [isLoading, isError, data]);
 
-  if (loading) {
-    return <Loading />;
+  if (isError && data && data.invalidateSesssion) {
+    doFetch({ initialUrl: api.auth.logout });
+    dispatch(logout());
+  }
+
+  if (isLoading || users.length === 0) {
+    return (
+      <Container>
+        <Row className="p-5 justify-content-center">
+          <FlashMessage />
+        </Row>
+        <Row className="pt-5">
+          <Loading />
+        </Row>
+      </Container>
+    );
   }
   return (
     <MainContainer fluid>

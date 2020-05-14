@@ -1,20 +1,19 @@
-import { TYPES } from '../actions/admin';
-import { TYPES as AUTH_TYPES } from '../actions/auth';
+import { TYPES as AUTH_TYPES } from './authReducer';
+
+const TYPES = {
+  GET_USERS: 'GET_USERS'
+};
 
 const initialState = {
-  users: [],
-  loading: true
+  users: []
 };
 
 const adminReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.IS_LOADING:
-      return { ...state, loading: payload };
     case TYPES.GET_USERS:
       return {
         ...state,
-        loading: false,
         users: payload
       };
     case AUTH_TYPES.LOGOUT_USER:
@@ -24,4 +23,4 @@ const adminReducer = (state = initialState, action) => {
   }
 };
 
-export default adminReducer;
+export { TYPES, adminReducer };

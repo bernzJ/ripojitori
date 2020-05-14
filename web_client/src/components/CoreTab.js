@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import styled from 'styled-components';
 import classNames from 'classnames';
-import { Dropdown, Container, Col, FormCheck, Row } from 'react-bootstrap';
+import DatePicker from 'react-datepicker';
+import { Container, Col, FormCheck, Row } from 'react-bootstrap';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave } from '@fortawesome/free-solid-svg-icons';
+import { faSave, faPlus } from '@fortawesome/free-solid-svg-icons';
+import Joi from '@hapi/joi';
+import { addError } from 'redux-flash-messages';
 
-import { customer } from '../constants';
-import { addCustomer, setCurrent } from '../actions/customers';
-import { addIndustry } from '../actions/industries';
-import { addTimezone } from '../actions/timezones';
+import { customer, api } from '../constants';
+import { useApi } from '../actions/useApi';
+import { setIndustries } from '../actions/industries';
+import { setCurrent } from '../actions/customers';
 
-const FormInput = styled.input`
+const Daty = styled(DatePicker)`
   &&& {
     display: block;
     width: 100%;
@@ -30,12 +34,21 @@ const FormInput = styled.input`
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
 `;
-const FormDropdown = styled(Dropdown)`
+const FormInput = styled.input`
   &&& {
+    display: block;
     width: 100%;
-  }
-  &&& .dropdown-toggle {
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
     border: 1px solid #ced4da;
+    border-radius: 0;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
 `;
 const MainItemRow = styled(Row)`
@@ -60,11 +73,11 @@ const CreatableSelectCustom = styled(CreatableSelect)`
     width: 100%;
   }
 `;
-const SaveIconContainer = styled.div`
+const ActionBoxContainer = styled.div`
   &&& {
     position: absolute;
     right: 50px;
-    padding: 12px;
+    padding: 16px;
     cursor: pointer;
   }
 `;
@@ -82,70 +95,141 @@ const buildSelectDefaultValues = (
   }, []);
 };
 
-const CoreTab = props => {
-  const {
-    industriesLoading,
-    timezonesLoading,
-    countriesLoading,
-    OMSLoading,
-    industries,
-    timezones,
-    OMS,
-    current,
-    countries
-  } = useSelector(state => ({
-    industries: state.industriesReducer.industries,
-    industriesLoading: state.industriesReducer.loading,
-    timezones: state.timezonesReducer.timezones,
-    timezonesLoading: state.timezonesReducer.loading,
-    countries: state.countriesReducer.countries,
-    countriesLoading: state.countriesReducer.loading,
-    OMS: state.OMSReducer.OMS,
-    OMSLoading: state.OMSReducer.loading,
-    current: state.customersReducer.current
-  }));
+const buildStatesByCID = (s, cid) =>
+  !cid ? s : s.filter(_s => _s.CountryId === cid || _s.CountryId === 0);
 
-  const [state, setState] = React.useState({
+const CoreTab = props => {
+  const { current, token } = useSelector(
+    state => ({
+      current: state.customersReducer.current,
+      token: state.authReducer.user.token
+    }),
+    shallowEqual
+  );
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    let didCancel = false;
+    const fetchData = async () => {
+      try {
+        const {
+          data: { industries }
+        } = await axios.post(api.industries.get, {
+          'x-auth-token': token
+        });
+        const {
+          data: { timezones }
+        } = await axios.post(api.timezones.get, {
+          'x-auth-token': token
+        });
+        const {
+          data: { countries }
+        } = await axios.post(api.countries.get, {
+          'x-auth-token': token
+        });
+        const {
+          data: { oms }
+        } = await axios.post(api.OMS.get, {
+          'x-auth-token': token
+        });
+        const {
+          data: { states }
+        } = await axios.post(api.states.get, {
+          'x-auth-token': token
+        });
+        if (!didCancel) {
+          setState({
+            ...state,
+            industriesDefaultValues: buildSelectDefaultValues(industries, {
+              value: 'Id',
+              label: 'Name'
+            }),
+            timezonesDefaultValues: buildSelectDefaultValues(timezones, {
+              value: 'Id',
+              label: 'Name'
+            }),
+            countriesDefaultValues: buildSelectDefaultValues(countries, {
+              value: 'Id',
+              label: 'CountryName'
+            }),
+            OMSDefaultValues: buildSelectDefaultValues(oms, {
+              value: 'Id',
+              label: 'Type'
+            }),
+            statesDefaultValues: buildSelectDefaultValues(
+              buildStatesByCID(states, current ? current.Id : null),
+              {
+                value: 'Id',
+                label: 'Abbreviation'
+              }
+            )
+          });
+        }
+      } catch ({ message, response }) {
+        if (!didCancel) {
+          addError({
+            text: response ? response.data : message
+          });
+        }
+      }
+    };
+    fetchData();
+    return () => {
+      didCancel = true;
+    };
+  }, [token]);
+  console.log('rendeeeeeeeeeeeeeer');
+  const [state, setState] = useState({
     data: customer,
     shouldUpdate: false,
     industriesDefaultValues: [],
     timezonesDefaultValues: [],
     countriesDefaultValues: [],
-    OMSDefaultValues: []
+    OMSDefaultValues: [],
+    statesDefaultValues: []
   });
-  const dispatch = useDispatch();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (current) {
       setState({
         ...state,
         data: current,
-        industriesDefaultValues: buildSelectDefaultValues(industries, {
-          value: 'Id',
-          label: 'Name'
-        }),
-        timezonesDefaultValues: buildSelectDefaultValues(timezones, {
-          value: 'Id',
-          label: 'Name'
-        }),
-        countriesDefaultValues: buildSelectDefaultValues(countries, {
-          value: 'Id',
-          label: 'CountryName'
-        }),
-        OMSDefaultValues: buildSelectDefaultValues(OMS, {
-          value: 'Id',
-          label: 'Type'
-        })
+        shouldUpdate: current ? !!current.shouldUpdate : true
       });
     }
-  }, [
-    buildSelectDefaultValues,
-    current,
-    industries,
-    timezones,
-    countries,
-    OMS
-  ]);
+  }, [current]);
+
+  /* React.useEffect(() => {
+    setState({
+      ...state,
+      data: current || customer,
+      shouldUpdate: current ? !!current.shouldUpdate : true,
+      industriesDefaultValues: buildSelectDefaultValues(industries, {
+        value: 'Id',
+        label: 'Name'
+      }),
+      timezonesDefaultValues: buildSelectDefaultValues(timezones, {
+        value: 'Id',
+        label: 'Name'
+      }),
+      countriesDefaultValues: buildSelectDefaultValues(countries, {
+        value: 'Id',
+        label: 'CountryName'
+      }),
+      OMSDefaultValues: buildSelectDefaultValues(OMS, {
+        value: 'Id',
+        label: 'Type'
+      }),
+      statesDefaultValues: buildSelectDefaultValues(
+        buildStatesByCID(states, current ? current.Id : null),
+        {
+          value: 'Id',
+          label: 'Abbreviation'
+        }
+      )
+    });
+  }, [current, industries, timezones, countries, OMS, states]); */
 
   const {
     data,
@@ -153,26 +237,84 @@ const CoreTab = props => {
     timezonesDefaultValues,
     countriesDefaultValues,
     OMSDefaultValues,
+    statesDefaultValues,
     shouldUpdate
   } = state;
-
-  if (!data.Id) {
-    return <div>Nothing selected</div>;
-  }
 
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
 
   // Click handlers
   const handleSaveButton = () => {
-    console.log(data);
-    // dispatch(addCustomer(data));
+    // return console.log(data);
+    const schema = Joi.object({
+      Id: Joi.number().default(-1),
+      Name: Joi.string()
+        .max(150)
+        .required(),
+      Website: Joi.string().max(255),
+      Industry: Joi.number().required(),
+      Timezone: Joi.number().required(),
+      FiscalYearId: Joi.number().default(-1),
+      FiscalYearBegin: Joi.date(),
+      FiscalYearEnd: Joi.date(),
+      FiscalYearMonthEndClosePeriod: Joi.date(),
+      FiscalYearQuarterlyCloseCycle: Joi.date(),
+      EmployeesCount: Joi.number().default(0),
+      OMS: Joi.number().required(),
+      ActiveProjects: Joi.boolean().default(false),
+      FinancialId: Joi.number().default(-1),
+      FinancialPlatform: Joi.string().max(50),
+      HRId: Joi.number().default(-1),
+      HRSystem: Joi.string().max(50),
+      SSO: Joi.boolean().default(false),
+      TestSite: Joi.boolean().default(false),
+      RefreshDate: Joi.date(),
+      Logo: Joi.any(),
+      Address1: Joi.string()
+        .max(255)
+        .required(),
+      Address2: Joi.string().max(255),
+      City: Joi.string()
+        .max(255)
+        .required(),
+      Zip: Joi.string().max(50),
+      Country: Joi.number().default(1),
+      State: Joi.number().default(71),
+      LGOwner: Joi.string().max(50),
+      EmployeeGroupsId: Joi.number().default(-1),
+      EmployeeGroupsName: Joi.string().max(50)
+    });
+
+    const customerSchema = schema.validate(
+      {
+        ...data,
+        Timezone: data.TimezoneId,
+        Industry: data.IndustryId,
+        Country: data.CountryId,
+        State: data.StateId,
+        OMS: data.OMSId
+      },
+      { stripUnknown: true }
+    );
+    if (customerSchema.error) {
+      const {
+        error: { details }
+      } = customerSchema;
+      addError({
+        text: details[0].message,
+        data: 'CoreTab.js handleSaveButton companySchema.error'
+      });
+    } else {
+      console.log(customerSchema.value);
+      // dispatch(addCustomer(customerSchema.value));
+    }
   };
 
   // @NOTE: this is iffy.
   const handleIndSelectCreate = Name => {
-    dispatch(setCurrent(data));
-    dispatch(addIndustry({ Name }));
+    // dispatch(setCurrent({ ...data, shouldUpdate: true }));
+    // dispatch(addIndustry({ Name }));
   };
 
   const handleIndSelectChange = (newValue, actionMeta) => {
@@ -238,6 +380,27 @@ const CoreTab = props => {
     }
   };
 
+  const handleStSelectChange = (newValue, actionMeta) => {
+    if (actionMeta.action === 'clear') {
+      setState({
+        ...state,
+        data: { ...data, StateId: null },
+        shouldUpdate: true
+      });
+    }
+    if (actionMeta.action === 'select-option') {
+      setState({
+        ...state,
+        data: {
+          ...data,
+          StateId: newValue.value,
+          StateName: newValue.label
+        },
+        shouldUpdate: true
+      });
+    }
+  };
+
   const handleOMSSelectChange = (newValue, actionMeta) => {
     if (actionMeta.action === 'clear') {
       setState({
@@ -258,17 +421,26 @@ const CoreTab = props => {
       });
     }
   };
-
   return (
     <Container className="p-5" fluid>
-      <SaveIconContainer
-        className={classNames({
-          'd-none': !shouldUpdate
-        })}
-        onClick={handleSaveButton}
-      >
-        <FontAwesomeIcon color="#757575" size="3x" icon={faSave} />
-      </SaveIconContainer>
+      <ActionBoxContainer>
+        <FontAwesomeIcon
+          onClick={() => dispatch(setCurrent())}
+          className="mr-3"
+          color="#c3c3c3"
+          size="2x"
+          icon={faPlus}
+        />
+        <FontAwesomeIcon
+          className={classNames({
+            'd-none': !shouldUpdate
+          })}
+          onClick={handleSaveButton}
+          color="#c3c3c3"
+          size="2x"
+          icon={faSave}
+        />
+      </ActionBoxContainer>
       <MainItemRow className="justify-content-start">
         <Col xl={3} className="mx-3">
           <Row>
@@ -285,21 +457,14 @@ const CoreTab = props => {
         </Col>
         <Col xl={2} className="mx-3">
           <Row>
-            <Labby>Country</Labby>
+            <Labby>Website</Labby>
           </Row>
           <Row>
-            <Select
-              isClearable
+            <FormInput
               className="w-100"
-              isLoading={countriesLoading}
-              value={
-                countriesDefaultValues.find(i => i.value === data.CountryId) ||
-                ''
-              }
-              onChange={(newItem, actionMeta) =>
-                handleCnSelectChange(newItem, actionMeta)
-              }
-              options={countriesDefaultValues}
+              placeholder="Website"
+              value={data.Website || ''}
+              onChange={e => setDataParam({ Website: e.target.value })}
             />
           </Row>
         </Col>
@@ -326,7 +491,6 @@ const CoreTab = props => {
                 <Select
                   isClearable
                   className="w-100"
-                  isLoading={OMSLoading}
                   value={
                     OMSDefaultValues.find(i => i.value === data.OMSId) || ''
                   }
@@ -356,6 +520,101 @@ const CoreTab = props => {
         </Col>
       </MainItemRow>
       <MainItemRow className="justify-content-start">
+        <Col xl={2} className="mx-3">
+          <Row>
+            <Labby>Country</Labby>
+          </Row>
+          <Row>
+            <Select
+              isClearable
+              className="w-100"
+              value={
+                countriesDefaultValues.find(i => i.value === data.CountryId) ||
+                ''
+              }
+              onChange={(newItem, actionMeta) =>
+                handleCnSelectChange(newItem, actionMeta)
+              }
+              options={countriesDefaultValues}
+            />
+          </Row>
+        </Col>
+        <Col xl={2} className="mx-3">
+          <Row>
+            <Labby>State</Labby>
+          </Row>
+          <Row>
+            <Select
+              isClearable
+              className="w-100"
+              value={
+                statesDefaultValues.find(i => i.value === data.StateId) || ''
+              }
+              onChange={(newItem, actionMeta) =>
+                handleStSelectChange(newItem, actionMeta)
+              }
+              options={statesDefaultValues}
+            />
+          </Row>
+        </Col>
+        <Col xl={2} className="mx-3">
+          <Row>
+            <Labby>City</Labby>
+          </Row>
+          <Row>
+            <FormInput
+              className="w-100"
+              placeholder="City"
+              value={data.City || ''}
+              onChange={e => setDataParam({ City: e.target.value })}
+            />
+          </Row>
+        </Col>
+        <Col xl={3} className="mx-3">
+          <Row>
+            <Col className="mr-3">
+              <Row>
+                <Labby>Address 1</Labby>
+              </Row>
+              <Row>
+                <FormInput
+                  className="w-100"
+                  placeholder="Address 1"
+                  value={data.Address1 || ''}
+                  onChange={e => setDataParam({ Address1: e.target.value })}
+                />
+              </Row>
+            </Col>
+            <Col>
+              <Row>
+                <Labby>Address 2</Labby>
+              </Row>
+              <Row>
+                <FormInput
+                  className="w-100"
+                  placeholder="Address 2"
+                  value={data.Address2 || ''}
+                  onChange={e => setDataParam({ Address2: e.target.value })}
+                />
+              </Row>
+            </Col>
+          </Row>
+        </Col>
+        <Col xl={1} className="mx-3">
+          <Row>
+            <Labby>Zip Code</Labby>
+          </Row>
+          <Row>
+            <FormInput
+              className="w-100"
+              placeholder="Zip Code"
+              value={data.Zip || ''}
+              onChange={e => setDataParam({ Zip: e.target.value })}
+            />
+          </Row>
+        </Col>
+      </MainItemRow>
+      <MainItemRow className="justify-content-start">
         <Col xl={3} className="mx-3">
           <Row>
             <Labby>Industry</Labby>
@@ -364,7 +623,6 @@ const CoreTab = props => {
             <CreatableSelectCustom
               classNamePrefix="react-select"
               isClearable
-              isLoading={industriesLoading}
               value={
                 industriesDefaultValues.find(
                   i => i.value === data.IndustryId
@@ -398,12 +656,11 @@ const CoreTab = props => {
                 <Labby>Fiscal Year Begin</Labby>
               </Row>
               <Row>
-                <FormInput
+                <Daty
                   className="w-100"
-                  placeholder="Fiscal Year Begin"
-                  value={data.FiscalYearBegin || ''}
-                  onChange={e =>
-                    setDataParam({ FiscalYearBegin: e.target.value })
+                  selected={data.FiscalYearBegin || ''}
+                  onChange={FiscalYearBegin =>
+                    setDataParam({ FiscalYearBegin })
                   }
                 />
               </Row>
@@ -413,13 +670,10 @@ const CoreTab = props => {
                 <Labby>Fiscal Year End</Labby>
               </Row>
               <Row>
-                <FormInput
+                <Daty
                   className="w-100"
-                  placeholder="Fiscal Year End"
-                  value={data.FiscalYearEnd || ''}
-                  onChange={e =>
-                    setDataParam({ FiscalYearEnd: e.target.value })
-                  }
+                  selected={data.FiscalYearEnd || ''}
+                  onChange={FiscalYearEnd => setDataParam({ FiscalYearEnd })}
                 />
               </Row>
             </Col>
@@ -427,23 +681,14 @@ const CoreTab = props => {
         </Col>
         <Col xl={2} className="mx-3">
           <Row>
-            <Labby>Permission</Labby>
+            <Labby>Refresh Date</Labby>
           </Row>
           <Row>
-            <FormDropdown>
-              <Dropdown.Toggle
-                variant="Secondary"
-                id="dropdown-scopes"
-                className="w-100"
-              >
-                PLEB
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item eventKey="PLEB">PLEB</Dropdown.Item>
-                <Dropdown.Item eventKey="PLEB">SUB</Dropdown.Item>
-                <Dropdown.Item eventKey="PLEB">ADMIN</Dropdown.Item>
-              </Dropdown.Menu>
-            </FormDropdown>
+            <Daty
+              className="w-100"
+              selected={data.RefreshDate || ''}
+              onChange={RefreshDate => setDataParam({ RefreshDate })}
+            />
           </Row>
         </Col>
       </MainItemRow>
@@ -456,7 +701,6 @@ const CoreTab = props => {
             <Select
               isClearable
               className="w-100"
-              isLoading={timezonesLoading}
               value={
                 timezonesDefaultValues.find(i => i.value === data.TimezoneId) ||
                 ''
@@ -490,13 +734,12 @@ const CoreTab = props => {
                 <Labby>Month End Close Period</Labby>
               </Row>
               <Row>
-                <FormInput
-                  placeholder="Month End Close Period"
+                <Daty
                   className="w-100"
-                  value={data.FiscalYearMonthEndClosePeriod || ''}
-                  onChange={e =>
+                  selected={data.FiscalYearMonthEndClosePeriod || ''}
+                  onChange={FiscalYearMonthEndClosePeriod =>
                     setDataParam({
-                      FiscalYearMonthEndClosePeriod: e.target.value
+                      FiscalYearMonthEndClosePeriod
                     })
                   }
                 />
@@ -507,13 +750,12 @@ const CoreTab = props => {
                 <Labby>Quarterly Close Cycle</Labby>
               </Row>
               <Row>
-                <FormInput
-                  placeholder="Quarterly Close Cycle"
+                <Daty
                   className="w-100"
-                  value={data.FiscalYearQuarterlyCloseCycle || ''}
-                  onChange={e =>
+                  selected={data.FiscalYearQuarterlyCloseCycle || ''}
+                  onChange={FiscalYearQuarterlyCloseCycle =>
                     setDataParam({
-                      FiscalYearQuarterlyCloseCycle: e.target.value
+                      FiscalYearQuarterlyCloseCycle
                     })
                   }
                 />

@@ -1,20 +1,19 @@
-import { TYPES } from '../actions/industries';
-import { TYPES as AUTH_TYPES } from '../actions/auth';
+import { TYPES as AUTH_TYPES } from './authReducer';
+
+const TYPES = {
+  GET_INDUSTRIES: 'GET_INDUSTRIES'
+};
 
 const initialState = {
-  industries: [],
-  loading: true
+  industries: []
 };
 
 const industriesReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.IS_LOADING:
-      return { ...state, loading: payload };
     case TYPES.GET_INDUSTRIES:
       return {
         ...state,
-        loading: false,
         industries: payload
       };
     case AUTH_TYPES.LOGOUT_USER:
@@ -24,4 +23,4 @@ const industriesReducer = (state = initialState, action) => {
   }
 };
 
-export default industriesReducer;
+export { TYPES, industriesReducer };

@@ -1,16 +1,16 @@
-import { TYPES } from '../actions/auth';
+const TYPES = {
+  LOGIN_USER: 'LOGIN_USER',
+  LOGOUT_USER: 'LOGOUT_USER'
+};
 
 const initialState = {
   isAuthenticated: false,
-  user: {},
-  loading: true
+  user: {}
 };
 
 const authReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.SET_LOADING:
-      return { ...state, loading: payload };
     case TYPES.LOGIN_USER:
       return {
         ...state,
@@ -24,4 +24,4 @@ const authReducer = (state = initialState, action) => {
   }
 };
 
-export default authReducer;
+export { TYPES, authReducer };

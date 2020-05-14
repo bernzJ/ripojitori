@@ -1,16 +1,16 @@
-import { TYPES } from '../actions/OMS';
-import { TYPES as AUTH_TYPES } from '../actions/auth';
+import { TYPES as AUTH_TYPES } from './authReducer';
+
+const TYPES = {
+  GET_OMS: 'GET_OMS'
+};
 
 const initialState = {
-  OMS: [],
-  loading: true
+  OMS: []
 };
 
 const OMSReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.IS_LOADING:
-      return { ...state, loading: payload };
     case TYPES.GET_OMS:
       return {
         ...state,
@@ -23,4 +23,4 @@ const OMSReducer = (state = initialState, action) => {
   }
 };
 
-export default OMSReducer;
+export { TYPES, OMSReducer };

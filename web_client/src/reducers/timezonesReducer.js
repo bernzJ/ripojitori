@@ -1,20 +1,19 @@
-import { TYPES } from '../actions/timezones';
-import { TYPES as AUTH_TYPES } from '../actions/auth';
+import { TYPES as AUTH_TYPES } from './authReducer';
+
+const TYPES = {
+  GET_TIMEZONES: 'GET_TIMEZONES'
+};
 
 const initialState = {
-  timezones: [],
-  loading: true
+  timezones: []
 };
 
 const timezonesReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.IS_LOADING:
-      return { ...state, loading: payload };
     case TYPES.GET_TIMEZONES:
       return {
         ...state,
-        loading: false,
         timezones: payload
       };
     case AUTH_TYPES.LOGOUT_USER:
@@ -24,4 +23,4 @@ const timezonesReducer = (state = initialState, action) => {
   }
 };
 
-export default timezonesReducer;
+export { TYPES, timezonesReducer };

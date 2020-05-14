@@ -15,15 +15,20 @@ const allowCrossDomain = (req, res, next) => {
   next();
 }
 
-
 const keys = require("./config/keys");
 const authRoutes = require("./routes/auth");
-const apiRoutes = require("./routes/customers");
+const customersRoutes = require("./routes/customers");
+const fiscalyearsRoutes = require("./routes/fiscalyears");
 const adminRoutes = require("./routes/admin");
 const industries = require("./routes/industries");
 const timezones = require("./routes/timezones");
 const countries = require("./routes/countries");
+const states = require("./routes/states");
 const oms = require("./routes/oms");
+const financialRoutes = require("./routes/financial");
+const hrRoutes = require("./routes/hr");
+const employeegroupsRoutes = require("./routes/employeegroups");
+const notes = require("./routes/notes");
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -61,13 +66,20 @@ sql.connect({
 
 // Use Routes
 app.use("/", authRoutes);
-app.use("/", apiRoutes);
+app.use("/", customersRoutes);
+app.use("/", fiscalyearsRoutes);
 app.use("/", adminRoutes);
 app.use("/", industries);
 app.use("/", timezones);
 app.use("/", countries);
+app.use("/", states);
+app.use("/", financialRoutes);
+app.use("/", hrRoutes);
+app.use("/", employeegroupsRoutes);
 app.use("/", oms);
-app.use("/static", express.static(__dirname + "/static"));
+app.use("/", notes);
+
+// app.use("/static", express.static(__dirname + "/static"));
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {

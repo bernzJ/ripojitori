@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Container, Tab, Tabs } from 'react-bootstrap';
 
 import CoreTab from './CoreTab';
+import NotesTab from './NotesTab';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -61,7 +62,7 @@ const ClientsDetailsTabs = props => {
         <Tab eventKey="8" title="Compliance">
           8
         </Tab>
-        <Tab eventKey="9" title="Footprint">
+        <Tab eventKey="9" title="Notes">
           9
         </Tab>
       </MainTab>

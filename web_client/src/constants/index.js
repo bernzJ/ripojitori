@@ -4,6 +4,7 @@ import actionsBox from './actionsBox.json';
 import user from './user';
 import customer from './customer';
 import endpoints from './endpoints';
+import api from './api';
 
 export {
   routes,
@@ -12,5 +13,6 @@ export {
   user,
   customer,
   actionsBox,
-  endpoints
+  endpoints,
+  api
 };

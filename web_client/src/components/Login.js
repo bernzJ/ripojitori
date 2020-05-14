@@ -1,14 +1,15 @@
 /* eslint-disable react/no-array-index-key */
 /* eslint-disable react/prop-types */
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch, shallowEqual } from 'react-redux';
 import styled from 'styled-components';
 import { Container, Row } from 'react-bootstrap';
 import { Redirect } from 'react-router-dom';
 import { addError } from 'redux-flash-messages';
 
-import { login, jwtLogin } from '../actions/auth';
-import { routes } from '../constants';
+import { setUser } from '../actions/auth';
+import { api, routes } from '../constants';
+import { useApi } from '../actions/useApi';
 
 import LoginFields from './LoginFields';
 import Loading from './Loading';
@@ -29,23 +30,31 @@ const MainContainer = styled.div`
 `;
 
 const Login = props => {
-  const {
-    authReducer: {
-      isAuthenticated,
-      loading: JWTLoading,
-      user: { token }
-    }
-  } = useSelector(({ authReducer }) => ({
-    authReducer
-  }));
+  const { user, isAuthenticated } = useSelector(state => state.authReducer);
   const dispatch = useDispatch();
-  React.useEffect(() => {
-    dispatch(jwtLogin(token));
-  }, [dispatch, jwtLogin, token]);
-  if (JWTLoading && !isAuthenticated) {
-    return <Loading />;
-  }
 
+  const [{ data, isLoading, isError }, doFetch] = useApi(api.auth.jwtLogin, {
+    'x-auth-token': user ? user.token : null
+  });
+
+  useEffect(() => {
+    if (!isLoading && !isError && data.user) {
+      dispatch(setUser(data.user));
+    }
+  }, [data, isLoading, isError]);
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Row className="p-5 justify-content-center">
+          <FlashMessage />
+        </Row>
+        <Row className="pt-5">
+          <Loading />
+        </Row>
+      </Container>
+    );
+  }
   if (isAuthenticated) {
     return (
       <Redirect
@@ -76,7 +85,10 @@ const Login = props => {
       });
       return;
     }
-    dispatch(login({ Email, Password }));
+    doFetch({
+      initialUrl: api.auth.login,
+      body: { Email, Password }
+    });
   };
 
   return (

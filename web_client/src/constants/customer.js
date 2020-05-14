@@ -19,8 +19,10 @@ const customer = {
   City: '',
   Zip: null,
   Country: 0,
+  State: 0,
   LGOwner: null,
-  EmployeeGroups: null
+  EmployeeGroups: null,
+  Notes: null
 };
 
 export default customer;

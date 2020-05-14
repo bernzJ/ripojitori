@@ -6,7 +6,7 @@ const requireLocalAuth = function(req, res, next) {
       return next(err);
     }
     if (!user) {
-      return res.send({ message: info, invalidateSesssion: true });
+      return res.status(500).send({ message: info, invalidateSesssion: true });
     }
     req.user = user;
     next();

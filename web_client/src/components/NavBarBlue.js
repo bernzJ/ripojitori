@@ -5,8 +5,9 @@ import { Nav, Navbar } from 'react-bootstrap';
 import { withRouter, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { routes, scopes } from '../constants';
-import { apiLogout } from '../actions/auth';
+import { routes, scopes, api } from '../constants';
+import { useApi } from '../actions/useApi';
+import { logout } from '../actions/auth';
 
 const NavWrapper = styled.div`
   &&& #main-nav {
@@ -49,13 +50,8 @@ const NavBarBlue = props => {
     location: { pathname }
   } = props;
   const dispatch = useDispatch();
-  const userScope = useSelector(
-    ({
-      authReducer: {
-        user: { Scope }
-      }
-    }) => Scope
-  );
+  const userScope = useSelector(state => state.authReducer.user.Scope);
+  const [state, doFetch] = useApi();
   if (pathname === routes.LOGIN) {
     return null;
   }
@@ -100,7 +96,8 @@ const NavBarBlue = props => {
           </Nav>
           <a
             onClick={() => {
-              dispatch(apiLogout());
+              doFetch({ initialUrl: api.auth.logout });
+              dispatch(logout());
             }}
             className={classNames({
               linka: true,

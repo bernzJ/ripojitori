@@ -34,7 +34,7 @@ const Flash = styled.div`
 `;
 
 const FlashMessage = props => {
-  const { messages } = useSelector(({ flashMessage }) => flashMessage);
+  const messages = useSelector(state => state.flashMessage.messages);
   const dispatch = useDispatch();
   const onFlashMessageClick = flashMessage => {
     // flashMessage.onClick(flashMessage);

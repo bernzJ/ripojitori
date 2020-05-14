@@ -1,5 +1,5 @@
 /* eslint-disable react/no-array-index-key */
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { Container, Form, Row } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
@@ -9,11 +9,9 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import ClientsDetailsTable from './ClientsDetailsTable';
 import Loading from './Loading';
 import FlashMessage from './FlashMessage';
-import { getCustomers } from '../actions/customers';
-import { getIndustries } from '../actions/industries';
-import { getTimezones } from '../actions/timezones';
-import { getCountries } from '../actions/countries';
-import { getOMS } from '../actions/OMS';
+import { api } from '../constants';
+import { useApi } from '../actions/useApi';
+import { logout } from '../actions/auth';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -58,31 +56,29 @@ const AutoRow = styled(Row)`
 `;
 
 const ClientsDetails = props => {
-  const {
-    customersReducer: { loading, customers },
-    indLoading,
-    tsLoading
-  } = useSelector(state => ({
-    customersReducer: state.customersReducer,
-    indLoading: state.industriesReducer.loading,
-    tsLoading: state.timezonesReducer.loading
-  }));
-
+  const token = useSelector(state => state.authReducer.user.token);
   const dispatch = useDispatch();
-  const [items, setItems] = React.useState(customers);
+  const [items, setItems] = React.useState([]);
 
   // @TODO: move this accordingly
-  React.useEffect(() => {
-    dispatch(getCustomers());
-    dispatch(getIndustries());
-    dispatch(getTimezones());
-    dispatch(getCountries());
-    dispatch(getOMS());
-  }, [dispatch]);
+  const [{ data, isLoading, isError }, doFetch] = useApi(api.customers.get, {
+    'x-auth-token': token
+  });
+
+  useEffect(() => {
+    if (!isLoading && !isError && data.customers) {
+      setItems(data.customers);
+    }
+  }, [isLoading, isError, data]);
+
+  if (isError && data && data.invalidateSesssion) {
+    doFetch({ initialUrl: api.auth.logout });
+    dispatch(logout());
+  }
 
   const filterData = filter => {
     setItems(
-      customers.filter(customer =>
+      items.filter(customer =>
         Object.keys(customer).find(
           key =>
             customer[key]
@@ -94,8 +90,17 @@ const ClientsDetails = props => {
     );
   };
 
-  if (loading || indLoading || tsLoading) {
-    return <Loading />;
+  if (isLoading || items.length === 0) {
+    return (
+      <Container>
+        <Row className="p-5 justify-content-center">
+          <FlashMessage />
+        </Row>
+        <Row className="pt-5">
+          <Loading />
+        </Row>
+      </Container>
+    );
   }
 
   return (

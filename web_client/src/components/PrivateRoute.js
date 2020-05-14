@@ -10,14 +10,14 @@ import { routes } from '../constants';
 
 const PrivateRoute = ({ component, children, scope, ...rest }) => {
   const Component = component || children;
-  const reducer = useSelector(({ authReducer }) => authReducer);
+  const reducer = useSelector(state => state.authReducer);
   return (
     <Route
       {...rest}
       render={props => {
         const {
           isAuthenticated,
-          user: { scope: userScope }
+          user: { Scope: userScope }
         } = reducer;
         if (!isAuthenticated) {
           // addWarning({ text: 'User not authenticated.' });

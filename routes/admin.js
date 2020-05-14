@@ -14,18 +14,18 @@ router.use((req, res, next) => {
   next();
 })
 
-router.post("/admin/users", requireJwtAuth, requireScope, async (req, res) => {
+router.post("/admin/users", requireJwtAuth, requireScope, async (req, res, next) => {
   try {
     const result = await new sql.Request().query('SELECT Id, Email, [FirstName], [LastName], Scope FROM Users FOR JSON AUTO;'); //await User.find({}, "-password");
     res.send({
       users: result.recordset[0]
     });
   } catch ({ message }) {
-    res.send({ message });
+    res.status(500).send({ message });;
   }
 });
 
-router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res) => {
+router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res, next) => {
   const ps = new sql.PreparedStatement();
   try {
     const { user } = req.body;
@@ -51,7 +51,7 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
         .required()
     });
     const userSchema = await schema.validateAsync(user);
-   
+
     if (userSchema.Password) {
       userSchema.Password = await User.hashPassword(userSchema.Password);
     } else {
@@ -75,11 +75,11 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
       result: "Saved"
     });
   } catch ({ message }) {
-    res.send({ message });
+    res.status(500).send({ message });;
   }
 });
 
-router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res) => {
+router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res, next) => {
   const ps = new sql.PreparedStatement();
   try {
     const { users } = req.body;
@@ -101,7 +101,7 @@ router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res) =
       result
     });
   } catch ({ message }) {
-    res.send({ message });
+    res.status(500).send({ message });;
   }
 });
 

@@ -1,20 +1,13 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faUserPlus,
-  faUserTimes,
-  faUserEdit
-} from '@fortawesome/free-solid-svg-icons';
-import { Button, Container, Row } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { areEqual } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
-import { actionsBox, intScopeToString } from '../constants';
-import AddEditDelUser from './AddEditDelUser';
+import { intScopeToString } from '../constants';
 import VirtualTable from './VirtualTable';
 
 const MainTableContainer = styled.div`
@@ -110,50 +103,20 @@ const PLHead = styled.tr`
     padding: 0 20px;
   }
 `;
-const ActionBox = styled.div`
-  &&& {
-    z-index: 9;
-    position: absolute;
-    right: 0;
-    top: -70px;
-    margin: 10px;
-  }
-`;
-const ButtonAction = styled(Button)`
-  &&& {
-    margin-left: 5px;
-    margin-right: 5px;
-    color: #fff;
-    background-color: #4898cf;
-    border: none;
-  }
-`;
 
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index }) => {
-  const {
-    users,
-    state,
-    setState,
-    state: { selected }
-  } = data;
+  const { users, state, setState } = data;
   const user = users[index];
   const HandleItemClick = () => {
-    if (selected.indexOf(user) > -1) {
-      setState({
-        ...state,
-        selected: [...selected.filter(s => s._id !== user._id)]
-      });
-    } else {
-      setState({ ...state, selected: [...selected, user] });
-    }
+    setState({ ...state, selected: user });
   };
   return (
     <RowItem
       className={classNames({
-        selected: selected.indexOf(user) > -1
+        selected: user.Id === (state.selected ? state.selected.Id : -1)
       })}
-      key={user._id}
+      key={user.Id}
       onClick={HandleItemClick}
     >
       <td data-title="ID">{user.Id}</td>
@@ -171,89 +134,17 @@ const checkBreakpoint = () => {
 };
 
 const AdminTable = ({ items }) => {
-  const [state, setState] = React.useState({
-    selected: [],
-    action: {
-      name: actionsBox.NONE,
-      visibility: false,
-      toggle: null,
-      params: {}
-    }
+  const [state, setState] = useState({
+    selected: null
   });
 
   /* if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   } */
-  const { action } = state;
-  const setVisibility = visibility =>
-    setState({ ...state, action: { ...action, visibility } });
-  const renderModals = () =>
-    action.name === actionsBox.NONE ? null : <AddEditDelUser {...action} />;
 
   return (
     <VHContainer fluid>
-      {renderModals()}
       <MainTableContainer className="h-100">
-        <ActionBox>
-          <Row className="px-0 m-0">
-            <ButtonAction
-              onClick={() =>
-                setState({
-                  ...state,
-                  action: {
-                    mode: actionsBox.CREATE,
-                    visibility: true,
-                    toggle: setVisibility
-                  }
-                })
-              }
-            >
-              <FontAwesomeIcon icon={faUserPlus} />
-            </ButtonAction>
-            <ButtonAction
-              onClick={() => {
-                const { selected } = state;
-                if (selected.length > 0) {
-                  setState({
-                    ...state,
-                    action: {
-                      mode: actionsBox.EDIT,
-                      visibility: true,
-                      toggle: setVisibility,
-                      params: {
-                        selected: selected[0]
-                      }
-                    }
-                  });
-                }
-              }}
-            >
-              <FontAwesomeIcon icon={faUserEdit} />
-            </ButtonAction>
-            <ButtonAction
-              onClick={() => {
-                const { selected } = state;
-                if (selected.length > 0) {
-                  setState({
-                    ...state,
-                    action: {
-                      mode: actionsBox.DELETE,
-                      visibility: true,
-                      toggle: setVisibility,
-                      params: {
-                        selected,
-                        title: 'Are you sure ?',
-                        message: 'Deleting selected users is permanent.'
-                      }
-                    }
-                  });
-                }
-              }}
-            >
-              <FontAwesomeIcon icon={faUserTimes} />
-            </ButtonAction>
-          </Row>
-        </ActionBox>
         <AutoSizer>
           {({ height, width }) => (
             <VirtualTable

@@ -1,20 +1,20 @@
 import { TYPES as AUTH_TYPES } from './authReducer';
 
 const TYPES = {
-  GET_COUNTRIES: 'GET_COUNTRIES'
+  GET_STATES: 'GET_STATES'
 };
 
 const initialState = {
-  countries: []
+  states: []
 };
 
-const countriesReducer = (state = initialState, action) => {
+const statesReducer = (state = initialState, action) => {
   const { type, payload } = action;
   switch (type) {
-    case TYPES.GET_COUNTRIES:
+    case TYPES.GET_STATES:
       return {
         ...state,
-        countries: payload
+        states: payload
       };
     case AUTH_TYPES.LOGOUT_USER:
       return initialState;
@@ -23,4 +23,4 @@ const countriesReducer = (state = initialState, action) => {
   }
 };
 
-export { TYPES, countriesReducer };
+export { TYPES, statesReducer };

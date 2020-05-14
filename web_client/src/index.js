@@ -8,6 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import 'bootstrap/dist/css/bootstrap.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import 'animate.css/animate.min.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import './assets/montserrat/index.css';
 import './assets/app.global.css';
 import App from './components/App';

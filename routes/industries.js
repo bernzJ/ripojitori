@@ -16,7 +16,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post("/industries", requireJwtAuth, requireScope, async (req, res) => {
+router.post("/industries", requireJwtAuth, requireScope, async (req, res, next) => {
   try {
     //SELECT _id, projectResource, clientName, segment, category, status, hours, start, "end"${req.user.scope === scopes.ADMIN ? ", scope" : ""} FROM companies FOR JSON AUTO;
     const result = await new sql.Request().query(`SELECT * FROM [dbo].[Industries] FOR JSON AUTO;`);
@@ -24,7 +24,7 @@ router.post("/industries", requireJwtAuth, requireScope, async (req, res) => {
       industries: result.recordset[0]
     });
   } catch ({ message }) {
-    res.send({ message })
+    res.status(500).send({ message });;
   }
 });
 
@@ -53,32 +53,7 @@ router.post("/industries/create", requireJwtAuth, requireScope, ((req, res, next
       result: "Saved"
     });
   } catch ({ message }) {
-    res.send({ message })
-  }
-});
-
-router.post("/industries/del", requireJwtAuth, requireScope, ((req, res, next) => req.user.scope !== scopes.ADMIN ? res.send({ message: "permission denied." }) : next()), async (req, res) => {
-  const ps = new sql.PreparedStatement();
-  try {
-    const { companies } = req.body;
-    //const result = await Company.deleteMany({ _id: companies });
-
-    var paramsObj = companies.reduce((obj, val, idx) => {
-      obj[`id${idx}`] = val;
-      ps.input(`id${idx}`, sql.Int);
-      return obj;
-    }, {});
-    // Manually insert the params' arbitrary keys into the statement
-    var stmt = "DELETE from companies where _id in (" + Object.keys(paramsObj).map((o) => { return '@' + o }).join(',') + ')';
-    await ps.prepare(stmt);
-    const result = await ps.execute(paramsObj);
-    await ps.unprepare();
-
-    res.send({
-      result
-    });
-  } catch ({ message }) {
-    res.send({ message })
+    res.status(500).send({ message });;
   }
 });
 
