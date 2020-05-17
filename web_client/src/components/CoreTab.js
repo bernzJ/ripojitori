@@ -115,6 +115,15 @@ const CoreTab = props => {
     statesDefaultValues: []
   });
 
+  useEffect(() => {
+    if (current) {
+      setState({
+        ...state,
+        data: current
+      });
+    }
+  }, [current]);
+
   const {
     data,
     industriesDefaultValues,
@@ -124,13 +133,6 @@ const CoreTab = props => {
     statesDefaultValues,
     shouldUpdate
   } = state;
-
-  useEffect(() => {
-    setState({
-      ...state,
-      data: current || customer
-    });
-  }, [current]);
 
   const fetchIndustries = async () => {
     try {
@@ -202,6 +204,7 @@ const CoreTab = props => {
         if (!didCancel) {
           setState({
             ...state,
+            data: current || customer,
             industriesDefaultValues: dv,
             timezonesDefaultValues: buildSelectDefaultValues(timezones, {
               value: 'Id',

@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import classNames from 'classnames';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { Col, Container, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { addError, addSuccess } from 'redux-flash-messages';
 
 import Loading from './Loading';
-import { api } from '../constants';
+import { api, upsert } from '../constants';
 import { useApi } from '../actions/useApi';
+import { addCustomer } from '../actions/customers';
 
 const ActionBoxContainer = styled.div`
   &&& {
@@ -60,53 +61,61 @@ const Note = {
 };
 
 const NotesTab = props => {
+  const dispatch = useDispatch();
   const { current, token } = useSelector(state => ({
     current: state.customersReducer.current,
     token: state.authReducer.user.token
   }));
   const [state, setState] = useState({
     data: Note,
+    notes: [],
     shouldUpdate: false
   });
-  const [{ data: apiData, isLoading, isError }, doFetch] = useApi();
+  const [
+    {
+      data: { notes: notesAPI, result, message },
+      isLoading,
+      isError
+    },
+    doFetch
+  ] = useApi(api.notes.get, {
+    'x-auth-token': token
+  });
 
-  const { data, shouldUpdate } = state;
+  const { data, notes, shouldUpdate } = state;
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
+  const filterNotes = id => notes.find(note => note.Id === id);
 
   useEffect(() => {
-    if (current) {
-      setState({ ...state, data: { ...Note, CustomerId: current.Id } });
-      if (current.Notes) {
-        doFetch({
-          initialUrl: api.notes.get,
-          body: {
-            'x-auth-token': token,
-            Id: current.Notes
-          }
-        });
-      }
+    if (current && notes) {
+      const n = current.Notes ? filterNotes(current.Notes) : Note;
+      setState({ ...state, data: { ...n, CustomerId: current.Id } });
     }
-  }, [current]);
+  }, [current, notes]);
 
   useEffect(() => {
     if (!isLoading && !isError) {
-      if (apiData.notes) {
-        setState({ ...state, data: { ...data, ...apiData.notes } });
+      if (notesAPI) {
+        setState({ ...state, notes: notesAPI });
       }
-      if (apiData.result) {
+      if (result) {
         addSuccess({ text: 'Saved !' });
+        // @HACK
+        // window.location.reload();
+        dispatch(addCustomer({ ...current, Notes: data.Id }));
       }
-      if (apiData.message) {
+      if (message) {
         addError({
-          text: apiData.message,
+          text: message,
           data: 'useEffect[isLoading, isError, apiData]'
         });
       }
     }
-  }, [isLoading, isError, apiData]);
+  }, [isLoading, isError, result, message, notesAPI]);
 
   const handleSaveButton = () => {
+    setState({ ...state, shouldUpdate: false, notes: upsert(notes, data) });
     doFetch({
       initialUrl: api.notes.create,
       body: {
@@ -114,7 +123,6 @@ const NotesTab = props => {
         Notes: data
       }
     });
-    setState({ ...state, shouldUpdate: false });
   };
   /* if (notes.length === 0) {
     return <div className="p-5">No notes have been found</div>;

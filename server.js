@@ -1,6 +1,5 @@
 const express = require("express");
 const sql = require('mssql/msnodesqlv8');
-//const mongoose = require("mongoose");
 const path = require("path");
 const https = require("https");
 const fs = require("fs");

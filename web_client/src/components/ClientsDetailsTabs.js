@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Container, Tab, Tabs } from 'react-bootstrap';
 
+import Visibility from './Visibility';
 import CoreTab from './CoreTab';
 import NotesTab from './NotesTab';
 

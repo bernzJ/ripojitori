@@ -15,20 +15,7 @@ router.use((req, res, next) => {
 
 router.post("/notes", requireJwtAuth, requireScope, async (req, res, next) => {
   try {
-
-    const ps = new sql.PreparedStatement();
-    const { Id } = req.body;
-
-    const schema = Joi.object({
-      Id: Joi.number().required()
-    });
-
-    const notesSchema = await schema.validateAsync({ Id });
-    ps.input('Id', sql.Int);
-
-    await ps.prepare(`SELECT * FROM [dbo].[Notes] WHERE Id = @Id;`);
-
-    const { recordset } = await ps.execute(notesSchema);
+    const { recordset } = await new sql.Request().query(`SELECT * FROM [dbo].[Notes] FOR JSON AUTO;`);
     res.send({
       notes: recordset[0]
     });
