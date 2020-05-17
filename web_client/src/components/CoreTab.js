@@ -6,16 +6,14 @@ import DatePicker from 'react-datepicker';
 import { Container, Col, FormCheck, Row } from 'react-bootstrap';
 import CreatableSelect from 'react-select/creatable';
 import Select from 'react-select';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Joi from '@hapi/joi';
-import { addError } from 'redux-flash-messages';
+import { addError, addSuccess } from 'redux-flash-messages';
 
 import { customer, api } from '../constants';
-import { useApi } from '../actions/useApi';
-import { setIndustries } from '../actions/industries';
-import { setCurrent } from '../actions/customers';
+import { setCurrent, addCustomer } from '../actions/customers';
 
 const Daty = styled(DatePicker)`
   &&& {
@@ -99,25 +97,88 @@ const buildStatesByCID = (s, cid) =>
   !cid ? s : s.filter(_s => _s.CountryId === cid || _s.CountryId === 0);
 
 const CoreTab = props => {
-  const { current, token } = useSelector(
-    state => ({
-      current: state.customersReducer.current,
-      token: state.authReducer.user.token
-    }),
-    shallowEqual
-  );
-
+  const { current, token } = useSelector(state => ({
+    current: state.customersReducer.current,
+    token: state.authReducer.user.token
+  }));
   const dispatch = useDispatch();
+
+  // const [{ data: apiData, isLoading, isError }, doFetch] = useApi();
+
+  const [state, setState] = useState({
+    data: customer,
+    shouldUpdate: false,
+    industriesDefaultValues: [],
+    timezonesDefaultValues: [],
+    countriesDefaultValues: [],
+    OMSDefaultValues: [],
+    statesDefaultValues: []
+  });
+
+  const {
+    data,
+    industriesDefaultValues,
+    timezonesDefaultValues,
+    countriesDefaultValues,
+    OMSDefaultValues,
+    statesDefaultValues,
+    shouldUpdate
+  } = state;
+
+  useEffect(() => {
+    setState({
+      ...state,
+      data: current || customer
+    });
+  }, [current]);
+
+  const fetchIndustries = async () => {
+    try {
+      const {
+        data: { industries }
+      } = await axios.post(api.industries.get, {
+        'x-auth-token': token
+      });
+      return {
+        industriesDefaultValues: buildSelectDefaultValues(industries, {
+          value: 'Id',
+          label: 'Name'
+        })
+      };
+    } catch ({ message, response }) {
+      addError({
+        text: response ? response.data : message
+      });
+    }
+  };
+  const addCustomerApi = async customer => {
+    try {
+      const {
+        data: { result, message }
+      } = await axios.post(api.customers.create, {
+        'x-auth-token': token,
+        customer
+      });
+      if (result) {
+        // dispatch(setCurrent({ ...data }));
+        dispatch(addCustomer(data));
+        setState({ ...state, shouldUpdate: false });
+        addSuccess({ text: 'Saved !' });
+      } else {
+        addError({ text: message, data: 'fetchUpdate' });
+      }
+    } catch ({ message, response }) {
+      addError({
+        text: response ? response.data : message
+      });
+    }
+  };
 
   useEffect(() => {
     let didCancel = false;
     const fetchData = async () => {
       try {
-        const {
-          data: { industries }
-        } = await axios.post(api.industries.get, {
-          'x-auth-token': token
-        });
+        const { industriesDefaultValues: dv } = await fetchIndustries();
         const {
           data: { timezones }
         } = await axios.post(api.timezones.get, {
@@ -141,10 +202,7 @@ const CoreTab = props => {
         if (!didCancel) {
           setState({
             ...state,
-            industriesDefaultValues: buildSelectDefaultValues(industries, {
-              value: 'Id',
-              label: 'Name'
-            }),
+            industriesDefaultValues: dv,
             timezonesDefaultValues: buildSelectDefaultValues(timezones, {
               value: 'Id',
               label: 'Name'
@@ -179,67 +237,6 @@ const CoreTab = props => {
       didCancel = true;
     };
   }, [token]);
-  console.log('rendeeeeeeeeeeeeeer');
-  const [state, setState] = useState({
-    data: customer,
-    shouldUpdate: false,
-    industriesDefaultValues: [],
-    timezonesDefaultValues: [],
-    countriesDefaultValues: [],
-    OMSDefaultValues: [],
-    statesDefaultValues: []
-  });
-
-  useEffect(() => {
-    if (current) {
-      setState({
-        ...state,
-        data: current,
-        shouldUpdate: current ? !!current.shouldUpdate : true
-      });
-    }
-  }, [current]);
-
-  /* React.useEffect(() => {
-    setState({
-      ...state,
-      data: current || customer,
-      shouldUpdate: current ? !!current.shouldUpdate : true,
-      industriesDefaultValues: buildSelectDefaultValues(industries, {
-        value: 'Id',
-        label: 'Name'
-      }),
-      timezonesDefaultValues: buildSelectDefaultValues(timezones, {
-        value: 'Id',
-        label: 'Name'
-      }),
-      countriesDefaultValues: buildSelectDefaultValues(countries, {
-        value: 'Id',
-        label: 'CountryName'
-      }),
-      OMSDefaultValues: buildSelectDefaultValues(OMS, {
-        value: 'Id',
-        label: 'Type'
-      }),
-      statesDefaultValues: buildSelectDefaultValues(
-        buildStatesByCID(states, current ? current.Id : null),
-        {
-          value: 'Id',
-          label: 'Abbreviation'
-        }
-      )
-    });
-  }, [current, industries, timezones, countries, OMS, states]); */
-
-  const {
-    data,
-    industriesDefaultValues,
-    timezonesDefaultValues,
-    countriesDefaultValues,
-    OMSDefaultValues,
-    statesDefaultValues,
-    shouldUpdate
-  } = state;
 
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
@@ -306,15 +303,36 @@ const CoreTab = props => {
         data: 'CoreTab.js handleSaveButton companySchema.error'
       });
     } else {
-      console.log(customerSchema.value);
+      addCustomerApi(customerSchema.value);
       // dispatch(addCustomer(customerSchema.value));
     }
   };
 
-  // @NOTE: this is iffy.
   const handleIndSelectCreate = Name => {
-    // dispatch(setCurrent({ ...data, shouldUpdate: true }));
-    // dispatch(addIndustry({ Name }));
+    const fetchUpdate = async () => {
+      try {
+        const {
+          data: { result, message }
+        } = await axios.post(api.industries.create, {
+          'x-auth-token': token,
+          Industry: { Name }
+        });
+        if (result) {
+          const { industriesDefaultValues: newVal } = await fetchIndustries();
+          setState({
+            ...state,
+            industriesDefaultValues: newVal
+          });
+        } else {
+          addError({ text: message, data: 'fetchUpdate' });
+        }
+      } catch ({ message, response }) {
+        addError({
+          text: response ? response.data : message
+        });
+      }
+    };
+    fetchUpdate();
   };
 
   const handleIndSelectChange = (newValue, actionMeta) => {
@@ -425,7 +443,9 @@ const CoreTab = props => {
     <Container className="p-5" fluid>
       <ActionBoxContainer>
         <FontAwesomeIcon
-          onClick={() => dispatch(setCurrent())}
+          onClick={() => {
+            dispatch(setCurrent());
+          }}
           className="mr-3"
           color="#c3c3c3"
           size="2x"

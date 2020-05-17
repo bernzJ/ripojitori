@@ -37,6 +37,7 @@ const MainTab = styled(Tabs)`
     padding-left: 30px;
   }
 `;
+// @TODO: implement this differently so all apis arent called at the same time.
 const ClientsDetailsTabs = props => {
   return (
     <MainContainer fluid>
@@ -63,7 +64,7 @@ const ClientsDetailsTabs = props => {
           8
         </Tab>
         <Tab eventKey="9" title="Notes">
-          9
+          <NotesTab />
         </Tab>
       </MainTab>
     </MainContainer>

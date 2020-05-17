@@ -12,6 +12,7 @@ import FlashMessage from './FlashMessage';
 import { api } from '../constants';
 import { useApi } from '../actions/useApi';
 import { logout } from '../actions/auth';
+import { setCustomers } from '../actions/customers';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -56,7 +57,10 @@ const AutoRow = styled(Row)`
 `;
 
 const ClientsDetails = props => {
-  const token = useSelector(state => state.authReducer.user.token);
+  const { token, customers } = useSelector(state => ({
+    token: state.authReducer.user.token,
+    customers: state.customersReducer.customers
+  }));
   const dispatch = useDispatch();
   const [items, setItems] = React.useState([]);
 
@@ -66,15 +70,23 @@ const ClientsDetails = props => {
   });
 
   useEffect(() => {
+    if (customers.length > 0) {
+      setItems(customers);
+    }
+  }, [customers]);
+
+  useEffect(() => {
     if (!isLoading && !isError && data.customers) {
-      setItems(data.customers);
+      dispatch(setCustomers(data.customers));
     }
   }, [isLoading, isError, data]);
-
-  if (isError && data && data.invalidateSesssion) {
-    doFetch({ initialUrl: api.auth.logout });
-    dispatch(logout());
-  }
+  // @TODO: test this for infinite loops.
+  useEffect(() => {
+    if (isError && data && data.invalidateSesssion) {
+      doFetch({ initialUrl: api.auth.logout });
+      dispatch(logout());
+    }
+  }, [data.invalidateSesssion, isError, data, doFetch]);
 
   const filterData = filter => {
     setItems(

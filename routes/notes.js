@@ -58,8 +58,8 @@ router.post("/notes/create", requireJwtAuth, requireScope, async (req, res, next
 
     await ps.prepare(`EXEC [dbo].[update_notes] @Id, @CustomerId, @Note, @SqlReport`);
 
-    const { recordset } = await ps.execute(notesSchema);
-    res.send(recordset[0]);
+    await ps.execute(notesSchema);
+    res.send({ result: 'saved !' });
   } catch ({ message }) {
     res.status(500).send({ message });;
   }

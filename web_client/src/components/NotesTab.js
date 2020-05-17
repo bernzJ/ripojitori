@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import styled from 'styled-components';
 import classNames from 'classnames';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Col, Container, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSave, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { addError, addSuccess } from 'redux-flash-messages';
 
 import Loading from './Loading';
-import { endpoints } from '../constants';
+import { api } from '../constants';
+import { useApi } from '../actions/useApi';
 
 const ActionBoxContainer = styled.div`
   &&& {
@@ -52,50 +52,69 @@ const Areay = styled.textarea`
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
   }
 `;
+const Note = {
+  Id: -1,
+  CustomerId: null,
+  Note: '',
+  SqlReport: ''
+};
 
 const NotesTab = props => {
-  const dispatch = useDispatch();
   const { current, token } = useSelector(state => ({
     current: state.customersReducer.current,
     token: state.authReducer.user.token
   }));
   const [state, setState] = useState({
-    data: {
-      Id: -1,
-      CustomerId: null,
-      Note: '',
-      SqlReport: ''
-    },
-    loading: false,
+    data: Note,
     shouldUpdate: false
   });
-  // @TODO: wtf
-  useEffect(() => {
-    console.log('called effect');
-    // dispatch(getOMS());
-  }, []);
+  const [{ data: apiData, isLoading, isError }, doFetch] = useApi();
 
-  const addNotes = async () => {
-    const { data } = await axios.post(`${endpoints.DEV}/notes/create`, {
-      'x-auth-token': token,
-      Notes: state.data
-    });
-    if (data.message) {
-      addError({
-        text: data.message,
-        data: 'notes.js addNotes data.message'
-      });
-    } else {
-      // dispatch(getCustomers());
-    }
-  };
-
-  const { data, loading, shouldUpdate } = state;
+  const { data, shouldUpdate } = state;
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
-  console.log(data);
+
+  useEffect(() => {
+    if (current) {
+      setState({ ...state, data: { ...Note, CustomerId: current.Id } });
+      if (current.Notes) {
+        doFetch({
+          initialUrl: api.notes.get,
+          body: {
+            'x-auth-token': token,
+            Id: current.Notes
+          }
+        });
+      }
+    }
+  }, [current]);
+
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      if (apiData.notes) {
+        setState({ ...state, data: { ...data, ...apiData.notes } });
+      }
+      if (apiData.result) {
+        addSuccess({ text: 'Saved !' });
+      }
+      if (apiData.message) {
+        addError({
+          text: apiData.message,
+          data: 'useEffect[isLoading, isError, apiData]'
+        });
+      }
+    }
+  }, [isLoading, isError, apiData]);
+
   const handleSaveButton = () => {
-    addNotes();
+    doFetch({
+      initialUrl: api.notes.create,
+      body: {
+        'x-auth-token': token,
+        Notes: data
+      }
+    });
+    setState({ ...state, shouldUpdate: false });
   };
   /* if (notes.length === 0) {
     return <div className="p-5">No notes have been found</div>;
@@ -103,7 +122,7 @@ const NotesTab = props => {
   if (!current) {
     return <div className="p-5">Nothing selected</div>;
   }
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="p-5">
         <Loading />

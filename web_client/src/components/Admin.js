@@ -37,10 +37,12 @@ const Admin = props => {
     }
   }, [isLoading, isError, data]);
 
-  if (isError && data && data.invalidateSesssion) {
-    doFetch({ initialUrl: api.auth.logout });
-    dispatch(logout());
-  }
+  useEffect(() => {
+    if (isError && data && data.invalidateSesssion) {
+      doFetch({ initialUrl: api.auth.logout });
+      dispatch(logout());
+    }
+  }, [data.invalidateSesssion, isError, data, doFetch]);
 
   if (isLoading || users.length === 0) {
     return (

@@ -34,6 +34,10 @@ const api = {
   },
   states: {
     get: `${endpoints.DEV}/states`
+  },
+  notes: {
+    get: `${endpoints.DEV}/notes`,
+    create: `${endpoints.DEV}/notes/create`
   }
 };
 

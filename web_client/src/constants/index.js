@@ -5,6 +5,7 @@ import user from './user';
 import customer from './customer';
 import endpoints from './endpoints';
 import api from './api';
+import { upsert } from './utils';
 
 export {
   routes,
@@ -14,5 +15,6 @@ export {
   customer,
   actionsBox,
   endpoints,
-  api
+  api,
+  upsert
 };

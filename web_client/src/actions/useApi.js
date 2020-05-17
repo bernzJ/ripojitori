@@ -29,11 +29,13 @@ const useApi = (initialUrl, body) => {
         }
       }
     };
-    fetchData();
+    if (payload.initialUrl) {
+      fetchData();
+    }
     return () => {
       didCancel = true;
     };
-  }, [payload.initialUrl]);
+  }, [payload]);
 
   return [state, setPayload];
 };
