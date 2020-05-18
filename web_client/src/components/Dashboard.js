@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,9 +7,13 @@ import { Container, Col, Row } from 'react-bootstrap';
 import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 
-import { routes } from '../constants';
+import { useSelector } from 'react-redux';
+import { routes, api } from '../constants';
 import dotSVG from '../assets/svg/dot.svg';
 import dotShadow from '../assets/svg/dotshadow.svg';
+import { useApi } from '../actions/useApi';
+import FlashMessage from './FlashMessage';
+import Loading from './Loading';
 
 const Mappy = styled(Map)`
   &&& {
@@ -155,12 +159,39 @@ const StatsLabelBot = styled.label`
 `;
 
 const Dashboard = props => {
+  const token = useSelector(state => state.authReducer.user.token);
+  const [state, setState] = useState({
+    TotalActiveProjects: 0,
+    TotalActiveClients: 0,
+    TotalClients: 0
+  });
+  const [{ data, isLoading, isError }] = useApi(api.dashboardstats.get, {
+    'x-auth-token': token
+  });
+  useEffect(() => {
+    if (!isLoading && !isError && data.dashboardstats) {
+      setState({ ...state, ...data.dashboardstats[0] });
+    }
+  }, [data, isLoading, isError]);
+
+  if (isLoading) {
+    return (
+      <Container>
+        <Row className="p-5 justify-content-center">
+          <FlashMessage />
+        </Row>
+        <Row className="pt-5">
+          <Loading />
+        </Row>
+      </Container>
+    );
+  }
   return (
     <Container fluid>
       <StatsBoxContainer>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>219</StatsLabelTop>
+            <StatsLabelTop>{state.TotalClients}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total clients</StatsLabelBot>
@@ -168,7 +199,7 @@ const Dashboard = props => {
         </Stats>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>43</StatsLabelTop>
+            <StatsLabelTop>{state.TotalActiveClients}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total active clients</StatsLabelBot>
@@ -176,7 +207,7 @@ const Dashboard = props => {
         </Stats>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>143</StatsLabelTop>
+            <StatsLabelTop>{state.TotalActiveProjects}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total active projects</StatsLabelBot>

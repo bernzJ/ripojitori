@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import { Container, Tab, Tabs } from 'react-bootstrap';
 
-import Visibility from './Visibility';
 import CoreTab from './CoreTab';
 import NotesTab from './NotesTab';
 
@@ -39,12 +39,12 @@ const MainTab = styled(Tabs)`
   }
 `;
 // @TODO: implement this differently so all apis arent called at the same time.
-const ClientsDetailsTabs = props => {
+const ClientsDetailsTabs = ({ unsaved }) => {
   return (
     <MainContainer fluid>
       <MainTab id="Extra" defaultActiveKey="1">
         <Tab eventKey="1" title="Company">
-          <CoreTab />
+          <CoreTab unsaved={unsaved} />
         </Tab>
         <Tab eventKey="2" title="Products">
           2
@@ -65,11 +65,15 @@ const ClientsDetailsTabs = props => {
           8
         </Tab>
         <Tab eventKey="9" title="Notes">
-          <NotesTab />
+          <NotesTab unsaved={unsaved} />
         </Tab>
       </MainTab>
     </MainContainer>
   );
+};
+
+ClientsDetailsTabs.propTypes = {
+  unsaved: PropTypes.func.isRequired
 };
 
 export default ClientsDetailsTabs;

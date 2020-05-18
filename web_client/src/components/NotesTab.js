@@ -1,4 +1,7 @@
+/* eslint-disable no-alert */
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { Prompt } from 'react-router';
 import styled from 'styled-components';
 import classNames from 'classnames';
 import { useSelector, useDispatch } from 'react-redux';
@@ -10,7 +13,7 @@ import { addError, addSuccess } from 'redux-flash-messages';
 import Loading from './Loading';
 import { api, upsert } from '../constants';
 import { useApi } from '../actions/useApi';
-import { addCustomer } from '../actions/customers';
+import { addCustomer, setCurrent } from '../actions/customers';
 
 const ActionBoxContainer = styled.div`
   &&& {
@@ -60,7 +63,7 @@ const Note = {
   SqlReport: ''
 };
 
-const NotesTab = props => {
+const NotesTab = ({ unsaved }) => {
   const dispatch = useDispatch();
   const { current, token } = useSelector(state => ({
     current: state.customersReducer.current,
@@ -86,6 +89,16 @@ const NotesTab = props => {
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
   const filterNotes = id => notes.find(note => note.Id === id);
+
+  // @NOTE: should update doesn't do any comparison. so this returns true everytime a field is changed.
+  useEffect(() => {
+    unsaved(shouldUpdate);
+    if (shouldUpdate) {
+      window.onbeforeunload = () => 'Unsaved changes, are you sure?';
+    } else {
+      window.onbeforeunload = undefined;
+    }
+  }, [shouldUpdate]);
 
   useEffect(() => {
     if (current && notes) {
@@ -139,6 +152,7 @@ const NotesTab = props => {
   }
   return (
     <Container className="p-5" fluid>
+      <Prompt when={shouldUpdate} message="Unsaved changes, are you sure?" />
       <ActionBoxContainer>
         <FontAwesomeIcon
           onClick={handleSaveButton}
@@ -180,6 +194,10 @@ const NotesTab = props => {
       </MainItemRow>
     </Container>
   );
+};
+
+NotesTab.propTypes = {
+  unsaved: PropTypes.func.isRequired
 };
 
 export default NotesTab;

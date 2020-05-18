@@ -1,6 +1,7 @@
+/* eslint-disable no-alert */
 /* eslint-disable no-plusplus */
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useSelector, useDispatch } from 'react-redux';
 import { Container } from 'react-bootstrap';
@@ -119,10 +120,13 @@ const PLHead = styled.tr`
 
 // @TODO: memo this might be useless.
 const renderItems = React.memo(({ data, index }) => {
-  const { companies, dispatch, currentId } = data;
+  const { companies, dispatch, currentId, prevent, setUnsaved } = data;
   const company = companies[index];
   const HandleItemClick = () => {
-    dispatch(setCurrent(company));
+    if (!prevent || window.confirm('Unsaved changes, are you sure?')) {
+      setUnsaved(false);
+      dispatch(setCurrent(company));
+    }
   };
   return (
     <RowItem
@@ -152,6 +156,7 @@ const checkBreakpoint = () => {
 const ClientsDetailsTable = ({ items }) => {
   const dispatch = useDispatch();
   const current = useSelector(state => state.customersReducer.current);
+  const [unsaved, setUnsaved] = useState(false);
   /* if (items.length === 0) {
     return <span>Nothing to see here.</span>;
   } */
@@ -180,6 +185,8 @@ const ClientsDetailsTable = ({ items }) => {
               itemData={{
                 companies: items,
                 dispatch,
+                prevent: unsaved,
+                setUnsaved,
                 currentId: current ? current.Id : -1
               }}
               itemCount={items.length}
@@ -188,7 +195,7 @@ const ClientsDetailsTable = ({ items }) => {
           )}
         </AutoSizer>
       </MainTableContainer>
-      <ClientsDetailsTabs />
+      <ClientsDetailsTabs unsaved={prevent => setUnsaved(prevent)} />
     </VHContainer>
   );
 };

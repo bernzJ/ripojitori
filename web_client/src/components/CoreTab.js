@@ -1,4 +1,7 @@
+/* eslint-disable no-alert */
 import React, { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Prompt } from 'react-router';
 import axios from 'axios';
 import styled from 'styled-components';
 import classNames from 'classnames';
@@ -96,7 +99,7 @@ const buildSelectDefaultValues = (
 const buildStatesByCID = (s, cid) =>
   !cid ? s : s.filter(_s => _s.CountryId === cid || _s.CountryId === 0);
 
-const CoreTab = props => {
+const CoreTab = ({ unsaved }) => {
   const { current, token } = useSelector(state => ({
     current: state.customersReducer.current,
     token: state.authReducer.user.token
@@ -133,6 +136,16 @@ const CoreTab = props => {
     statesDefaultValues,
     shouldUpdate
   } = state;
+
+  // @NOTE: should update doesn't do any comparison. so this returns true everytime a field is changed.
+  useEffect(() => {
+    unsaved(shouldUpdate);
+    if (shouldUpdate) {
+      window.onbeforeunload = () => 'Unsaved changes, are you sure?';
+    } else {
+      window.onbeforeunload = undefined;
+    }
+  }, [shouldUpdate]);
 
   const fetchIndustries = async () => {
     try {
@@ -204,7 +217,6 @@ const CoreTab = props => {
         if (!didCancel) {
           setState({
             ...state,
-            data: current || customer,
             industriesDefaultValues: dv,
             timezonesDefaultValues: buildSelectDefaultValues(timezones, {
               value: 'Id',
@@ -444,10 +456,16 @@ const CoreTab = props => {
   };
   return (
     <Container className="p-5" fluid>
+      <Prompt when={shouldUpdate} message="Unsaved changes, are you sure?" />
       <ActionBoxContainer>
         <FontAwesomeIcon
           onClick={() => {
-            dispatch(setCurrent());
+            if (
+              !shouldUpdate ||
+              window.confirm('Unsaved changes, are you sure?')
+            ) {
+              dispatch(setCurrent({}));
+            }
           }}
           className="mr-3"
           color="#c3c3c3"
@@ -802,6 +820,10 @@ const CoreTab = props => {
       </MainItemRow>
     </Container>
   );
+};
+
+CoreTab.propTypes = {
+  unsaved: PropTypes.func.isRequired
 };
 
 export default CoreTab;

@@ -28,6 +28,7 @@ const financialRoutes = require("./routes/financial");
 const hrRoutes = require("./routes/hr");
 const employeegroupsRoutes = require("./routes/employeegroups");
 const notes = require("./routes/notes");
+const dashboardstats = require('./routes/dashboardstats');
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -77,6 +78,7 @@ app.use("/", hrRoutes);
 app.use("/", employeegroupsRoutes);
 app.use("/", oms);
 app.use("/", notes);
+app.use("/", dashboardstats);
 
 // app.use("/static", express.static(__dirname + "/static"));
 

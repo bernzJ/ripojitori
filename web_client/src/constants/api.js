@@ -38,6 +38,9 @@ const api = {
   notes: {
     get: `${endpoints.DEV}/notes`,
     create: `${endpoints.DEV}/notes/create`
+  },
+  dashboardstats: {
+    get: `${endpoints.DEV}/dashboardstats`
   }
 };
 
