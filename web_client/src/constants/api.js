@@ -40,7 +40,8 @@ const api = {
     create: `${endpoints.DEV}/notes/create`
   },
   dashboardstats: {
-    get: `${endpoints.DEV}/dashboardstats`
+    stats: `${endpoints.DEV}/dashboard/stats`,
+    markers: `${endpoints.DEV}/dashboard/markers`
   }
 };
 

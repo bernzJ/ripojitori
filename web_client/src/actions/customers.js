@@ -15,4 +15,9 @@ const setCurrent = payload => ({
   payload
 });
 
-export { addCustomer, setCustomers, setCurrent };
+const setCurrentById = payload => ({
+  type: TYPES.SET_CURRENT_BY_ID,
+  payload
+});
+
+export { addCustomer, setCustomers, setCurrent, setCurrentById };

@@ -153,7 +153,7 @@ const checkBreakpoint = () => {
   return width <= 1100 ? 1028 : 63;
 };
 
-const ClientsDetailsTable = ({ items }) => {
+const ClientsDetailsTable = ({ items, mapId }) => {
   const dispatch = useDispatch();
   const current = useSelector(state => state.customersReducer.current);
   const [unsaved, setUnsaved] = useState(false);
@@ -195,7 +195,10 @@ const ClientsDetailsTable = ({ items }) => {
           )}
         </AutoSizer>
       </MainTableContainer>
-      <ClientsDetailsTabs unsaved={prevent => setUnsaved(prevent)} />
+      <ClientsDetailsTabs
+        unsaved={prevent => setUnsaved(prevent)}
+        mapId={mapId}
+      />
     </VHContainer>
   );
 };

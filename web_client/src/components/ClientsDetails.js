@@ -56,7 +56,7 @@ const AutoRow = styled(Row)`
   }
 `;
 
-const ClientsDetails = props => {
+const ClientsDetails = ({ location: { Id } }) => {
   const { token, customers } = useSelector(state => ({
     token: state.authReducer.user.token,
     customers: state.customersReducer.customers
@@ -135,7 +135,7 @@ const ClientsDetails = props => {
         </FormContainer>
       </Row>
       <AutoRow className="px-5">
-        <ClientsDetailsTable items={items} />
+        <ClientsDetailsTable items={items} mapId={Id} />
       </AutoRow>
     </MainContainer>
   );

@@ -14,9 +14,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSave, faPlus } from '@fortawesome/free-solid-svg-icons';
 import Joi from '@hapi/joi';
 import { addError, addSuccess } from 'redux-flash-messages';
+import L from 'leaflet';
 
 import { customer, api } from '../constants';
-import { setCurrent, addCustomer } from '../actions/customers';
+import { setCurrent, addCustomer, setCurrentById } from '../actions/customers';
 
 const Daty = styled(DatePicker)`
   &&& {
@@ -99,7 +100,7 @@ const buildSelectDefaultValues = (
 const buildStatesByCID = (s, cid) =>
   !cid ? s : s.filter(_s => _s.CountryId === cid || _s.CountryId === 0);
 
-const CoreTab = ({ unsaved }) => {
+const CoreTab = ({ unsaved, mapId }) => {
   const { current, token } = useSelector(state => ({
     current: state.customersReducer.current,
     token: state.authReducer.user.token
@@ -119,13 +120,10 @@ const CoreTab = ({ unsaved }) => {
   });
 
   useEffect(() => {
-    if (current) {
-      setState({
-        ...state,
-        data: current
-      });
+    if (mapId !== undefined) {
+      dispatch(setCurrentById(mapId));
     }
-  }, [current]);
+  }, [mapId]);
 
   const {
     data,
@@ -136,6 +134,17 @@ const CoreTab = ({ unsaved }) => {
     statesDefaultValues,
     shouldUpdate
   } = state;
+
+  // @NOTE: reason for statesDefaultValues in dependencies; as its the last one set (presumably), it use the [state] object it got before.
+  // test this, if true, solution is either that or flatten state.
+  useEffect(() => {
+    if (current && data.Id !== current.Id) {
+      setState({
+        ...state,
+        data: current
+      });
+    }
+  }, [current, statesDefaultValues]);
 
   // @NOTE: should update doesn't do any comparison. so this returns true everytime a field is changed.
   useEffect(() => {
@@ -166,13 +175,29 @@ const CoreTab = ({ unsaved }) => {
       });
     }
   };
+  const calcGeo = customer => {
+    const { Address1, City, Zip } = customer;
+    const { CountryName } = data;
+    const addy = `${Address1}, ${City}${Zip ? `, ${Zip}` : ''}, ${CountryName}`;
+    const geocoder = L.Control.Geocoder.nominatim();
+    return new Promise(resolve =>
+      geocoder.geocode(addy, r =>
+        resolve(
+          r.length > 0 ? JSON.stringify(r[0].center) : '{"lat":0,"lng":0}'
+        )
+      )
+    );
+  };
   const addCustomerApi = async customer => {
     try {
+      const AddressLngLat = customer.AddressLngLat
+        ? customer.AddressLngLat
+        : await calcGeo(customer);
       const {
         data: { result, message }
       } = await axios.post(api.customers.create, {
         'x-auth-token': token,
-        customer
+        customer: { ...customer, AddressLngLat }
       });
       if (result) {
         // dispatch(setCurrent({ ...data }));
@@ -234,7 +259,7 @@ const CoreTab = ({ unsaved }) => {
               buildStatesByCID(states, current ? current.Id : null),
               {
                 value: 'Id',
-                label: 'Abbreviation'
+                label: 'Name'
               }
             )
           });
@@ -253,6 +278,10 @@ const CoreTab = ({ unsaved }) => {
     };
   }, [token]);
 
+  const formatDate = sqlDate =>
+    sqlDate && sqlDate.includes('-')
+      ? new Date(sqlDate.replace(/-/g, '/'))
+      : '';
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
 
@@ -295,6 +324,7 @@ const CoreTab = ({ unsaved }) => {
       State: Joi.number().default(71),
       LGOwner: Joi.string().max(50),
       EmployeeGroupsId: Joi.number().default(-1),
+      AddressLngLat: Joi.string().max(150),
       EmployeeGroupsName: Joi.string().max(50)
     });
 
@@ -318,6 +348,7 @@ const CoreTab = ({ unsaved }) => {
         data: 'CoreTab.js handleSaveButton companySchema.error'
       });
     } else {
+      // calc geo pos and add it
       addCustomerApi(customerSchema.value);
       // dispatch(addCustomer(customerSchema.value));
     }
@@ -698,8 +729,9 @@ const CoreTab = ({ unsaved }) => {
               </Row>
               <Row>
                 <Daty
+                  dateFormat="yyyy/MM/dd"
                   className="w-100"
-                  selected={data.FiscalYearBegin || ''}
+                  selected={formatDate(data.FiscalYearBegin)}
                   onChange={FiscalYearBegin =>
                     setDataParam({ FiscalYearBegin })
                   }
@@ -712,8 +744,9 @@ const CoreTab = ({ unsaved }) => {
               </Row>
               <Row>
                 <Daty
+                  dateFormat="yyyy/MM/dd"
                   className="w-100"
-                  selected={data.FiscalYearEnd || ''}
+                  selected={formatDate(data.FiscalYearEnd)}
                   onChange={FiscalYearEnd => setDataParam({ FiscalYearEnd })}
                 />
               </Row>
@@ -726,8 +759,9 @@ const CoreTab = ({ unsaved }) => {
           </Row>
           <Row>
             <Daty
+              dateFormat="yyyy/MM/dd"
               className="w-100"
-              selected={data.RefreshDate || ''}
+              selected={formatDate(data.RefreshDate)}
               onChange={RefreshDate => setDataParam({ RefreshDate })}
             />
           </Row>
@@ -776,8 +810,9 @@ const CoreTab = ({ unsaved }) => {
               </Row>
               <Row>
                 <Daty
+                  dateFormat="yyyy/MM/dd"
                   className="w-100"
-                  selected={data.FiscalYearMonthEndClosePeriod || ''}
+                  selected={formatDate(data.FiscalYearMonthEndClosePeriod)}
                   onChange={FiscalYearMonthEndClosePeriod =>
                     setDataParam({
                       FiscalYearMonthEndClosePeriod
@@ -792,8 +827,9 @@ const CoreTab = ({ unsaved }) => {
               </Row>
               <Row>
                 <Daty
+                  dateFormat="yyyy/MM/dd"
                   className="w-100"
-                  selected={data.FiscalYearQuarterlyCloseCycle || ''}
+                  selected={formatDate(data.FiscalYearQuarterlyCloseCycle)}
                   onChange={FiscalYearQuarterlyCloseCycle =>
                     setDataParam({
                       FiscalYearQuarterlyCloseCycle

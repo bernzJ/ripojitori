@@ -68,6 +68,9 @@ router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next)
       Country: Joi.number().default(1),
       State: Joi.number().default(71),
       LGOwner: Joi.string().max(50),
+      AddressLngLat: Joi.string()
+        .max(150)
+        .required(),
       EmployeeGroupsId: Joi.number().default(-1),
       EmployeeGroupsName: Joi.string().max(50)
     });
@@ -80,10 +83,10 @@ router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next)
     ps.input('Industry', sql.Int);
     ps.input('Timezone', sql.Int);
     ps.input('FiscalYearId', sql.Int);
-    ps.input('FiscalYearBegin', sql.DateTime);
-    ps.input('FiscalYearEnd', sql.DateTime);
-    ps.input('FiscalYearMonthEndClosePeriod', sql.DateTime);
-    ps.input('FiscalYearQuarterlyCloseCycle', sql.DateTime);
+    ps.input('FiscalYearBegin', sql.Date);
+    ps.input('FiscalYearEnd', sql.Date);
+    ps.input('FiscalYearMonthEndClosePeriod', sql.Date);
+    ps.input('FiscalYearQuarterlyCloseCycle', sql.Date);
     ps.input('EmployeesCount', sql.Int);
     ps.input('OMS', sql.Int);
     ps.input('ActiveProjects', sql.Bit);
@@ -104,8 +107,9 @@ router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next)
     ps.input('LGOwner', sql.NVarChar(50));
     ps.input('EmployeeGroupsId', sql.Int);
     ps.input('EmployeeGroupsName', sql.NVarChar(50));
+    ps.input('AddressLngLat', sql.NVarChar(150));
 
-    await ps.prepare(`EXEC [dbo].[update_customer] @Id, @Name, @Website, @Industry, @Timezone, @FiscalYearId, @FiscalYearBegin, @FiscalYearEnd, @FiscalYearMonthEndClosePeriod, @FiscalYearQuarterlyCloseCycle, @EmployeesCount, @OMS, @ActiveProjects, @FinancialId, @FinancialPlatform, @HRId, @HRSystem, @SSO, @TestSite, @RefreshDate, @Logo, @Address1, @Address2, @City, @Zip, @Country, @State, @LGOwner, @EmployeeGroupsId, @EmployeeGroupsName`);
+    await ps.prepare(`EXEC [dbo].[update_customer] @Id, @Name, @Website, @Industry, @Timezone, @FiscalYearId, @FiscalYearBegin, @FiscalYearEnd, @FiscalYearMonthEndClosePeriod, @FiscalYearQuarterlyCloseCycle, @EmployeesCount, @OMS, @ActiveProjects, @FinancialId, @FinancialPlatform, @HRId, @HRSystem, @SSO, @TestSite, @RefreshDate, @Logo, @Address1, @Address2, @City, @Zip, @Country, @State, @LGOwner, @EmployeeGroupsId, @EmployeeGroupsName, @AddressLngLat`);
     await ps.execute(customerSchema);
     await ps.unprepare();
 

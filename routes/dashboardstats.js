@@ -16,7 +16,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router.post("/dashboardstats", requireJwtAuth, requireScope, async (req, res, next) => {
+router.post("/dashboard/stats", requireJwtAuth, requireScope, async (req, res, next) => {
   try {
     //SELECT _id, projectResource, clientName, segment, category, status, hours, start, "end"${req.user.scope === scopes.ADMIN ? ", scope" : ""} FROM companies FOR JSON AUTO;
     const result = await new sql.Request().query(`SELECT * FROM [dbo].[dashboard_stats] FOR JSON AUTO;`);
@@ -27,5 +27,18 @@ router.post("/dashboardstats", requireJwtAuth, requireScope, async (req, res, ne
     res.status(500).send({ message });;
   }
 });
+
+router.post("/dashboard/markers", requireJwtAuth, requireScope, async (req, res, next) => {
+  try {
+    //SELECT _id, projectResource, clientName, segment, category, status, hours, start, "end"${req.user.scope === scopes.ADMIN ? ", scope" : ""} FROM companies FOR JSON AUTO;
+    const result = await new sql.Request().query(`SELECT * FROM [dbo].[dashboard_markers] FOR JSON AUTO;`);
+    res.send({
+      dashboardmarkers: result.recordset[0]
+    });
+  } catch ({ message }) {
+    res.status(500).send({ message });;
+  }
+});
+
 
 module.exports = router;

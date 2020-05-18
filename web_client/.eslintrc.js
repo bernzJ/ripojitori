@@ -7,7 +7,7 @@ module.exports = {
     "allowImportExportEverywhere": false,
     "codeFrame": false
   },
-  plugins: ['import', 'promise', 'compat', 'react'],
+  plugins: ['import', 'promise', 'react'],
   "extends": ["airbnb", 'plugin:prettier/recommended', "prettier/react"],
   "env": {
     "browser": true,
@@ -15,7 +15,6 @@ module.exports = {
   },
   "rules": {
     "arrow-parens": "off",
-    "compat/compat": "error",
     "consistent-return": "off",
     "comma-dangle": "off",
     "generator-star-spacing": "off",

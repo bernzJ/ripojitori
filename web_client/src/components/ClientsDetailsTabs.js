@@ -39,12 +39,12 @@ const MainTab = styled(Tabs)`
   }
 `;
 // @TODO: implement this differently so all apis arent called at the same time.
-const ClientsDetailsTabs = ({ unsaved }) => {
+const ClientsDetailsTabs = ({ unsaved, mapId }) => {
   return (
     <MainContainer fluid>
       <MainTab id="Extra" defaultActiveKey="1">
         <Tab eventKey="1" title="Company">
-          <CoreTab unsaved={unsaved} />
+          <CoreTab unsaved={unsaved} mapId={mapId} />
         </Tab>
         <Tab eventKey="2" title="Products">
           2

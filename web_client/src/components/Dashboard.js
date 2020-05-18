@@ -161,20 +161,39 @@ const StatsLabelBot = styled.label`
 const Dashboard = props => {
   const token = useSelector(state => state.authReducer.user.token);
   const [state, setState] = useState({
-    TotalActiveProjects: 0,
-    TotalActiveClients: 0,
-    TotalClients: 0
+    markers: [],
+    stats: null
   });
-  const [{ data, isLoading, isError }] = useApi(api.dashboardstats.get, {
-    'x-auth-token': token
-  });
+  const [{ data, isLoading, isError }, doFetch] = useApi(
+    api.dashboardstats.stats,
+    {
+      'x-auth-token': token
+    }
+  );
+
   useEffect(() => {
-    if (!isLoading && !isError && data.dashboardstats) {
-      setState({ ...state, ...data.dashboardstats[0] });
+    if (state.stats) {
+      doFetch({
+        initialUrl: api.dashboardstats.markers,
+        body: {
+          'x-auth-token': token
+        }
+      });
+    }
+  }, [state.stats]);
+
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      if (data.dashboardstats) {
+        setState({ ...state, stats: data.dashboardstats[0] });
+      }
+      if (data.dashboardmarkers) {
+        setState({ ...state, markers: data.dashboardmarkers });
+      }
     }
   }, [data, isLoading, isError]);
 
-  if (isLoading) {
+  if (isLoading || state.stats == null) {
     return (
       <Container>
         <Row className="p-5 justify-content-center">
@@ -186,12 +205,73 @@ const Dashboard = props => {
       </Container>
     );
   }
+
+  const { TotalClients, TotalActiveClients, TotalActiveProjects } = state.stats;
+
+  const renderMarkers = () => {
+    return state.markers.map(marker => {
+      const {
+        Id,
+        Name,
+        ActiveProjects,
+        OMSType,
+        Address1,
+        AddressLngLat
+      } = marker;
+      const { lng, lat } = JSON.parse(AddressLngLat);
+
+      return (
+        <Marker key={Id} icon={dotIcon} position={[lat, lng]}>
+          <Poppy>
+            <Container fluid>
+              <PopupHeader>
+                <TitleLabel>{Name}</TitleLabel>
+              </PopupHeader>
+              <Row>
+                <Col lg="5">
+                  <PopupLabel>Address</PopupLabel>
+                </Col>
+                <Col lg="7">
+                  <PopupField>{Address1}</PopupField>
+                </Col>
+              </Row>
+              <Row>
+                <Col lg="5">
+                  <PopupLabel>Active</PopupLabel>
+                </Col>
+                <Col lg="7">
+                  <PopupField>{ActiveProjects ? 'Yes' : 'No'}</PopupField>
+                </Col>
+              </Row>
+              <Row>
+                <Col lg="5">
+                  <PopupLabel>Oms type</PopupLabel>
+                </Col>
+                <Col lg="7">
+                  <PopupField>{OMSType}</PopupField>
+                </Col>
+              </Row>
+              <PopupFooter>
+                <Col>
+                  <ButtonAction to={{ pathname: routes.CLIENTS, Id }}>
+                    See Details <FontAwesomeIcon icon={faArrowRight} />
+                  </ButtonAction>
+                </Col>
+              </PopupFooter>
+            </Container>
+          </Poppy>
+        </Marker>
+      );
+    });
+  };
+
+  // geocoder.geocode();
   return (
     <Container fluid>
       <StatsBoxContainer>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>{state.TotalClients}</StatsLabelTop>
+            <StatsLabelTop>{TotalClients || 0}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total clients</StatsLabelBot>
@@ -199,7 +279,7 @@ const Dashboard = props => {
         </Stats>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>{state.TotalActiveClients}</StatsLabelTop>
+            <StatsLabelTop>{TotalActiveClients || 0}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total active clients</StatsLabelBot>
@@ -207,7 +287,7 @@ const Dashboard = props => {
         </Stats>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>{state.TotalActiveProjects}</StatsLabelTop>
+            <StatsLabelTop>{TotalActiveProjects || 0}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total active projects</StatsLabelBot>
@@ -225,86 +305,7 @@ const Dashboard = props => {
             attribution='&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors'
             url="https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png"
           />
-          <Marker icon={dotIcon} position={[51.505, -0.09]}>
-            <Poppy>
-              <Container fluid>
-                <PopupHeader>
-                  <TitleLabel>Snap, Inc.</TitleLabel>
-                </PopupHeader>
-                <Row>
-                  <Col lg="5">
-                    <PopupLabel>Address</PopupLabel>
-                  </Col>
-                  <Col lg="7">
-                    <PopupField>5550 Newbury Street</PopupField>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg="5">
-                    <PopupLabel>Active</PopupLabel>
-                  </Col>
-                  <Col lg="7">
-                    <PopupField>Yes</PopupField>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg="5">
-                    <PopupLabel>Oms type</PopupLabel>
-                  </Col>
-                  <Col lg="7">
-                    <PopupField>None</PopupField>
-                  </Col>
-                </Row>
-                <PopupFooter>
-                  <Col>
-                    <ButtonAction to={routes.CLIENTS}>
-                      See Details <FontAwesomeIcon icon={faArrowRight} />
-                    </ButtonAction>
-                  </Col>
-                </PopupFooter>
-              </Container>
-            </Poppy>
-          </Marker>
-          <Marker icon={dotIcon} position={[45.505, -0.09]}>
-            <Poppy>
-              <Container fluid>
-                <PopupHeader>
-                  <TitleLabel>Ecosystem Investment Partners (EIP)</TitleLabel>
-                </PopupHeader>
-                <Row>
-                  <Col lg="5">
-                    <PopupLabel>Address</PopupLabel>
-                  </Col>
-                  <Col lg="7">
-                    <PopupField>5550 Newbury Street</PopupField>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg="5">
-                    <PopupLabel>Active</PopupLabel>
-                  </Col>
-                  <Col lg="7">
-                    <PopupField>Yes</PopupField>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg="5">
-                    <PopupLabel>Oms type</PopupLabel>
-                  </Col>
-                  <Col lg="7">
-                    <PopupField>Project</PopupField>
-                  </Col>
-                </Row>
-                <PopupFooter>
-                  <Col>
-                    <ButtonAction to={routes.CLIENTS}>
-                      See Details <FontAwesomeIcon icon={faArrowRight} />
-                    </ButtonAction>
-                  </Col>
-                </PopupFooter>
-              </Container>
-            </Poppy>
-          </Marker>
+          {renderMarkers()}
         </Mappy>
       </Row>
     </Container>
