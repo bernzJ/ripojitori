@@ -206,7 +206,7 @@ const Dashboard = props => {
     );
   }
 
-  const { TotalClients, TotalActiveClients, TotalActiveProjects } = state.stats;
+  const { TotalClients, TotalUsers, TotalActiveProjects } = state.stats;
 
   const renderMarkers = () => {
     return state.markers.map(marker => {
@@ -279,18 +279,18 @@ const Dashboard = props => {
         </Stats>
         <Stats>
           <Col lg="12">
-            <StatsLabelTop>{TotalActiveClients || 0}</StatsLabelTop>
-          </Col>
-          <Col lg="12">
-            <StatsLabelBot>Total active clients</StatsLabelBot>
-          </Col>
-        </Stats>
-        <Stats>
-          <Col lg="12">
             <StatsLabelTop>{TotalActiveProjects || 0}</StatsLabelTop>
           </Col>
           <Col lg="12">
             <StatsLabelBot>Total active projects</StatsLabelBot>
+          </Col>
+        </Stats>
+        <Stats>
+          <Col lg="12">
+            <StatsLabelTop>{TotalUsers || 0}</StatsLabelTop>
+          </Col>
+          <Col lg="12">
+            <StatsLabelBot>Total active users</StatsLabelBot>
           </Col>
         </Stats>
       </StatsBoxContainer>

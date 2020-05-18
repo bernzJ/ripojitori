@@ -98,7 +98,7 @@ const buildSelectDefaultValues = (
 };
 
 const buildStatesByCID = (s, cid) =>
-  !cid ? s : s.filter(_s => _s.CountryId === cid || _s.CountryId === 0);
+  !cid ? s : s.filter(_s => _s.CountryId === cid);
 
 const CoreTab = ({ unsaved, mapId }) => {
   const { current, token } = useSelector(state => ({
@@ -116,7 +116,8 @@ const CoreTab = ({ unsaved, mapId }) => {
     timezonesDefaultValues: [],
     countriesDefaultValues: [],
     OMSDefaultValues: [],
-    statesDefaultValues: []
+    statesDefaultValues: [],
+    states: []
   });
 
   useEffect(() => {
@@ -176,9 +177,9 @@ const CoreTab = ({ unsaved, mapId }) => {
     }
   };
   const calcGeo = customer => {
-    const { Address1, City, Zip } = customer;
-    const { CountryName } = data;
-    const addy = `${Address1}, ${City}${Zip ? `, ${Zip}` : ''}, ${CountryName}`;
+    const { City } = customer;
+    const { CountryName, StateName } = data;
+    const addy = `${City}${StateName ? `, ${StateName}` : ''}, ${CountryName}`;
     const geocoder = L.Control.Geocoder.nominatim();
     return new Promise(resolve =>
       geocoder.geocode(addy, r =>
@@ -242,6 +243,7 @@ const CoreTab = ({ unsaved, mapId }) => {
         if (!didCancel) {
           setState({
             ...state,
+            states,
             industriesDefaultValues: dv,
             timezonesDefaultValues: buildSelectDefaultValues(timezones, {
               value: 'Id',
@@ -255,13 +257,10 @@ const CoreTab = ({ unsaved, mapId }) => {
               value: 'Id',
               label: 'Type'
             }),
-            statesDefaultValues: buildSelectDefaultValues(
-              buildStatesByCID(states, current ? current.Id : null),
-              {
-                value: 'Id',
-                label: 'Name'
-              }
-            )
+            statesDefaultValues: buildSelectDefaultValues(states, {
+              value: 'Id',
+              label: 'Name'
+            })
           });
         }
       } catch ({ message, response }) {
@@ -277,6 +276,18 @@ const CoreTab = ({ unsaved, mapId }) => {
       didCancel = true;
     };
   }, [token]);
+
+  useEffect(() => {
+    if (data.CountryId > 0) {
+      setState({
+        ...state,
+        statesDefaultValues: buildSelectDefaultValues(
+          buildStatesByCID(state.states, data.CountryId),
+          { value: 'Id', label: 'Name' }
+        )
+      });
+    }
+  }, [data.CountryId]);
 
   const formatDate = sqlDate =>
     sqlDate && sqlDate.includes('-')

@@ -13,7 +13,7 @@ import { addError, addSuccess } from 'redux-flash-messages';
 import Loading from './Loading';
 import { api, upsert } from '../constants';
 import { useApi } from '../actions/useApi';
-import { addCustomer, setCurrent } from '../actions/customers';
+import { addCustomer } from '../actions/customers';
 
 const ActionBoxContainer = styled.div`
   &&& {
