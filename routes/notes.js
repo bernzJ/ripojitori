@@ -20,7 +20,7 @@ router.post("/notes", requireJwtAuth, requireScope, async (req, res, next) => {
       notes: recordset[0]
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 
@@ -48,7 +48,7 @@ router.post("/notes/create", requireJwtAuth, requireScope, async (req, res, next
     await ps.execute(notesSchema);
     res.send({ result: 'saved !' });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

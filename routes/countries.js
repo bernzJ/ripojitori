@@ -24,7 +24,7 @@ router.post("/countries", requireJwtAuth, requireScope, async (req, res, next) =
       countries: result.recordset[0]
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

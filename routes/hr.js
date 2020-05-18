@@ -34,7 +34,7 @@ router.post("/HR/create", requireJwtAuth, requireScope, ((req, res, next) => req
     await ps.unprepare();
     res.send(recordset[0]);
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

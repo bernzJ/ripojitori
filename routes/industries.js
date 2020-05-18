@@ -24,7 +24,7 @@ router.post("/industries", requireJwtAuth, requireScope, async (req, res, next) 
       industries: result.recordset[0]
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 
@@ -53,7 +53,7 @@ router.post("/industries/create", requireJwtAuth, requireScope, ((req, res, next
       result: "Saved"
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

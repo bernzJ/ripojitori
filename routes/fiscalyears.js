@@ -40,7 +40,7 @@ router.post("/fiscalyears/create", requireJwtAuth, requireScope, ((req, res, nex
     await ps.unprepare();
     res.send(recordset[0]);
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

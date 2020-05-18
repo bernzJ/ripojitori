@@ -34,7 +34,7 @@ router.post("/employeegroups/create", requireJwtAuth, requireScope, ((req, res, 
     await ps.unprepare();
     res.send(recordset[0]);
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

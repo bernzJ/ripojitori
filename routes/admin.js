@@ -21,7 +21,7 @@ router.post("/admin/users", requireJwtAuth, requireScope, async (req, res, next)
       users: result.recordset[0]
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 
@@ -75,7 +75,7 @@ router.post("/admin/users/create", requireJwtAuth, requireScope, async (req, res
       result: "Saved"
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 
@@ -101,7 +101,7 @@ router.post("/admin/users/del", requireJwtAuth, requireScope, async (req, res, n
       result
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

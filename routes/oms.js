@@ -21,7 +21,7 @@ router.post("/OMS", requireJwtAuth, requireScope, async (req, res, next) => {
       oms: result.recordset[0]
     });
   } catch ({ message }) {
-    res.status(500).send({ message });;
+    res.status(500).send({ message });
   }
 });
 

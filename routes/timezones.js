@@ -24,7 +24,7 @@ router.post("/timezones", requireJwtAuth, requireScope, async (req, res) => {
       timezones: result.recordset[0]
     });
   } catch ({ message }) {
-    res.send({ message })
+    res.status(500).send({ message });
   }
 });
 module.exports = router;
