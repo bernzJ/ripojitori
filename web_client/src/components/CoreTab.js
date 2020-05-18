@@ -290,9 +290,9 @@ const CoreTab = ({ unsaved, mapId }) => {
   }, [data.CountryId]);
 
   const formatDate = sqlDate =>
-    sqlDate && sqlDate.includes('-')
+    typeof sqlDate === 'string'
       ? new Date(sqlDate.replace(/-/g, '/'))
-      : '';
+      : sqlDate;
   const setDataParam = kv =>
     setState({ ...state, shouldUpdate: true, data: { ...data, ...kv } });
 
