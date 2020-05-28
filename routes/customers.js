@@ -56,7 +56,7 @@ router.post("/customers/create", requireJwtAuth, requireScope, ((req, res, next)
       SSO: Joi.boolean().default(false),
       TestSite: Joi.boolean().default(false),
       RefreshDate: Joi.date(),
-      Logo: Joi.any().default(''),
+      Logo: Joi.any(),
       Address1: Joi.string()
         .max(255)
         .required(),

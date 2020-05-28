@@ -6,4 +6,20 @@ const upsert = (array, item, key = 'Id') => {
   return [...array, item];
 };
 
-export { upsert };
+const buildSelectDefaultValues = (
+  values,
+  select = { value: 'Name', label: 'Name' }
+) => {
+  if (!values) {
+    return [];
+  }
+  return values.reduce((acc, cur) => {
+    acc.push({
+      value: cur[select.value],
+      label: cur[select.label]
+    });
+    return acc;
+  }, []);
+};
+
+export { upsert, buildSelectDefaultValues };

@@ -42,6 +42,10 @@ const api = {
   dashboardstats: {
     stats: `${endpoints.DEV}/dashboard/stats`,
     markers: `${endpoints.DEV}/dashboard/markers`
+  },
+  products: {
+    get: `${endpoints.DEV}/products`,
+    create: `${endpoints.DEV}/products/create`
   }
 };
 

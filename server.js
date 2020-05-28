@@ -29,6 +29,7 @@ const hrRoutes = require("./routes/hr");
 const employeegroupsRoutes = require("./routes/employeegroups");
 const notes = require("./routes/notes");
 const dashboardstats = require('./routes/dashboardstats');
+const products = require("./routes/products");
 
 // Bodyparser Middleware
 app.use(express.json());
@@ -79,6 +80,7 @@ app.use("/", employeegroupsRoutes);
 app.use("/", oms);
 app.use("/", notes);
 app.use("/", dashboardstats);
+app.use("/", products);
 
 // app.use("/static", express.static(__dirname + "/static"));
 

@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Container, Tab, Tabs } from 'react-bootstrap';
 
 import CoreTab from './CoreTab';
 import NotesTab from './NotesTab';
+import ProductsTab from './ProductTab';
 
 const MainContainer = styled(Container)`
   &&& {
@@ -40,14 +41,16 @@ const MainTab = styled(Tabs)`
 `;
 // @TODO: implement this differently so all apis arent called at the same time.
 const ClientsDetailsTabs = ({ unsaved, mapId }) => {
+  const [key, setKey] = useState('1');
+
   return (
     <MainContainer fluid>
-      <MainTab id="Extra" defaultActiveKey="1">
+      <MainTab id="Extra" activeKey={key} onSelect={k => setKey(k)}>
         <Tab eventKey="1" title="Company">
           <CoreTab unsaved={unsaved} mapId={mapId} />
         </Tab>
         <Tab eventKey="2" title="Products">
-          2
+          {key === '2' ? <ProductsTab unsaved={unsaved} /> : null}
         </Tab>
         <Tab eventKey="4" title="TMCs">
           4
